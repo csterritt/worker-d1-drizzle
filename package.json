@@ -1,0 +1,21 @@
+{
+	"name": "worker-d1-drizzle",
+	"scripts": {
+		"dev": "./run-dev.sh",
+		"build": "wrangler build",
+		"deploy": "wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+	},
+	"dependencies": {
+		"@tailwindcss/cli": "^4.1.8",
+		"hono": "^4.7.10",
+		"tailwindcss": "^4.1.8",
+		"true-myth": "^9.0.1",
+		"valibot": "^1.1.0"
+	},
+	"devDependencies": {
+		"concurrently": "^9.1.2",
+		"prettier": "^3.5.3",
+		"wrangler": "^4.17.0"
+	}
+}
