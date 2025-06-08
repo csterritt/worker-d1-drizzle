@@ -13,7 +13,7 @@ import { useLayout } from './buildLayout'
 const renderRoot = (c: Context) => {
   return (
     <div data-testid='startup-page-banner'>
-      <h3 id='heading'>Mini Auth Project</h3>
+      <h3 id='heading'>Worker, D1, Drizzle Project</h3>
       <p>
         <a href={PATHS.HOME}>Home</a>
       </p>

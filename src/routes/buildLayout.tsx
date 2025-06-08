@@ -51,7 +51,7 @@ export function useLayout(c: Context, children: any) {
   return (
     <main class='font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3'>
       <header>
-        <h3>CF Mini Auth Demo</h3>
+        <h3>CF Worker, D1, Drizzle Demo</h3>
       </header>
 
       {message && (
