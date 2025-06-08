@@ -7,6 +7,7 @@
 	"name": "worker-d1-drizzle",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-05-23",
+	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./public"
@@ -18,11 +19,12 @@
 		"port": 3000
 	},
 	"vars": {
-		"Session": ""
+		"Session": "",
+		"db": ""
 	},
 	"d1_databases": [
 		{
-			"binding": "DB",
+			"binding": "PROJECT_DB",
 			"database_name": "worker-d1-drizzle-db",
 			"database_id": "5faeaa9c-02fe-4102-bdc1-aee545d6a0fe"
 		}

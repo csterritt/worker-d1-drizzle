@@ -7,6 +7,8 @@ import { Hono } from 'hono'
 import { PATHS } from '../constants'
 import { redirectWithMessage, redirectWithError } from '../lib/redirects'
 import { IncrementSchema, validateRequest } from '../lib/validators'
+import { eq, sql } from 'drizzle-orm'
+import * as schema from '../db/schema'
 
 /**
  * Attach the increment POST route to the app.
@@ -28,14 +30,18 @@ export const handleIncrement = (
     }
 
     try {
-      const results = await c.env.DB.prepare(
-        'UPDATE count SET count = count + 1 WHERE id = ? returning count'
-      )
-        .bind('foo')
-        .first()
-
-      if (results == null || results.count == null) {
-        console.log(`did bad increment: ${results}`)
+      // Get DB client from context
+      const db = c.get('db')
+      
+      // Update using Drizzle ORM
+      const result = await db.update(schema.count)
+        .set({ count: sql`${schema.count.count} + 1` })
+        .where(eq(schema.count.id, 'foo'))
+        .returning({ count: schema.count.count })
+        .get()
+      
+      if (result == null || result.count == null) {
+        console.log(`did bad increment: ${result}`)
         return redirectWithError(c, PATHS.COUNT, 'Unable to increment')
       }
     } catch (e: any) {
@@ -43,7 +49,7 @@ export const handleIncrement = (
       return redirectWithError(
         c,
         PATHS.COUNT,
-        e.ToString() || 'Unable to increment'
+        e.toString() || 'Unable to increment'
       )
     }
 
