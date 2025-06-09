@@ -9,6 +9,7 @@ import { redirectWithMessage, redirectWithError } from '../lib/redirects'
 import { IncrementSchema, validateRequest } from '../lib/validators'
 import { eq, sql } from 'drizzle-orm'
 import * as schema from '../db/schema'
+import { incrementCountById } from '../lib/db-access'
 
 /**
  * Attach the increment POST route to the app.
@@ -30,17 +31,11 @@ export const handleIncrement = (
     }
 
     try {
-      // Get DB client from context
-      const db = c.get('db')
-      
-      // Update using Drizzle ORM
-      const result = await db.update(schema.count)
-        .set({ count: sql`${schema.count.count} + 1` })
-        .where(eq(schema.count.id, 'foo'))
-        .returning({ count: schema.count.count })
-        .get()
-      
-      if (result == null || result.count == null) {
+      const db = c.env.PROJECT_DB
+
+      const result = await incrementCountById(db, 'foo')
+
+      if (result.isErr || result.value.isNothing || result.value.value !== 1) {
         console.log(`did bad increment: ${result}`)
         return redirectWithError(c, PATHS.COUNT, 'Unable to increment')
       }

@@ -8,8 +8,7 @@ import { PATHS } from '../constants'
 import { useLayout } from './buildLayout'
 import { Maybe } from 'true-myth'
 import { isJust } from 'true-myth/maybe'
-import { eq } from 'drizzle-orm'
-import * as schema from '../db/schema'
+import { findCountById, incrementCountById } from '../lib/db-access'
 
 /**
  * Render the JSX for the count page.
@@ -48,17 +47,14 @@ export const buildCount = (
   app.get(PATHS.COUNT, async (c) => {
     let maybeCount: Maybe<any>
     try {
-      // Get DB client from context
-      const db = c.get('db')
-      
-      // Query using Drizzle ORM
-      const results = await db.select({ count: schema.count.count })
-        .from(schema.count)
-        .where(eq(schema.count.id, 'foo'))
-        .get()
+      // Pass the raw D1Database instance directly from env
+      const db = c.env.PROJECT_DB
 
-      if (results && results.count != null) {
-        maybeCount = Maybe.of(results.count)
+      // Query using Drizzle ORM
+      const results = await findCountById(db, 'foo')
+
+      if (results.isOk) {
+        maybeCount = results.value
       } else {
         console.log(`got bad count: ${results}`)
         maybeCount = Maybe.nothing()
