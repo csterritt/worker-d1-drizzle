@@ -5,19 +5,16 @@
 import { Hono } from 'hono'
 
 import { PATHS } from '../constants'
+import { Bindings } from '../local-types'
 import { redirectWithMessage, redirectWithError } from '../lib/redirects'
 import { IncrementSchema, validateRequest } from '../lib/validators'
-import { eq, sql } from 'drizzle-orm'
-import * as schema from '../db/schema'
 import { incrementCountById } from '../lib/db-access'
 
 /**
  * Attach the increment POST route to the app.
  * @param app - Hono app instance
  */
-export const handleIncrement = (
-  app: Hono<{ Bindings: CloudflareBindings }>
-): void => {
+export const handleIncrement = (app: Hono<{ Bindings: Bindings }>): void => {
   app.post(PATHS.INCREMENT, async (c) => {
     // Validate the request using Valibot schema
     const formData = await c.req.parseBody()

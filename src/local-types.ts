@@ -6,9 +6,14 @@ export type SignInSession = {
   userId: string
   signedIn: boolean
   attemptCount: number
-  createdAt: Date
-  updatedAt: Date
-  expiresAt: Date
+  createdAt: number
+  updatedAt: number
+  expiresAt: number
+}
+
+export type Bindings = {
+  PROJECT_DB: D1Database
+  Session: Maybe<SignInSession>
 }
 
 export class CountAndDecrement {

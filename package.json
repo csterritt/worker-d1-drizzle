@@ -4,7 +4,7 @@
 		"dev": "./run-dev.sh",
 		"build": "wrangler build",
 		"deploy": "wrangler deploy --minify",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+		"cf-typegen": "wrangler types --env-interface Bindings"
 	},
 	"dependencies": {
 		"@tailwindcss/cli": "^4.1.8",

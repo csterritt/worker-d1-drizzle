@@ -5,7 +5,7 @@
 import { Context } from 'hono'
 import { getCookie, deleteCookie } from 'hono/cookie'
 
-import { COOKIES } from '../constants'
+import { COOKIES, PATHS } from '../constants'
 import { version } from '../version'
 
 /**
@@ -27,9 +27,12 @@ export function useLayout(c: Context, children: any) {
     deleteCookie(c, COOKIES.ERROR_FOUND, { path: '/' })
   }
 
-  /*
-  Header used to have:
-          {c.env.Session.isNothing && (
+  return (
+    <main class='font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3'>
+      <header>
+        <h3>Worker, D1, Drizzle Demo</h3>
+
+        {c.env.Session.isNothing && (
           <p>
             <a href={PATHS.AUTH.SIGN_IN} data-testid='sign-in-link'>
               Sign in
@@ -46,12 +49,6 @@ export function useLayout(c: Context, children: any) {
             </form>
           </p>
         )}
-   */
-
-  return (
-    <main class='font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3'>
-      <header>
-        <h3>CF Worker, D1, Drizzle Demo</h3>
       </header>
 
       {message && (

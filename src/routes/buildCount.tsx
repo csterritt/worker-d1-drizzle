@@ -5,10 +5,11 @@
 import { Hono, Context } from 'hono'
 
 import { PATHS } from '../constants'
+import { Bindings } from '../local-types'
 import { useLayout } from './buildLayout'
 import { Maybe } from 'true-myth'
 import { isJust } from 'true-myth/maybe'
-import { findCountById, incrementCountById } from '../lib/db-access'
+import { findCountById } from '../lib/db-access'
 
 /**
  * Render the JSX for the count page.
@@ -41,9 +42,7 @@ const renderCount = (c: Context, count: number, error?: string) => {
  * Attach the count route to the app.
  * @param app - Hono app instance
  */
-export const buildCount = (
-  app: Hono<{ Bindings: CloudflareBindings }>
-): void => {
+export const buildCount = (app: Hono<{ Bindings: Bindings }>): void => {
   app.get(PATHS.COUNT, async (c) => {
     let maybeCount: Maybe<any>
     try {

@@ -29,6 +29,6 @@ const renderNotFound = (c: Context) => {
  * Attach the 404 route to the app.
  * @param app - Hono app instance
  */
-export const build404 = (app: Hono<{ Bindings: CloudflareBindings }>): void => {
+export const build404 = (app: Hono<{ Bindings: Bindings }>): void => {
   app.notFound((c) => c.render(useLayout(c, renderNotFound(c))))
 }

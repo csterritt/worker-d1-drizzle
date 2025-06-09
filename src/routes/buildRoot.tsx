@@ -26,7 +26,7 @@ const renderRoot = (c: Context) => {
  * @param app - Hono app instance
  */
 export const buildRoot = (
-  app: Hono<{ Bindings: CloudflareBindings }>
+  app: Hono<{ Bindings: Bindings }>
 ): void => {
   app.get(PATHS.ROOT, (c) => c.render(useLayout(c, renderRoot(c))))
 }

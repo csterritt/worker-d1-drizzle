@@ -33,7 +33,7 @@ const renderHome = (c: Context) => {
  * @param app - Hono app instance
  */
 export const buildHome = (
-  app: Hono<{ Bindings: CloudflareBindings }>
+  app: Hono<{ Bindings: Bindings }>
 ): void => {
   app.get(PATHS.HOME, (c) => c.render(useLayout(c, renderHome(c))))
 }
