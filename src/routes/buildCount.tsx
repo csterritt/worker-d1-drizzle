@@ -4,12 +4,14 @@
  */
 import { Hono, Context } from 'hono'
 
-import { PATHS } from '../constants'
-import { Bindings } from '../local-types'
+import { COOKIES, PATHS } from '../constants'
+import { Bindings, CountAndDecrement } from '../local-types'
 import { useLayout } from './buildLayout'
 import { Maybe } from 'true-myth'
 import { isJust } from 'true-myth/maybe'
 import { findCountById } from '../lib/db-access'
+import { getCookie } from 'hono/cookie'
+import { isErr } from 'true-myth/result'
 
 /**
  * Render the JSX for the count page.
@@ -49,15 +51,25 @@ export const buildCount = (app: Hono<{ Bindings: Bindings }>): void => {
       // Pass the raw D1Database instance directly from env
       const db = c.env.PROJECT_DB
 
-      // Query using Drizzle ORM
-      const results = await findCountById(db, 'foo')
+      // Check for DB_FAIL_COUNT cookie using getCookie // PRODUCTION:REMOVE
+      let dbFailCount: CountAndDecrement | undefined = undefined
+      const failCountCookie = getCookie(c, COOKIES.DB_FAIL_COUNT) // PRODUCTION:REMOVE
+      // PRODUCTION:REMOVE-NEXT-LINE
+      if (failCountCookie && !isNaN(Number(failCountCookie))) {
+        dbFailCount = new CountAndDecrement(Number(failCountCookie)) // PRODUCTION:REMOVE
+      } // PRODUCTION:REMOVE
+      console.log('========> dbFailCount', dbFailCount)
 
-      if (results.isOk) {
-        maybeCount = results.value
-      } else {
-        console.log(`got bad count: ${results}`)
-        maybeCount = Maybe.nothing()
+      const countResult = await findCountById(
+        c.env.PROJECT_DB,
+        'foo',
+        dbFailCount
+      )
+      if (isErr(countResult)) {
+        return c.render(renderCount(c, 0, `Database error`))
       }
+
+      maybeCount = countResult.value
     } catch (e) {
       console.error('Error getting count', e)
       maybeCount = Maybe.nothing()

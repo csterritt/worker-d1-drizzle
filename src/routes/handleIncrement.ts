@@ -3,12 +3,14 @@
  * @module routes/handleIncrement
  */
 import { Hono } from 'hono'
+import { getCookie } from 'hono/cookie'
 
-import { PATHS } from '../constants'
-import { Bindings } from '../local-types'
+import { COOKIES, PATHS } from '../constants'
 import { redirectWithMessage, redirectWithError } from '../lib/redirects'
 import { IncrementSchema, validateRequest } from '../lib/validators'
 import { incrementCountById } from '../lib/db-access'
+import { isErr } from 'true-myth/result'
+import { Bindings, CountAndDecrement } from '../local-types'
 
 /**
  * Attach the increment POST route to the app.
@@ -28,20 +30,36 @@ export const handleIncrement = (app: Hono<{ Bindings: Bindings }>): void => {
     }
 
     try {
-      const db = c.env.PROJECT_DB
+      // Check for DB_FAIL_INCR cookie using getCookie // PRODUCTION:REMOVE
+      let dbFailCount: CountAndDecrement | undefined = undefined
+      const failCountCookie = getCookie(c, COOKIES.DB_FAIL_INCR) // PRODUCTION:REMOVE
+      // PRODUCTION:REMOVE-NEXT-LINE
+      if (failCountCookie && !isNaN(Number(failCountCookie))) {
+        dbFailCount = new CountAndDecrement(Number(failCountCookie)) // PRODUCTION:REMOVE
+      } // PRODUCTION:REMOVE
 
-      const result = await incrementCountById(db, 'foo')
-
-      if (result.isErr || result.value.isNothing || result.value.value !== 1) {
-        console.log(`did bad increment: ${result}`)
-        return redirectWithError(c, PATHS.COUNT, 'Unable to increment')
+      const result = await incrementCountById(
+        c.env.PROJECT_DB,
+        'foo',
+        dbFailCount
+      )
+      if (isErr(result)) {
+        console.error('======> Error incrementing count:', result.error)
+        return redirectWithError(
+          c,
+          PATHS.COUNT,
+          'Internal problem: Database error'
+        )
       }
+
+      // Success, regardless of Maybe
+      return redirectWithMessage(c, PATHS.COUNT, 'Increment successful')
     } catch (e: any) {
       console.error('Error incrementing count', e)
       return redirectWithError(
         c,
         PATHS.COUNT,
-        e.toString() || 'Unable to increment'
+        e.ToString() || 'Unable to increment'
       )
     }
 
