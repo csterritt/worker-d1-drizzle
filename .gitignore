@@ -31,3 +31,4 @@ lerna-debug.log*
 .DS_Store
 test-results
 public/style-XXXXXX.css
+tmp/
