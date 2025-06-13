@@ -13,6 +13,10 @@ npm run deploy
 npm run cf-typegen
 ```
 
+### TODO:
+
+- Set up '/' to have proper headers
+
 Pass the `Bindings` as generics when instantiation `Hono`:
 
 ```ts

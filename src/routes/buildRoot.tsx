@@ -13,7 +13,7 @@ import { Bindings } from '../local-types'
  */
 const renderRoot = (c: Context) => {
   return (
-    <div data-testid='startup-page-banner'>
+    <div data-testid='root-page-banner'>
       <h3 id='heading'>Worker, D1, Drizzle Project</h3>
       <p>
         <a href={PATHS.HOME}>Home</a>
