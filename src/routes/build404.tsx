@@ -6,6 +6,7 @@ import { Hono, Context } from 'hono'
 
 import { PATHS } from '../constants'
 import { useLayout } from './buildLayout'
+import { Bindings } from '../local-types'
 
 /**
  * Render the JSX for the 404 page.

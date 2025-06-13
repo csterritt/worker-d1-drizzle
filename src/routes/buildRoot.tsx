@@ -5,6 +5,7 @@
 import { Hono, Context } from 'hono'
 import { PATHS } from '../constants'
 import { useLayout } from './buildLayout'
+import { Bindings } from '../local-types'
 
 /**
  * Render the JSX for the root page.
@@ -25,8 +26,6 @@ const renderRoot = (c: Context) => {
  * Attach the root route to the app.
  * @param app - Hono app instance
  */
-export const buildRoot = (
-  app: Hono<{ Bindings: Bindings }>
-): void => {
+export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
   app.get(PATHS.ROOT, (c) => c.render(useLayout(c, renderRoot(c))))
 }
