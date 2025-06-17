@@ -24,7 +24,8 @@ import { buildPrivate } from './routes/buildPrivate'
 import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMOVE
 import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
-import { handleCleanSessions } from './routes/auth/handleCleanSessions' // PRODUCTION:REMOVE
+import { handleCleanSessions } from './routes/auth/handleCleanSessions'
+import { handleResendCode } from './routes/auth/handleResendCode' // PRODUCTION:REMOVE
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -73,6 +74,7 @@ buildSignIn(app)
 handleStartOtp(app)
 buildAwaitCode(app)
 handleFinishOtp(app)
+handleResendCode(app)
 handleCancelSignIn(app)
 handleSignOut(app)
 

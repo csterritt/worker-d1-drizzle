@@ -57,9 +57,6 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
 
     // see if this session has expired
     const now = getCurrentTime(c).getTime()
-    console.log(
-      `Current time: ${now}, session expires at: ${session.expiresAt}`
-    )
     if (session.expiresAt < now) {
       await deleteSession(c.env.PROJECT_DB, session.id)
       deleteCookie(c, COOKIES.SESSION, { path: '/' })
@@ -122,7 +119,7 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
         // Save updated attemptCount in session
         await updateSessionById(c.env.PROJECT_DB, session.id, {
           attemptCount: newAttemptCount,
-          updatedAt: getCurrentTime(c),
+          updatedAt: getCurrentTime(c).getTime(),
         })
 
         return redirectWithError(

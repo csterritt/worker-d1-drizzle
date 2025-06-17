@@ -5,12 +5,12 @@ CREATE TABLE `count` (
 --> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
-	`expiresAt` text NOT NULL,
+	`expiresAt` integer NOT NULL,
 	`signedIn` integer NOT NULL,
 	`token` text NOT NULL,
 	`attemptCount` integer DEFAULT 0 NOT NULL,
-	`createdAt` text NOT NULL,
-	`updatedAt` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL,
 	`userId` text NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -20,8 +20,8 @@ CREATE TABLE `user` (
 	`email` text NOT NULL,
 	`name` text,
 	`emailVerified` integer NOT NULL,
-	`createdAt` text NOT NULL,
-	`updatedAt` text NOT NULL
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);

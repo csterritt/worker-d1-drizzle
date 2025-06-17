@@ -80,8 +80,8 @@ test.describe.serial('Resend code notification tests', () => {
       // Read the first OTP code using our retry mechanism
       console.log('First code:', JSON.stringify(firstCode))
 
-      // Jump ahead 4 seconds to ensure resend becomes available
-      await page.goto(`http://localhost:3000/auth/set-clock/${4000}`)
+      // Jump ahead 6 seconds to ensure resend becomes available
+      await page.goto(`http://localhost:3000/auth/set-clock/${6000}`)
       await page.goto('http://localhost:3000/auth/await-code')
 
       // Capture the response to get the session token from the headers
@@ -160,8 +160,8 @@ test.describe.serial('Resend code notification tests', () => {
       expect(parseInt(secondsMatch?.[1] || '0')).toBeGreaterThan(0)
       expect(parseInt(secondsMatch?.[1] || '0')).toBeLessThan(31)
 
-      // Jump ahead 4 seconds to ensure resend becomes available
-      await page.goto(`http://localhost:3000/auth/set-clock/${4000}`)
+      // Jump ahead 6 seconds to ensure resend becomes available
+      await page.goto(`http://localhost:3000/auth/set-clock/${6000}`)
       await page.goto('http://localhost:3000/auth/await-code')
 
       // Capture the response to get the session token from the headers
@@ -213,8 +213,8 @@ test.describe.serial('Resend code notification tests', () => {
       const firstCode = headers['x-session-token']
       console.log('First code:', firstCode)
 
-      // Jump ahead 4 seconds to ensure resend becomes available
-      await page.goto(`http://localhost:3000/auth/set-clock/${4000}`)
+      // Jump ahead 6 seconds to ensure resend becomes available
+      await page.goto(`http://localhost:3000/auth/set-clock/${6000}`)
       await page.goto('http://localhost:3000/auth/await-code')
 
       // Capture the response to get the session token from the headers
@@ -231,8 +231,8 @@ test.describe.serial('Resend code notification tests', () => {
       console.log('Second code:', secondCode)
       expect(secondCode).not.toBe(firstCode)
 
-      // Jump ahead another 4 seconds to ensure resend becomes available
-      await page.goto(`http://localhost:3000/auth/set-clock/${8000}`)
+      // Jump ahead another 6 seconds to ensure resend becomes available
+      await page.goto(`http://localhost:3000/auth/set-clock/${12000}`)
       await page.goto('http://localhost:3000/auth/await-code')
 
       // Capture the response to get the session token from the headers

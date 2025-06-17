@@ -6,7 +6,7 @@ import { Context } from 'hono'
 import Maybe from 'true-myth/maybe'
 import Result from 'true-myth/result'
 import retry from 'async-retry'
-import { eq, and, gt, desc, sql } from 'drizzle-orm'
+import { eq, and, gt, sql } from 'drizzle-orm'
 import { ulid } from 'ulid'
 
 import { createDbClient } from '../db/client'
@@ -140,8 +140,8 @@ const createSessionActual = async (
       token: sessionData.token as string,
       attemptCount: Number(sessionData.attemptCount || 0),
       userId: sessionData.userId as string,
-      createdAt: (sessionData.createdAt as string) || new Date().toISOString(),
-      updatedAt: (sessionData.updatedAt as string) || new Date().toISOString(),
+      createdAt: sessionData.createdAt || new Date().getTime(),
+      updatedAt: sessionData.updatedAt || new Date().getTime(),
     }
 
     const [insertedSession] = await drizzle
@@ -234,15 +234,9 @@ const updateSessionByIdActual = async (
   try {
     const drizzle = createDbClient(db)
 
-    // Always update the updatedAt timestamp
-    const dataToUpdate: any = {
-      ...updateData,
-      updatedAt: new Date().toISOString(),
-    }
-
     const [updatedSession] = await drizzle
       .update(session)
-      .set(dataToUpdate)
+      .set(updateData)
       .where(eq(session.id, sessionId))
       .returning()
 
@@ -443,9 +437,7 @@ const countRecentNonSignedInSessionsByEmailActual = async (
   try {
     const drizzle = createDbClient(db)
     const currentTime = getCurrentTime(c)
-    const windowStartTime = new Date(
-      currentTime.getTime() - windowMs
-    ).toISOString()
+    const windowStartTime = new Date(currentTime.getTime() - windowMs).getTime()
 
     // First, find the user
     const users = await drizzle

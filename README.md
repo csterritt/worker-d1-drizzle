@@ -36,11 +36,11 @@ one, **BUT** it will use the file `./schema-prod.sql` which you need to create f
 
 Change 'your-email@your-provider.com' to your actual email address.
 
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaaa', 'your-email@your-provider.com', true, '2025-04-30T04:53:26.997Z', '2025-04-30T04:53:26.997Z');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaab', 'fredfred@team439980.testinator.com', true, '2025-04-30T04:53:26.997Z', '2025-04-30T04:53:26.997Z');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaac', 'fredfred2@team439980.testinator.com', true, '2025-04-30T04:53:26.997Z', '2025-04-30T04:53:26.997Z');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaad', 'rate-limit-user1@team439980.testinator.com', true, '2025-04-30T04:53:26.997Z', '2025-04-30T04:53:26.997Z');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaae', 'rate-limit-user2@team439980.testinator.com', true, '2025-04-30T04:53:26.997Z', '2025-04-30T04:53:26.997Z');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaaa', 'your-email@your-provider.com', true, '1745988806997', '1745988806997');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaab', 'fredfred@team439980.testinator.com', true, '1745988806997', '1745988806997');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaac', 'fredfred2@team439980.testinator.com', true, '1745988806997', '1745988806997');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaad', 'rate-limit-user1@team439980.testinator.com', true, '1745988806997', '1745988806997');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaae', 'rate-limit-user2@team439980.testinator.com', true, '1745988806997', '1745988806997');
     insert into count (id, count) values ('foo', 0);
 
 To run in production, set the following environment variables:

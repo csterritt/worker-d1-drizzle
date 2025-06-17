@@ -14,7 +14,6 @@ import { COOKIES } from '../../constants'
 import { redirectWithError } from '../../lib/redirects'
 import {
   deleteSession,
-  findSessionById,
   findUserById,
   updateSessionById,
 } from '../../lib/db-access'
@@ -60,7 +59,7 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
 
     // see if this session has expired
     const now = getCurrentTime(c)
-    if (session.expiresAt < now) {
+    if (session.expiresAt < now.getTime()) {
       await deleteSession(c.env.PROJECT_DB, session.id)
       deleteCookie(c, COOKIES.SESSION, { path: '/' })
 
@@ -73,8 +72,8 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
 
     // see if the user has not waited long enough to ask for another code
     const ago = now.getTime() - DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
-    if (session.updatedAt.getTime() > ago) {
-      const secondsLeft = Math.floor((session.updatedAt.getTime() - ago) / 1000)
+    if (session.updatedAt > ago) {
+      const secondsLeft = Math.floor((session.updatedAt - ago) / 1000)
 
       return redirectWithError(
         c,
@@ -120,12 +119,12 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
     const expiresAt = getCurrentTime(
       c,
       now.getTime() + DURATIONS.FIFTEEN_MINUTES_IN_MILLISECONDS
-    )
+    ).getTime()
     const sessionToken: string = await generateToken()
     const updateResult = await updateSessionById(c.env.PROJECT_DB, session.id, {
       token: sessionToken,
       expiresAt,
-      updatedAt: getCurrentTime(c),
+      updatedAt: getCurrentTime(c).getTime(),
     })
 
     if (isErr(updateResult)) {
