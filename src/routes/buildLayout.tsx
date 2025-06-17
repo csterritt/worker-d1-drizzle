@@ -28,13 +28,17 @@ export function useLayout(c: Context, children: any) {
   }
 
   return (
-    <main class='font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3'>
+    <main className='font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3'>
       <header>
         <h3>Worker, D1, Drizzle Demo</h3>
 
         {c.env.Session.isNothing && (
           <p>
-            <a href={PATHS.AUTH.SIGN_IN} data-testid='sign-in-link'>
+            <a
+              href={PATHS.AUTH.SIGN_IN}
+              className='btn btn-primary'
+              data-testid='sign-in-link'
+            >
               Sign in
             </a>
           </p>
