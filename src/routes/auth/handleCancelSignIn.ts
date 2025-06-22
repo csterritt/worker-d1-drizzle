@@ -16,7 +16,7 @@ import { deleteSession } from '../../lib/db-access'
  * @param app - Hono app instance
  */
 export const handleCancelSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.post(PATHS.AUTH.CANCEL_OTP, async (c) => {
+  app.get(PATHS.AUTH.CANCEL_OTP, async (c) => {
     const sessionId: string = (getCookie(c, COOKIES.SESSION) ?? '').trim()
     if (sessionId !== '') {
       await deleteSession(c.env.PROJECT_DB, sessionId)

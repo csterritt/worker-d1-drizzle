@@ -3,6 +3,7 @@ import { test } from '@playwright/test'
 import {
   verifyOnStartupPage,
   verifyOnAwaitCodePage,
+  verifyHaveSignInLink,
 } from '../support/page-verifiers'
 import { startSignIn, submitEmail, cancelSignIn } from '../support/auth-helpers'
 
@@ -15,6 +16,7 @@ test('submitting a known email succeeds', async ({ page }) => {
   // Submit known email and verify success
   await submitEmail(page, 'fredfred@team439980.testinator.com')
   await verifyOnAwaitCodePage(page)
+  await verifyHaveSignInLink(page)
 
   // Cancel to reset internal state
   await cancelSignIn(page)

@@ -13,18 +13,35 @@ import { Bindings } from '../local-types'
  */
 const renderHome = (c: Context) => {
   return (
-    <div data-testid='startup-page-banner'>
-      <h3>Hello!</h3>
-      <p>
-        <a href={PATHS.PRIVATE} data-testid='visit-private-link'>
-          Go to Private
-        </a>
-      </p>
-      <p>
-        <a href={PATHS.COUNT} data-testid='visit-count-link'>
-          Go to Count
-        </a>
-      </p>
+    <div
+      data-testid='startup-page-banner'
+      className='flex flex-col items-center'
+    >
+      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
+        <div className='card-body'>
+          <h2 className='card-title text-2xl font-bold'>Welcome!</h2>
+          <p className='py-4'>
+            Select one of the options below to navigate through the application.
+          </p>
+          <div className='card-actions justify-center gap-4'>
+            <a
+              href={PATHS.PRIVATE}
+              className='btn btn-primary'
+              data-testid='visit-private-link'
+            >
+              Go to Private
+            </a>
+
+            <a
+              href={PATHS.COUNT}
+              className='btn btn-primary'
+              data-testid='visit-count-link'
+            >
+              Go to Count
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

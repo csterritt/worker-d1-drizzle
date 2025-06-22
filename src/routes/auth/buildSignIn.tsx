@@ -20,44 +20,53 @@ import { reloadOnBackButton } from '../../lib/reload-on-back-button'
  */
 const renderSignIn = (c: Context, emailEntered: string) => {
   return (
-    <div data-testid='sign-in-page-banner'>
-      <h3>Sign In</h3>
-      <form
-        method='post'
-        action={PATHS.AUTH.START_OTP}
-        className='flex flex-col gap-4'
-        aria-label='Sign in form'
-      >
-        <label htmlFor='email'>Email</label>
-        <input
-          id='email'
-          name='email'
-          type='email'
-          placeholder='Email'
-          required
-          className='input input-bordered'
-          autoFocus
-          value={emailEntered}
-          data-testid='email-input'
-          aria-label='Email'
-        />
-        <button type='submit' className='btn btn-primary' data-testid='submit'>
-          Sign In
-        </button>
-      </form>
+    <div data-testid='sign-in-page-banner' className='flex justify-center'>
+      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
+        <div className='card-body'>
+          <h2 className='card-title text-2xl font-bold mb-4'>Sign In</h2>
+          <form
+            method='post'
+            action={PATHS.AUTH.START_OTP}
+            className='flex flex-col gap-4'
+            aria-label='Sign in form'
+          >
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='email'>
+                <span className='label-text'>Email</span>
+              </label>
+              <input
+                id='email'
+                name='email'
+                type='email'
+                placeholder='Enter your email'
+                required
+                className='input input-bordered w-full'
+                autoFocus
+                value={emailEntered}
+                data-testid='email-input'
+                aria-label='Email'
+              />
+            </div>
+            <div className='card-actions justify-between mt-4'>
+              <a
+                href={PATHS.AUTH.CANCEL_OTP}
+                className='btn btn-ghost'
+                data-testid='cancel-sign-in-link'
+              >
+                Cancel
+              </a>
 
-      <p>
-        <form
-          method='post'
-          action={PATHS.AUTH.CANCEL_OTP}
-          aria-label='Cancel sign in'
-        >
-          <button type='submit' data-testid='cancel-sign-in-link'>
-            Cancel sign in
-          </button>
-        </form>
-      </p>
-
+              <button
+                type='submit'
+                className='btn btn-primary'
+                data-testid='submit'
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
       {reloadOnBackButton()}
     </div>
   )

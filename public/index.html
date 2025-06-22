@@ -7,20 +7,43 @@
     <title>Worker, D1, Drizzle</title>
   </head>
   <body>
-    <main
-      class="font-family-slabserif h-full min-h-screen flex flex-col justify-between mx-auto max-w-7xl pb-3"
-    >
-      <header>
-        <h3>Worker, D1, Drizzle Demo</h3>
-        <p><a href="/auth/sign-in" data-testid="sign-in-link">Sign in</a></p>
-      </header>
-      <div class="flex-grow">
-        <div data-testid="root-page-banner">
-          <h3 id="heading">Worker, D1, Drizzle Project</h3>
-          <p><a href="/home">Home</a></p>
+    <div class="min-h-screen flex flex-col bg-base-100 text-base-content">
+      <div class="navbar bg-base-200 shadow-md">
+        <div class="navbar-start">
+          <div class="px-2 mx-2">
+            <span class="text-lg font-bold">Worker, D1, Drizzle Demo</span>
+          </div>
+        </div>
+        <div class="navbar-end flex items-center">
+          <a
+            href="/auth/sign-in"
+            class="btn btn-primary btn-sm mx-2"
+            data-testid="sign-in-link"
+            >Sign in</a
+          >
         </div>
       </div>
-      <footer><div>Copyright © 2025 V-0</div></footer>
-    </main>
+      <div class="flex-grow container mx-auto px-4 py-8">
+        <div data-testid="root-page-banner" class="flex flex-col items-center">
+          <div class="card w-full max-w-md bg-base-100 shadow-xl mb-6">
+            <div class="card-body">
+              <h2 class="card-title text-2xl font-bold">Welcome!</h2>
+              <h3 id="heading">Worker, D1, Drizzle Project</h3>
+              <p>
+                <a
+                  href="/home"
+                  class="btn btn-primary"
+                  data-testid="visit-home-link"
+                  >Home</a
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer footer-center p-4 bg-base-200 text-base-content">
+        <div><p>Copyright © 2025 V-0</p></div>
+      </footer>
+    </div>
   </body>
 </html>

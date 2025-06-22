@@ -21,21 +21,43 @@ import { isErr } from 'true-myth/result'
  */
 const renderCount = (c: Context, count: number, error?: string) => {
   return (
-    <div>
-      <h3>Count</h3>
-      <p data-testid='count-value'>
-        {error ? `Internal problem: ${error}` : count}
-      </p>
-      <p>
-        <a href={PATHS.HOME} data-testid='visit-home-link'>
-          Go home
-        </a>
-      </p>
-      <form method='post' action={PATHS.INCREMENT}>
-        <button type='submit' data-testid='increment-count-link'>
-          Increment the count
-        </button>
-      </form>
+    <div className='flex flex-col items-center'>
+      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
+        <div className='card-body'>
+          <h2 className='card-title text-2xl font-bold'>Count</h2>
+
+          <div className='stats shadow my-4'>
+            <div className='stat'>
+              <div className='stat-title'>Current Count</div>
+              <div
+                className='stat-value text-primary'
+                data-testid='count-value'
+              >
+                {error ? `Internal problem: ${error}` : count}
+              </div>
+            </div>
+          </div>
+
+          <div className='card-actions justify-between mt-4'>
+            <a
+              href={PATHS.HOME}
+              className='btn btn-ghost'
+              data-testid='visit-home-link'
+            >
+              Return Home
+            </a>
+            <form method='post' action={PATHS.INCREMENT}>
+              <button
+                type='submit'
+                className='btn btn-primary'
+                data-testid='increment-count-link'
+              >
+                Increment Count
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -58,7 +80,6 @@ export const buildCount = (app: Hono<{ Bindings: Bindings }>): void => {
       if (failCountCookie && !isNaN(Number(failCountCookie))) {
         dbFailCount = new CountAndDecrement(Number(failCountCookie)) // PRODUCTION:REMOVE
       } // PRODUCTION:REMOVE
-      console.log('========> dbFailCount', dbFailCount)
 
       const countResult = await findCountById(
         c.env.PROJECT_DB,

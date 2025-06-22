@@ -14,14 +14,27 @@ import { Bindings } from '../local-types'
  */
 const renderNotFound = (c: Context) => {
   return (
-    <div data-testid='404-page-banner'>
-      <h3>404 - Page Not Found</h3>
-      <p data-testid='404-message'>That page does not exist.</p>
-      <p>
-        <a href={PATHS.HOME} data-testid='home-link'>
-          Go home
-        </a>
-      </p>
+    <div data-testid='404-page-banner' className='flex flex-col items-center'>
+      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
+        <div className='card-body text-center'>
+          <div className='text-error text-7xl font-bold mb-4'>404</div>
+          <h2 className='card-title text-2xl font-bold justify-center'>
+            Page Not Found
+          </h2>
+          <p className='py-4' data-testid='404-message'>
+            That page does not exist.
+          </p>
+          <div className='card-actions justify-center mt-4'>
+            <a
+              href={PATHS.HOME}
+              className='btn btn-primary'
+              data-testid='home-link'
+            >
+              Return Home
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

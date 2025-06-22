@@ -13,11 +13,22 @@ import { Bindings } from '../local-types'
  */
 const renderRoot = (c: Context) => {
   return (
-    <div data-testid='root-page-banner'>
-      <h3 id='heading'>Worker, D1, Drizzle Project</h3>
-      <p>
-        <a href={PATHS.HOME}>Home</a>
-      </p>
+    <div data-testid='root-page-banner' className='flex flex-col items-center'>
+      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
+        <div className='card-body'>
+          <h2 className='card-title text-2xl font-bold'>Welcome!</h2>
+          <h3 id='heading'>Worker, D1, Drizzle Project</h3>
+          <p>
+            <a
+              href={PATHS.HOME}
+              className='btn btn-primary'
+              data-testid='visit-home-link'
+            >
+              Home
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
