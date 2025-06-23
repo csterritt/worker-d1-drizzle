@@ -1,11 +1,6 @@
-```txt
-npm install
-npm run dev
-```
+### Basic CloudFlare worker+d1+drizzle app with magic-code sign-in
 
-```txt
-npm run deploy
-```
+#### Setup
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
 
@@ -13,18 +8,7 @@ npm run deploy
 npm run cf-typegen
 ```
 
-### TODO:
-
-- Set up '/' to have proper headers
-
-Pass the `Bindings` as generics when instantiation `Hono`:
-
-```ts
-// src/index.ts
-const app = new Hono<{ Bindings: Bindings }>()
-```
-
-### Database migrations
+#### Database migrations
 
 Note once the drizzle database schema in src/db/schema.ts is updated, run `npx drizzle-kit generate`
 again to update the database schema. This will update the generated `drizzle/*.sql` files. Then run
@@ -32,7 +16,7 @@ again to update the database schema. This will update the generated `drizzle/*.s
 `./build-schema-update.sh` script it will update the remote Cloudflare database instead of the local
 one, **BUT** it will use the file `./schema-prod.sql` which you need to create from `schema.sql`.
 
-### Adding initial users and count via sqlite3:
+#### Adding initial users and count via sqlite3:
 
 Change 'your-email@your-provider.com' to your actual email address.
 
