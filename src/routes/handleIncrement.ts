@@ -62,8 +62,5 @@ export const handleIncrement = (app: Hono<{ Bindings: Bindings }>): void => {
         e.ToString() || 'Unable to increment'
       )
     }
-
-    // Success, regardless of Maybe
-    return redirectWithMessage(c, PATHS.COUNT, 'Increment successful')
   })
 }

@@ -17,6 +17,7 @@ import { buildSignIn } from './routes/auth/buildSignIn'
 import { handleStartOtp } from './routes/auth/handleStartOtp'
 import { buildAwaitCode } from './routes/auth/buildAwaitCode'
 import { handleFinishOtp } from './routes/auth/handleFinishOtp'
+import { handleResendCode } from './routes/auth/handleResendCode'
 import { handleCancelSignIn } from './routes/auth/handleCancelSignIn'
 import { handleSignOut } from './routes/auth/handleSignOut'
 import { Bindings } from './local-types'
@@ -24,8 +25,7 @@ import { buildPrivate } from './routes/buildPrivate'
 import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMOVE
 import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
-import { handleCleanSessions } from './routes/auth/handleCleanSessions'
-import { handleResendCode } from './routes/auth/handleResendCode' // PRODUCTION:REMOVE
+import { handleCleanSessions } from './routes/auth/handleCleanSessions' // PRODUCTION:REMOVE
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -35,7 +35,7 @@ app.use(
   '*',
   csrf({
     origin: (origin) => {
-      // return /https:\/\/cf-mini.example.com$/.test(origin)  // PRODUCTION:UNCOMMENT
+      // return /https:\/\/mini-auth.example.com$/.test(origin)  // PRODUCTION:UNCOMMENT
       return /http:\/\/localhost(:\d+)?$/.test(origin) // PRODUCTION:REMOVE
     },
   })

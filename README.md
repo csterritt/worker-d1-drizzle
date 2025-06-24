@@ -1,6 +1,6 @@
 ### Basic CloudFlare worker+d1+drizzle app with magic-code sign-in
 
-#### Setup
+#### Setup for development
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
 
@@ -33,3 +33,9 @@ To run in production, set the following environment variables:
     SMTP_SERVER_PORT='<numeric port>'
     SMTP_SERVER_USER='<user name for email hosting provider>'
     SMTP_SERVER_PASSWORD='<password for email hosting provider>'
+
+### Setting up for production
+
+Change the host name in the `constants.ts` `STANDARD_COOKIE_OPTIONS` object from `mini-auth.example.com`
+to the domain name you want to use for the worker. It will also need to be set in the `CSRF`
+middleware call in `index.ts`.

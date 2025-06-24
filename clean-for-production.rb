@@ -39,8 +39,10 @@ def copy_to_temp_cleaning(file_name, out_filename)
                     when /PRODUCTION:STOP/
                         @state = :STOP
                 else
-                    send_out(out, line, @state) unless @state == :SKIP
-                    @state = :KEEP unless @state == :STOP
+                    unless @state == :STOP
+                        send_out(out, line, @state) unless @state == :SKIP
+                        @state = :KEEP
+                    end
                 end
             end
         end

@@ -7,19 +7,16 @@ import { Hono } from 'hono'
 import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
-import { setCurrentDelta } from '../../lib/time-access'
+import { setCurrentDelta } from '../../lib/time-access'  // PRODUCTION:REMOVE
 
 /**
  * Attach the set clock GET route to the app.
  * @param app - Hono app instance
  */
 export const handleSetClock = (app: Hono<{ Bindings: Bindings }>): void => {
+  // } // PRODUCTION:UNCOMMENT
+  // PRODUCTION:STOP
   app.get(`${PATHS.AUTH.SET_CLOCK}/:delta`, async (c) => {
-    // return redirectWithMessage(c, PATHS.HOME, '') // PRODUCTION:UNCOMMENT
-    // }) // PRODUCTION:UNCOMMENT
-    // } // PRODUCTION:UNCOMMENT
-    // PRODUCTION:STOP
-
     const delta = parseInt(c.req.param('delta'))
     setCurrentDelta(c, delta)
 

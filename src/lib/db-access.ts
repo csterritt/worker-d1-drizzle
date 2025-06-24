@@ -471,6 +471,7 @@ const countRecentNonSignedInSessionsByEmailActual = async (
   }
 }
 
+// PRODUCTION:STOP
 /**
  * Delete all sessions for a specific user identified by email.
  * @param db - D1Database instance

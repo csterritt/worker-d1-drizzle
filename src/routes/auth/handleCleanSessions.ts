@@ -7,7 +7,7 @@ import { Hono } from 'hono'
 import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
-import { deleteAllUserSessions } from '../../lib/db-access'
+import { deleteAllUserSessions } from '../../lib/db-access' // PRODUCTION:REMOVE
 import { isErr } from 'true-myth/result'
 
 /**
@@ -17,12 +17,9 @@ import { isErr } from 'true-myth/result'
 export const handleCleanSessions = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
+  // } // PRODUCTION:UNCOMMENT
+   // PRODUCTION:STOP
   app.get(`${PATHS.AUTH.CLEAN_SESSIONS}/:email`, async (c) => {
-    // return redirectWithMessage(c, PATHS.HOME, '') // PRODUCTION:UNCOMMENT
-    // }) // PRODUCTION:UNCOMMENT
-    // } // PRODUCTION:UNCOMMENT
-    // PRODUCTION:STOP
-
     const email = c.req.param('email')
 
     if (!email) {
