@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "worker-d1-drizzle",
+	"name": "rdb-wrk-d1-dr",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-05-23",
 	"compatibility_flags": ["nodejs_compat"],
@@ -25,8 +25,9 @@
 	"d1_databases": [
 		{
 			"binding": "PROJECT_DB",
-			"database_name": "worker-d1-drizzle-db",
-			"database_id": "5faeaa9c-02fe-4102-bdc1-aee545d6a0fe"
+			"migrations_dir": "drizzle/migrations",
+			"database_name": "rdb-wrk-d1-dr-db",
+			"database_id": "e1bcd038-d281-4b02-95e3-78435dcf7b4b"
 		}
 	]
 

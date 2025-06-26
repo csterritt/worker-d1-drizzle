@@ -31,14 +31,6 @@ const renderHome = (c: Context) => {
             >
               Go to Private
             </a>
-
-            <a
-              href={PATHS.COUNT}
-              className='btn btn-primary'
-              data-testid='visit-count-link'
-            >
-              Go to Count
-            </a>
           </div>
         </div>
       </div>

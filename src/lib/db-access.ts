@@ -10,7 +10,7 @@ import { eq, and, gt, sql } from 'drizzle-orm'
 import { ulid } from 'ulid'
 
 import { createDbClient } from '../db/client'
-import { user, session, count, User, Session } from '../db/schema'
+import { user, session, User, Session } from '../db/schema'
 import { CountAndDecrement } from '../local-types'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
 import { getCurrentTime } from './time-access'
@@ -283,118 +283,6 @@ const deleteSessionActual = async (
       .where(eq(session.id, sessionId))
 
     return Result.ok(true)
-  } catch (e) {
-    throw Result.err(e instanceof Error ? e : new Error(String(e)))
-  }
-}
-
-/**
- * Find the count record by id.
- * @param db - D1Database instance
- * @param countId - Count record id
- * @param failureCount - Optional number of failures to simulate (for testing)
- * @returns Result with Maybe.just(count) or Maybe.nothing if not found, or Result.err with error
- */
-export const findCountById = async (
-  db: D1Database,
-  countId: string,
-  failureCount?: CountAndDecrement
-): Promise<Result<Maybe<number>, Error>> => {
-  let res: Result<Maybe<number>, Error>
-  try {
-    res = await retry(
-      () => findCountByIdActual(db, countId, failureCount),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`findCountById final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
-
-  return res
-}
-
-const findCountByIdActual = async (
-  db: D1Database,
-  countId: string,
-  failureCount?: CountAndDecrement
-): Promise<Result<Maybe<number>, Error>> => {
-  try {
-    // Optional failure for testing
-    if (failureCount && failureCount.count > 0) {
-      failureCount.count -= 1
-      throw new Error(`Simulated DB failure ${failureCount.count} remaining`)
-    }
-
-    const drizzle = createDbClient(db)
-    const counts = await drizzle
-      .select()
-      .from(count)
-      .where(eq(count.id, countId))
-      .limit(1)
-    const foundCount = counts[0] || null
-
-    return Result.ok(
-      foundCount ? Maybe.just(foundCount.count) : Maybe.nothing()
-    )
-  } catch (e) {
-    throw Result.err(e instanceof Error ? e : new Error(String(e)))
-  }
-}
-
-/**
- * Increment the count record by id.
- * @param db - D1Database instance
- * @param countId - Count record id
- * @param failureCount - Optional number of failures to simulate (for testing)
- * @returns Result with Maybe.just(updated) or Maybe.nothing if not updated, or Result.err with error
- */
-export const incrementCountById = async (
-  db: D1Database,
-  countId: string,
-  failureCount?: CountAndDecrement
-): Promise<Result<Maybe<number>, Error>> => {
-  let res: Result<Maybe<number>, Error>
-  try {
-    res = await retry(
-      () => incrementCountByIdActual(db, countId, failureCount),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`incrementCountById final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
-
-  return res
-}
-
-const incrementCountByIdActual = async (
-  db: D1Database,
-  countId: string,
-  failureCount?: CountAndDecrement
-): Promise<Result<Maybe<number>, Error>> => {
-  try {
-    // Optional failure for testing
-    if (failureCount && failureCount.count > 0) {
-      failureCount.count -= 1
-      throw new Error(`Simulated DB failure ${failureCount.count} remaining`)
-    }
-
-    const drizzle = createDbClient(db)
-
-    // Using SQL template literal for direct increment
-    const result = await drizzle
-      .update(count)
-      .set({
-        count: sql`${count.count} + 1`,
-      })
-      .where(eq(count.id, countId))
-
-    return Result.ok(
-      result.meta?.changes > 0
-        ? Maybe.just(result.meta.changes)
-        : Maybe.nothing()
-    )
   } catch (e) {
     throw Result.err(e instanceof Error ? e : new Error(String(e)))
   }

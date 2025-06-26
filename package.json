@@ -1,5 +1,5 @@
 {
-	"name": "worker-d1-drizzle",
+	"name": "rdb-wrk-d1-dr",
 	"scripts": {
 		"dev": "./run-dev.sh",
 		"build": "wrangler build",

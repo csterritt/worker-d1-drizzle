@@ -1,33 +1,9 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c5f53a02-b86e-4169-9351-3e15a9b41ade",
+  "id": "56fe6645-7511-4984-9965-cbb2d56e0355",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "count": {
-      "name": "count",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "count": {
-          "name": "count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "session": {
       "name": "session",
       "columns": {
@@ -106,7 +82,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "user": {
       "name": "user",
@@ -165,13 +142,18 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
+  "views": {},
   "enums": {},
   "_meta": {
     "schemas": {},
     "tables": {},
     "columns": {}
+  },
+  "internal": {
+    "indexes": {}
   }
 }

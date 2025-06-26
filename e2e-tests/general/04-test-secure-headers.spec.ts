@@ -96,7 +96,6 @@ test.describe('Security Headers', () => {
     const endpoints = [
       '/home', // Home page
       '/auth/sign-in', // Sign-in page
-      '/count', // Count page
     ]
 
     // Store headers from the first endpoint as a reference

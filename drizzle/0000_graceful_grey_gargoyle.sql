@@ -1,8 +1,3 @@
-CREATE TABLE `count` (
-	`id` text PRIMARY KEY NOT NULL,
-	`count` integer DEFAULT 0 NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
 	`expiresAt` integer NOT NULL,

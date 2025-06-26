@@ -9,8 +9,6 @@ import { renderer } from './renderer'
 import { provideSession } from './middleware/provide-session'
 import { buildHome } from './routes/buildHome'
 import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
-import { buildCount } from './routes/buildCount'
-import { handleIncrement } from './routes/handleIncrement'
 import { build404 } from './routes/build404'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
@@ -34,8 +32,8 @@ app.use(secureHeaders({ referrerPolicy: 'strict-origin-when-cross-origin' }))
 app.use(
   '*',
   csrf({
-    origin: (origin) => {
-      // return /https:\/\/mini-auth.example.com$/.test(origin)  // PRODUCTION:UNCOMMENT
+    origin: (origin: string) => {
+      // return /https:\/\/recipes.cls.cloud$/.test(origin)  // PRODUCTION:UNCOMMENT
       return /http:\/\/localhost(:\d+)?$/.test(origin) // PRODUCTION:REMOVE
     },
   })
@@ -67,8 +65,6 @@ app.use(async (c, next) => {
 // Route declarations
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
-buildCount(app)
-handleIncrement(app)
 buildHome(app)
 buildSignIn(app)
 handleStartOtp(app)

@@ -20,8 +20,6 @@ export const PATHS = {
   ROOT: '/' as const,
   HOME: '/home' as const,
   PRIVATE: '/private' as const,
-  COUNT: '/count' as const,
-  INCREMENT: '/increment' as const,
 
   // Auth API paths
   AUTH: {
@@ -82,7 +80,7 @@ export const COOKIES = {
     httpOnly: true,
     sameSite: 'Strict',
     // secure: true, // PRODUCTION:UNCOMMENT
-    // domain: 'mini-auth.example.com', // PRODUCTION:UNCOMMENT
+    // domain: 'recipes.cls.cloud', // PRODUCTION:UNCOMMENT
   },
 } as const
 

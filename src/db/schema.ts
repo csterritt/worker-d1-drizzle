@@ -4,14 +4,6 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 /**
- * Count table schema definition
- */
-export const count = sqliteTable('count', {
-  id: text('id').primaryKey(),
-  count: integer('count').notNull().default(0),
-})
-
-/**
  * User table schema definition
  */
 export const user = sqliteTable('user', {
@@ -41,15 +33,12 @@ export const session = sqliteTable('session', {
 
 // Define schema object for export
 export const schema = {
-  count,
   user,
   session,
 }
 
-export type Count = typeof count.$inferSelect
 export type User = typeof user.$inferSelect
 export type Session = typeof session.$inferSelect
 
-export type NewCount = typeof count.$inferInsert
 export type NewUser = typeof user.$inferInsert
 export type NewSession = typeof session.$inferInsert
