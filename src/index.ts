@@ -32,8 +32,8 @@ app.use(secureHeaders({ referrerPolicy: 'strict-origin-when-cross-origin' }))
 app.use(
   '*',
   csrf({
-    origin: (origin: string) => {
-      // return /https:\/\/recipes.cls.cloud$/.test(origin)  // PRODUCTION:UNCOMMENT
+    origin: (origin) => {
+      // return /https:\/\/mini-auth.example.com$/.test(origin)  // PRODUCTION:UNCOMMENT
       return /http:\/\/localhost(:\d+)?$/.test(origin) // PRODUCTION:REMOVE
     },
   })

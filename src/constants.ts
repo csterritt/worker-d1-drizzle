@@ -80,7 +80,7 @@ export const COOKIES = {
     httpOnly: true,
     sameSite: 'Strict',
     // secure: true, // PRODUCTION:UNCOMMENT
-    // domain: 'recipes.cls.cloud', // PRODUCTION:UNCOMMENT
+    // domain: 'mini-auth.example.com', // PRODUCTION:UNCOMMENT
   },
 } as const
 
