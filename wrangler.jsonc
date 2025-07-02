@@ -27,7 +27,7 @@
 			"binding": "PROJECT_DB",
 			"migrations_dir": "drizzle/migrations",
 			"database_name": "rdb-wrk-d1-dr-db",
-			"database_id": "e1bcd038-d281-4b02-95e3-78435dcf7b4b"
+			"database_id": "5faeaa9c-02fe-4102-bdc1-aee545d6a0fe"
 		}
 	]
 
