@@ -62,7 +62,7 @@ test.describe.serial('Resend code notification tests', () => {
   }) => {
     try {
       // Navigate to startup page and verify
-      await page.goto('http://localhost:3000/home')
+      await page.goto('http://localhost:3000')
       await verifyOnStartupPage(page)
       await startSignIn(page)
 
@@ -108,7 +108,6 @@ test.describe.serial('Resend code notification tests', () => {
       await submitValidCode(page, secondCode)
 
       // Sign out and verify we're back on the home page
-      await clickLink(page, 'visit-home-link')
       await signOutAndVerify(page)
     } finally {
       // Reset the clock
@@ -122,7 +121,7 @@ test.describe.serial('Resend code notification tests', () => {
   }) => {
     try {
       // Navigate to startup page and verify
-      await page.goto('http://localhost:3000/home')
+      await page.goto('http://localhost:3000')
       await verifyOnStartupPage(page)
       await startSignIn(page)
 
@@ -182,7 +181,6 @@ test.describe.serial('Resend code notification tests', () => {
       await submitValidCode(page, secondCode)
 
       // Sign out and verify we're back on the home page
-      await clickLink(page, 'visit-home-link')
       await signOutAndVerify(page)
     } finally {
       // Reset the clock
@@ -196,7 +194,7 @@ test.describe.serial('Resend code notification tests', () => {
   }) => {
     try {
       // Navigate to startup page and verify
-      await page.goto('http://localhost:3000/home')
+      await page.goto('http://localhost:3000')
       await verifyOnStartupPage(page)
       await startSignIn(page)
 
@@ -272,7 +270,6 @@ test.describe.serial('Resend code notification tests', () => {
       await submitValidCode(page, thirdCode)
 
       // Sign out and verify we're back on the home page
-      await clickLink(page, 'visit-home-link')
       await signOutAndVerify(page)
     } finally {
       // Reset the clock

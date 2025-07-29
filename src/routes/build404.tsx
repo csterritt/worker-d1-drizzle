@@ -26,7 +26,7 @@ const renderNotFound = (c: Context) => {
           </p>
           <div className='card-actions justify-center mt-4'>
             <a
-              href={PATHS.HOME}
+              href={PATHS.ROOT}
               className='btn btn-primary'
               data-testid='home-link'
             >

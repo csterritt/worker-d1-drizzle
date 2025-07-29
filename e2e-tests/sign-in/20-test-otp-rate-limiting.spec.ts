@@ -4,7 +4,7 @@ import {
   verifyOnSignInPage,
 } from '../support/page-verifiers'
 import { startSignIn } from '../support/auth-helpers'
-import { deleteAllUserSessions } from '../../src/lib/db-access'
+import { deleteAllUserSessions } from '../../src/lib/db/auth-access'
 
 // This test verifies that the handleStartOtp endpoint has rate limiting
 // It should return a 429 error if called more than three times in a five minute period
@@ -33,7 +33,7 @@ test.describe('OTP Rate Limiting', () => {
     const testEmail = 'rate-limit-user1@team439980.testinator.com'
     try {
       // Navigate to startup page and verify
-      await page.goto('http://localhost:3000/home')
+      await page.goto('http://localhost:3000')
       await verifyOnStartupPage(page)
 
       // Start sign in process

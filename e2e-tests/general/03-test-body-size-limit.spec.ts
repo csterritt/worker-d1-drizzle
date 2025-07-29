@@ -14,7 +14,7 @@ test.describe('Body size limit', () => {
     request,
   }) => {
     // First sign in to get a valid session
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
@@ -52,7 +52,7 @@ test.describe('Body size limit', () => {
     request,
   }) => {
     // First sign in to get a valid session
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
@@ -93,7 +93,7 @@ test.describe('Body size limit', () => {
     request,
   }) => {
     // First sign in to get a valid session
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 

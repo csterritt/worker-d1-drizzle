@@ -12,7 +12,7 @@ test('cannot POST empty code for browsers that ignore HTML constraints', async (
   context,
 }) => {
   // Start sign in and verify
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await verifyOnStartupPage(page)
   await startSignIn(page)
 

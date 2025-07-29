@@ -7,7 +7,7 @@ import { verifyOnAwaitCodePage } from '../support/page-verifiers'
 test('back button does not leave await code page after submitting email', async ({
   page,
 }) => {
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await startSignIn(page)
   const testEmail = 'fredfred@team439980.testinator.com'
   await submitEmail(page, testEmail)

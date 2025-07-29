@@ -15,7 +15,7 @@ test('sign out endpoint when not signed in (no session cookie)', async ({
   expect(response.status()).toBe(403)
 
   // Optionally, check the UI after POST (should be at startup or sign-in page)
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   try {
     await verifyOnStartupPage(page)
   } catch {
@@ -48,7 +48,7 @@ test('sign out endpoint with invalid session cookie', async ({
   expect(response.status()).toBe(403)
 
   // Optionally, check the UI after POST (should be at startup or sign-in page)
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   try {
     await verifyOnStartupPage(page)
   } catch {

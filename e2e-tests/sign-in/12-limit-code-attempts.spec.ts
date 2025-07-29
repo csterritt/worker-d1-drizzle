@@ -32,7 +32,7 @@ test.describe.serial('Code attempt limits', () => {
     page,
   }) => {
     // Navigate to startup page and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
@@ -64,7 +64,6 @@ test.describe.serial('Code attempt limits', () => {
     await submitValidCode(page, correctCode)
 
     // Sign out and verify we're back on the home page
-    await clickLink(page, 'visit-home-link')
     await signOutAndVerify(page)
   })
 
@@ -72,7 +71,7 @@ test.describe.serial('Code attempt limits', () => {
     page,
   }) => {
     // Navigate to startup page and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 

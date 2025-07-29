@@ -30,5 +30,5 @@ lerna-debug.log*
 # misc
 .DS_Store
 test-results
-public/style-XXXXXX.css
 tmp/
+schema.sql

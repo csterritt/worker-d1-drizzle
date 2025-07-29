@@ -31,7 +31,7 @@ customTest(
   'authenticated session persists across page reloads',
   async ({ page, testEmail }) => {
     // Navigate to startup page and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
 
     // Sign in
@@ -53,7 +53,7 @@ customTest(
     await verifyOnProtectedPage(page)
 
     // Navigate to home page
-    await clickLink(page, 'visit-home-link')
+    await page.goto('http://localhost:3000/')
     await verifyOnStartupPage(page)
 
     // Navigate back to protected page - should work without re-authentication
@@ -71,7 +71,7 @@ customTest(
     }
 
     // Navigate to home and back to private again to ensure session is maintained
-    await clickLink(page, 'visit-home-link')
+    await page.goto('http://localhost:3000/')
     await verifyOnStartupPage(page)
     await clickLink(page, 'visit-private-link')
     await verifyOnProtectedPage(page)

@@ -3,13 +3,13 @@
  * @module routes/auth/buildAwaitCode
  */
 import { Hono, Context } from 'hono'
-import { getCookie } from 'hono/cookie'
 
 import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
 import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
+import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
  * Render the JSX for the await code page.
@@ -22,56 +22,65 @@ const renderAwaitCode = (c: Context, emailEntered: string) => {
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
         <div className='card-body'>
           <h2 className='card-title text-2xl font-bold mb-4'>Enter Code</h2>
-          <form
-            method='post'
-            action={PATHS.AUTH.FINISH_OTP}
-            className='flex flex-col gap-4'
-            aria-label='Enter code form'
-          >
-            <input type='hidden' name='email' value={emailEntered} />
-            <div className='form-control w-full'>
-              <label className='label' htmlFor='otp'>
-                <span
-                  className='label-text'
-                  data-testid='please-enter-code-message'
+
+          {/* Position container for the cancel link */}
+          <div className='relative'>
+            <form
+              method='post'
+              action={PATHS.AUTH.FINISH_OTP}
+              className='flex flex-col gap-4'
+              aria-label='Enter code form'
+            >
+              <input type='hidden' name='email' value={emailEntered} />
+              <div className='form-control w-full'>
+                <label className='label' htmlFor='otp'>
+                  <span
+                    className='label-text'
+                    data-testid='please-enter-code-message'
+                  >
+                    Please enter the one-time code sent to
+                    <br />
+                    {emailEntered}
+                  </span>
+                </label>
+                <input
+                  id='otp'
+                  name='otp'
+                  type='text'
+                  inputMode='numeric'
+                  pattern='[0-9]{6}'
+                  maxLength={6}
+                  minLength={6}
+                  placeholder='6-digit code'
+                  required
+                  className='input input-bordered w-full'
+                  autoFocus
+                  data-testid='otp-input'
+                  aria-label={`Please enter the one-time code sent to ${emailEntered}`}
+                />
+              </div>
+              <div className='card-actions justify-end mt-4'>
+                <button
+                  type='submit'
+                  className='btn btn-primary'
+                  data-testid='submit'
                 >
-                  Please enter the one-time code sent to {emailEntered}
-                </span>
-              </label>
-              <input
-                id='otp'
-                name='otp'
-                type='text'
-                inputMode='numeric'
-                pattern='[0-9]{6}'
-                maxLength={6}
-                minLength={6}
-                placeholder='6-digit code'
-                required
-                className='input input-bordered w-full'
-                autoFocus
-                data-testid='otp-input'
-                aria-label={`Please enter the one-time code sent to ${emailEntered}`}
-              />
-            </div>
-            <div className='card-actions justify-between mt-4'>
-              <a
-                href={PATHS.AUTH.CANCEL_OTP}
-                className='btn btn-ghost'
+                  Verify Code
+                </button>
+              </div>
+            </form>
+
+            {/* Cancel button positioned outside form but visually in the same place */}
+            <form method='post' action={PATHS.AUTH.CANCEL_OTP}>
+              <button
+                type='submit'
+                className='btn btn-ghost absolute bottom-0 left-0'
                 data-testid='cancel-sign-in-link'
               >
                 Cancel
-              </a>
-
-              <button
-                type='submit'
-                className='btn btn-primary'
-                data-testid='submit'
-              >
-                Verify Code
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
 
           {/* Resend code form */}
           <div className='divider'>OR</div>
@@ -111,10 +120,10 @@ export const buildAwaitCode = (app: Hono<{ Bindings: Bindings }>): void => {
     }
 
     if (c.env.Session.value.signedIn) {
-      return redirectWithMessage(c, PATHS.HOME, 'You are already signed in.')
+      return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
     }
 
-    const emailEntered: string = getCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
+    const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     return c.render(useLayout(c, renderAwaitCode(c, emailEntered)))
   })

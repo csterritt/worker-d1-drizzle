@@ -8,7 +8,7 @@ import { startSignIn, cancelSignIn, submitEmail } from '../support/auth-helpers'
 
 test('canceling code submission returns to startup page', async ({ page }) => {
   // Start sign in and verify
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await verifyOnStartupPage(page)
   await startSignIn(page)
 

@@ -3,8 +3,8 @@
  * @module routes/buildLayout
  */
 import { Context } from 'hono'
-import { getCookie, deleteCookie } from 'hono/cookie'
 
+import { removeCookie, retrieveCookie } from '../lib/cookie-support'
 import { PATHS, COOKIES } from '../constants'
 import { version } from '../version'
 
@@ -16,13 +16,13 @@ import { version } from '../version'
  */
 export const useLayout = (c: Context, children: any) => {
   // Get message and error cookies
-  const message = getCookie(c, COOKIES.MESSAGE_FOUND)
+  const message = retrieveCookie(c, COOKIES.MESSAGE_FOUND)
   if (message) {
-    deleteCookie(c, COOKIES.MESSAGE_FOUND)
+    removeCookie(c, COOKIES.MESSAGE_FOUND)
   }
-  const error = getCookie(c, COOKIES.ERROR_FOUND)
+  const error = retrieveCookie(c, COOKIES.ERROR_FOUND)
   if (error) {
-    deleteCookie(c, COOKIES.ERROR_FOUND)
+    removeCookie(c, COOKIES.ERROR_FOUND)
   }
 
   // Set content type header
@@ -49,65 +49,57 @@ export const useLayout = (c: Context, children: any) => {
           )}
 
           {c.env.Session.isJust && c.env.Session.value.signedIn && (
-            <form method='post' action={PATHS.AUTH.SIGN_OUT}>
-              <button
-                type='submit'
-                className='btn btn-ghost btn-sm mx-2'
-                data-testid='sign-out-link'
-              >
-                Sign out
-              </button>
-            </form>
+            <div className='flex flex-row align-center space-x-4'>
+              <form method='post' action={PATHS.AUTH.SIGN_OUT}>
+                <button
+                  type='submit'
+                  className='btn btn-ghost btn-sm'
+                  data-testid='sign-out-link'
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
           )}
         </div>
       </div>
 
       {/* Alert messages */}
       {message && (
-        <div
-          className='alert alert-success shadow-lg max-w-md mx-auto mt-4'
-          role='alert'
-        >
-          <div>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              className='stroke-current flex-shrink-0 h-6 w-6'
-              fill='none'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-              />
-            </svg>
-            <span>{message}</span>
-          </div>
+        <div className='alert alert-success mx-auto mt-4' role='alert'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='h-6 w-6 shrink-0 stroke-current'
+            fill='none'
+            viewBox='0 0 24 24'
+          >
+            <path
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              stroke-width='2'
+              d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+            />
+          </svg>
+          <span className='align-middle'>{message}</span>
         </div>
       )}
 
       {error && (
-        <div
-          className='alert alert-error shadow-lg max-w-md mx-auto mt-4'
-          role='alert'
-        >
-          <div>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              className='stroke-current flex-shrink-0 h-6 w-6'
-              fill='none'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
-              />
-            </svg>
-            <span>{error}</span>
-          </div>
+        <div className='alert alert-error mx-auto mt-4' role='alert'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            className='h-6 w-6 shrink-0 stroke-current'
+            fill='none'
+            viewBox='0 0 24 24'
+          >
+            <path
+              stroke-linecap='round'
+              stroke-linejoin='round'
+              stroke-width='2'
+              d='M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'
+            />
+          </svg>
+          <span className='align-middle'>{error}</span>
         </div>
       )}
 

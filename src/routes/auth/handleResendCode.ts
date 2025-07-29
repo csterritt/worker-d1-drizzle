@@ -3,20 +3,18 @@
  * @module routes/auth/handleResendCode
  */
 import { Hono } from 'hono'
-import { deleteCookie, getCookie } from 'hono/cookie'
 import Result, { isErr } from 'true-myth/result'
 import { isNothing } from 'true-myth/maybe'
 
-import { DURATIONS, PATHS } from '../../constants'
+import { PATHS, COOKIES, DURATIONS } from '../../constants'
 import { Bindings } from '../../local-types'
-import { redirectWithMessage } from '../../lib/redirects'
-import { COOKIES } from '../../constants'
-import { redirectWithError } from '../../lib/redirects'
+import { removeCookie } from '../../lib/cookie-support'
+import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
 import {
   deleteSession,
   findUserById,
   updateSessionById,
-} from '../../lib/db-access'
+} from '../../lib/db/auth-access'
 import { generateToken } from '../../lib/generate-code'
 import { getCurrentTime } from '../../lib/time-access'
 import { ResendCodeSchema, validateRequest } from '../../lib/validators'
@@ -61,7 +59,7 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
     const now = getCurrentTime(c)
     if (session.expiresAt < now.getTime()) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
 
       return redirectWithError(
         c,
@@ -92,8 +90,8 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
     const maybeUser = userResult.value
     if (isNothing(maybeUser)) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
-      deleteCookie(c, COOKIES.EMAIL_ENTERED, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
 
       return redirectWithError(
         c,
@@ -105,8 +103,8 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
     const user = maybeUser.value
     if (user.email !== email) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
-      deleteCookie(c, COOKIES.EMAIL_ENTERED, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
 
       return redirectWithError(
         c,
@@ -145,7 +143,7 @@ export const handleResendCode = (app: Hono<{ Bindings: Bindings }>): void => {
     if (res.isErr) {
       console.error('Failed to send email:', res.error)
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
 
       return redirectWithError(
         c,

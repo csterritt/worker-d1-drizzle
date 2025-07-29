@@ -12,7 +12,7 @@ import {
 
 test('submitting a too-short email fails', async ({ page }) => {
   // Start sign in and verify
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await verifyOnStartupPage(page)
   await startSignIn(page)
 
@@ -23,7 +23,7 @@ test('submitting a too-short email fails', async ({ page }) => {
 
 test('submitting a too-long email fails', async ({ page }) => {
   // Start sign in and verify
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await verifyOnStartupPage(page)
   await startSignIn(page)
 

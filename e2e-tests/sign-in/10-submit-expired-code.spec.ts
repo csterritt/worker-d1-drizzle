@@ -17,7 +17,7 @@ test('submitting an expired code shows token expired error', async ({
     await page.goto(`http://localhost:3000/auth/set-clock/${ago}`)
 
     // Navigate to startup page and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 

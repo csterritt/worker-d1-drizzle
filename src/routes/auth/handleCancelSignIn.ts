@@ -1,31 +1,30 @@
 /**
- * Route handler for canceling sign-in (POST).
+ * Route handler for cancelling the sign-in process.
  * @module routes/auth/handleCancelSignIn
  */
 import { Hono } from 'hono'
-import { deleteCookie } from 'hono/cookie'
-import { getCookie } from 'hono/cookie'
 
 import { PATHS, COOKIES } from '../../constants'
 import { Bindings } from '../../local-types'
+import { removeCookie, retrieveCookie } from '../../lib/cookie-support'
 import { redirectWithMessage } from '../../lib/redirects'
-import { deleteSession } from '../../lib/db-access'
+import { deleteSession } from '../../lib/db/auth-access'
 
 /**
- * Attach the cancel sign-in route to the app.
+ * Attach the cancel sign-in POST route to the app.
  * @param app - Hono app instance
  */
 export const handleCancelSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.CANCEL_OTP, async (c) => {
-    const sessionId: string = (getCookie(c, COOKIES.SESSION) ?? '').trim()
+  app.post(PATHS.AUTH.CANCEL_OTP, async (c) => {
+    const sessionId: string = (retrieveCookie(c, COOKIES.SESSION) ?? '').trim()
     if (sessionId !== '') {
       await deleteSession(c.env.PROJECT_DB, sessionId)
     }
 
-    deleteCookie(c, COOKIES.EMAIL_ENTERED, { path: '/' })
-    deleteCookie(c, COOKIES.ERROR_FOUND, { path: '/' })
-    deleteCookie(c, COOKIES.SESSION, { path: '/' })
+    removeCookie(c, COOKIES.EMAIL_ENTERED)
+    removeCookie(c, COOKIES.ERROR_FOUND)
+    removeCookie(c, COOKIES.SESSION)
 
-    return redirectWithMessage(c, PATHS.HOME, 'Sign in canceled.')
+    return redirectWithMessage(c, PATHS.ROOT, 'Sign in canceled.')
   })
 }

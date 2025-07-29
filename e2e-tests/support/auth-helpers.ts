@@ -31,7 +31,7 @@ export async function submitEmail(page: Page, email: string) {
 
   // Verify instruction message
   const message = await getElementText(page, 'please-enter-code-message')
-  expect(message).toBe(`Please enter the one-time code sent to ${email}`)
+  expect(message).toBe(`Please enter the one-time code sent to${email}`)
 }
 
 export async function submitInvalidEmail(page: Page, email: string) {

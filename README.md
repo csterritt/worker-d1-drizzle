@@ -37,6 +37,9 @@ To run in production, set the following environment variables:
     CLOUDFLARE_DATABASE_ID='<your cloudflare database id>'
     CLOUDFLARE_D1_TOKEN='<your cloudflare d1 access token>'
 
+    PO_APP_ID='<your pushover app id>'
+    PO_USER_ID='<your pushover user id>'
+
 For development, set the same environment variables as above, but put them in a `.dev.vars` file in the
 root directory of the project.
 

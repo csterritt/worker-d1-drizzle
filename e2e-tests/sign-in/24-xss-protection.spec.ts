@@ -65,7 +65,7 @@ async function checkNoAlertDialog(page: Page): Promise<void> {
 test.describe.skip('XSS Protection Tests', () => {
   test('email input field should sanitize XSS payloads', async ({ page }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await startSignIn(page)
 
     for (const payload of xssPayloads) {
@@ -99,7 +99,7 @@ test.describe.skip('XSS Protection Tests', () => {
     page,
   }) => {
     // Navigate to sign-in page and submit a valid email to get to code entry page
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await startSignIn(page)
     await submitEmail(page, 'fredfred@team439980.testinator.com')
 

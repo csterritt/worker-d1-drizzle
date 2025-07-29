@@ -7,7 +7,7 @@ import { Hono } from 'hono'
 import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
-import { setCurrentDelta } from '../../lib/time-access'  // PRODUCTION:REMOVE
+import { setCurrentDelta } from '../../lib/time-access' // PRODUCTION:REMOVE
 
 /**
  * Attach the set clock GET route to the app.
@@ -23,6 +23,6 @@ export const handleSetClock = (app: Hono<{ Bindings: Bindings }>): void => {
     // For test: pretend to set the server clock (no-op in prod)
     // Accept a timestamp or ISO string in the body (for extensibility)
     // In a real implementation, you would update a test clock here
-    return redirectWithMessage(c, PATHS.HOME, 'Clock set!')
+    return redirectWithMessage(c, PATHS.ROOT, 'Clock set!')
   })
 }

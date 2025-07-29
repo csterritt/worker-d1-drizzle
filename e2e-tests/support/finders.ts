@@ -30,7 +30,7 @@ export const verifyContentByTestId = async (
   return expect(page.getByTestId(testId)).toHaveText(expectedText)
 }
 
-export const elementExists = async (
+export const verifyElementExists = async (
   page: Page,
   testId: string
 ): Promise<boolean> => {

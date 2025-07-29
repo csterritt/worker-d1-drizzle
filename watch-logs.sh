@@ -1,3 +1,3 @@
 #!/bin/bash
 
-wrangler pages deployment tail --project-name mini-auth
+wrangler tail worker-d1-drizzle

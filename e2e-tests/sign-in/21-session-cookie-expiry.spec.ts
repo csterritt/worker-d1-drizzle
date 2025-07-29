@@ -2,12 +2,12 @@ import { test } from '@playwright/test'
 import {
   startSignIn,
   submitEmail,
-  submitCode,
   submitValidCode,
 } from '../support/auth-helpers'
 import {
   verifyOnStartupPage,
   verifyOnProtectedPage,
+  verifyOnSignInPage,
 } from '../support/page-verifiers'
 import { PATHS, DURATIONS } from '../../src/constants'
 import { verifyAlert } from '../support/finders' // Adjusted path for constants
@@ -18,7 +18,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000
 test.describe('Session Cookie Expiry', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(`http://localhost:3000${PATHS.AUTH.RESET_CLOCK}`)
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
   })
 
@@ -30,7 +30,7 @@ test.describe('Session Cookie Expiry', () => {
     page,
   }) => {
     // 1. Sign in a user
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
     await submitEmail(page, 'fredfred@team439980.testinator.com')
@@ -51,7 +51,7 @@ test.describe('Session Cookie Expiry', () => {
     await page.goto(`http://localhost:3000${PATHS.PRIVATE}`)
 
     // 4. Verify that the user is redirected to the sign-in page
-    await verifyOnStartupPage(page)
+    await verifyOnSignInPage(page)
     await verifyAlert(page, 'You must sign in to visit that page')
   })
 })

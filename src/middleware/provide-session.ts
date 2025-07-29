@@ -1,11 +1,11 @@
 import { createMiddleware } from 'hono/factory'
-import { getCookie } from 'hono/cookie'
 import { Maybe } from 'true-myth'
 
 import { COOKIES } from '../constants'
-import { findSessionById } from '../lib/db-access'
+import { findSessionById } from '../lib/db/auth-access'
 import { isErr } from 'true-myth/result'
 import type { Bindings } from '../local-types'
+import { retrieveCookie } from '../lib/cookie-support'
 
 /**
  * Middleware to provide session data to the request.
@@ -13,7 +13,7 @@ import type { Bindings } from '../local-types'
  */
 export const provideSession = createMiddleware<{ Bindings: Bindings }>(
   async (c, next) => {
-    const sessionId = getCookie(c, COOKIES.SESSION)
+    const sessionId = retrieveCookie(c, COOKIES.SESSION)
     if (!sessionId) {
       c.env.Session = Maybe.nothing()
     } else {

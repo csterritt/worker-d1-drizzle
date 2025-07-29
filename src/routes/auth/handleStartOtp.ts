@@ -3,7 +3,6 @@
  * @module routes/auth/handleStartOtp
  */
 import { Context, Hono } from 'hono'
-import { deleteCookie, setCookie } from 'hono/cookie'
 import { ulid } from 'ulid'
 import Result, { isErr } from 'true-myth/result'
 import { isNothing } from 'true-myth/maybe'
@@ -16,10 +15,11 @@ import {
   createSession,
   deleteSession,
   countRecentNonSignedInSessionsByEmail,
-} from '../../lib/db-access'
+} from '../../lib/db/auth-access'
 import { generateToken } from '../../lib/generate-code'
 import { getCurrentTime } from '../../lib/time-access'
 import { StartOtpSchema, validateRequest } from '../../lib/validators'
+import { addCookie, removeCookie } from '../../lib/cookie-support'
 // import { sendOtpToUserViaEmail } from '../../lib/send-email' // PRODUCTION:UNCOMMENT
 
 // Maximum number of non-signed-in sessions allowed in the rate limit window
@@ -65,12 +65,7 @@ export const handleStartOtp = (app: Hono<{ Bindings: Bindings }>): void => {
       typeof formData.email === 'string' ? formData.email.trim() : ''
 
     // Store the entered email in a cookie
-    setCookie(
-      c,
-      COOKIES.EMAIL_ENTERED,
-      enteredEmail,
-      COOKIES.STANDARD_COOKIE_OPTIONS
-    )
+    addCookie(c, COOKIES.EMAIL_ENTERED, enteredEmail)
     // Validate the request using Valibot schema
     let [isValid, validatedData, errorMessage] = validateRequest(
       formData,
@@ -105,7 +100,7 @@ export const handleStartOtp = (app: Hono<{ Bindings: Bindings }>): void => {
 
     // Is there a session already?
     if (c.env.Session.isJust && c.env.Session.value.signedIn) {
-      return redirectWithError(c, PATHS.PRIVATE, 'Already signed in')
+      return redirectWithError(c, PATHS.PRIVATE, 'You are already signed in')
     }
 
     // Check if user exists in the database
@@ -149,7 +144,7 @@ export const handleStartOtp = (app: Hono<{ Bindings: Bindings }>): void => {
       )
       return redirectWithError(c, PATHS.AUTH.SIGN_IN, 'Database error')
     }
-    setCookie(c, COOKIES.SESSION, sessionId, COOKIES.STANDARD_COOKIE_OPTIONS)
+    addCookie(c, COOKIES.SESSION, sessionId)
     c.header('X-Session-Token', sessionToken) // PRODUCTION:REMOVE
 
     // Send the OTP code to the user via email
@@ -160,7 +155,7 @@ export const handleStartOtp = (app: Hono<{ Bindings: Bindings }>): void => {
     if (res.isErr) {
       console.error('Failed to send email:', res.error)
       await deleteSession(c.env.PROJECT_DB, sessionId)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
 
       return redirectWithError(
         c,

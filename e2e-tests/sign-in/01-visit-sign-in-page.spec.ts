@@ -5,7 +5,7 @@ import { startSignIn } from '../support/auth-helpers'
 
 test('visiting sign in page shows sign in form', async ({ page }) => {
   // Navigate to startup page and verify
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
 
   // Start sign in and verify form shown
   await startSignIn(page)

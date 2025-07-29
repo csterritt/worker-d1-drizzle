@@ -18,7 +18,6 @@ export const HTML_STATUS = {
  */
 export const PATHS = {
   ROOT: '/' as const,
-  HOME: '/home' as const,
   PRIVATE: '/private' as const,
 
   // Auth API paths
@@ -71,6 +70,8 @@ export const COOKIES = {
   OTP_SETUP: 'OTP_SETUP',
   // Session cookie
   SESSION: 'SESSION',
+  // Sign out message cookie
+  SIGN_OUT_MESSAGE: 'SIGN_OUT_MESSAGE',
   // DB failure count cookie for testing // PRODUCTION:REMOVE
   DB_FAIL_COUNT: 'DB_FAIL_COUNT', // PRODUCTION:REMOVE
   DB_FAIL_INCR: 'DB_FAIL_INCR', // PRODUCTION:REMOVE
@@ -115,3 +116,8 @@ export const STANDARD_RETRY_OPTIONS = {
   minTimeout: 20, // PRODUCTION:REMOVE
   retries: 5,
 } as const
+
+// API URLs
+export const API_URLS = {
+  PUSHOVER: 'https://api.pushover.net/1/messages.json',
+}

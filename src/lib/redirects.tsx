@@ -1,5 +1,5 @@
 import { Context } from 'hono'
-import { setCookie } from 'hono/cookie'
+import { addCookie } from './cookie-support'
 
 import { COOKIES, HTML_STATUS } from '../constants'
 
@@ -15,7 +15,10 @@ export function redirectWithMessage(
   redirectUrl: string,
   message: string
 ): Response {
-  setCookie(c, COOKIES.MESSAGE_FOUND, message, COOKIES.STANDARD_COOKIE_OPTIONS)
+  if (message.trim() !== '') {
+    addCookie(c, COOKIES.MESSAGE_FOUND, message)
+  }
+
   return c.redirect(redirectUrl, HTML_STATUS.SEE_OTHER)
 }
 
@@ -31,11 +34,6 @@ export function redirectWithError(
   redirectUrl: string,
   errorMessage: string
 ): Response {
-  setCookie(
-    c,
-    COOKIES.ERROR_FOUND,
-    errorMessage,
-    COOKIES.STANDARD_COOKIE_OPTIONS
-  )
+  addCookie(c, COOKIES.ERROR_FOUND, errorMessage)
   return c.redirect(redirectUrl, HTML_STATUS.SEE_OTHER)
 }

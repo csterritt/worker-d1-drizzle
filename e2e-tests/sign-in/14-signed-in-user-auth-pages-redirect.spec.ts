@@ -13,7 +13,7 @@ import {
 test('signed-in user visiting /auth/sign-in is redirected to home', async ({
   page,
 }) => {
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await startSignIn(page)
 
   // Capture the response to get the session token from the headers
@@ -30,7 +30,7 @@ test('signed-in user visiting /auth/sign-in is redirected to home', async ({
   await page.goto('http://localhost:3000/auth/sign-in')
 
   // Should be redirected to the home page (startup)
-  await verifyOnStartupPage(page)
+  await verifyOnProtectedPage(page)
 
   // Sign out and verify
   await signOutAndVerify(page)
@@ -39,7 +39,7 @@ test('signed-in user visiting /auth/sign-in is redirected to home', async ({
 test('signed-in user visiting /auth/await-code is redirected to home', async ({
   page,
 }) => {
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await startSignIn(page)
 
   // Capture the response to get the session token from the headers
@@ -56,7 +56,7 @@ test('signed-in user visiting /auth/await-code is redirected to home', async ({
   await page.goto('http://localhost:3000/auth/await-code')
 
   // Should be redirected to the home page (startup)
-  await verifyOnStartupPage(page)
+  await verifyOnProtectedPage(page)
 
   // Sign out and verify
   await signOutAndVerify(page)

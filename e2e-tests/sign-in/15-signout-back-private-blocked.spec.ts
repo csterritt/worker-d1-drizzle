@@ -14,7 +14,7 @@ import {
 test('sign out from private page and back button does not restore access', async ({
   page,
 }) => {
-  await page.goto('http://localhost:3000/home')
+  await page.goto('http://localhost:3000')
   await startSignIn(page)
   await submitEmail(page, 'fredfred@team439980.testinator.com')
   await submitCode(page, '123456')

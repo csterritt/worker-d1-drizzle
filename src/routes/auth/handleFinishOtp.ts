@@ -3,7 +3,6 @@
  * @module routes/auth/handleFinishOtp
  */
 import { Hono } from 'hono'
-import { deleteCookie, setCookie } from 'hono/cookie'
 import { isErr } from 'true-myth/result'
 import { isNothing } from 'true-myth/maybe'
 
@@ -14,9 +13,11 @@ import {
   deleteSession,
   findUserById,
   updateSessionById,
-} from '../../lib/db-access'
+} from '../../lib/db/auth-access'
 import { getCurrentTime } from '../../lib/time-access'
 import { FinishOtpSchema, validateRequest } from '../../lib/validators'
+import { addCookie, removeCookie } from '../../lib/cookie-support'
+// import { pushoverNotify } from '../../lib/po-notify'  // PRODUCTION:UNCOMMENT
 
 /**
  * Attach the finish OTP POST route to the app.
@@ -59,7 +60,7 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
     const now = getCurrentTime(c).getTime()
     if (session.expiresAt < now) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
 
       return redirectWithError(
         c,
@@ -78,7 +79,7 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
     const maybeUser = userResult.value
     if (isNothing(maybeUser)) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
 
       return redirectWithError(
         c,
@@ -90,8 +91,8 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
     const user = maybeUser.value
     if (user.email !== email) {
       await deleteSession(c.env.PROJECT_DB, session.id)
-      deleteCookie(c, COOKIES.SESSION, { path: '/' })
-      deleteCookie(c, COOKIES.EMAIL_ENTERED, { path: '/' })
+      removeCookie(c, COOKIES.SESSION)
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
 
       return redirectWithError(
         c,
@@ -107,7 +108,7 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
         const newAttemptCount: number = session.attemptCount + 1
         if (newAttemptCount >= 3) {
           await deleteSession(c.env.PROJECT_DB, session.id)
-          deleteCookie(c, COOKIES.SESSION, { path: '/' })
+          removeCookie(c, COOKIES.SESSION)
 
           return redirectWithError(
             c,
@@ -154,10 +155,12 @@ export const handleFinishOtp = (app: Hono<{ Bindings: Bindings }>): void => {
       return redirectWithError(c, PATHS.AUTH.SIGN_IN, 'Database error')
     }
 
-    deleteCookie(c, COOKIES.EMAIL_ENTERED, { path: '/' })
-    deleteCookie(c, COOKIES.ERROR_FOUND, { path: '/' })
-    setCookie(c, COOKIES.SESSION, session.id, {
-      ...COOKIES.STANDARD_COOKIE_OPTIONS,
+    // const msg = `${user.email} signed in successfully to the application` // PRODUCTION:UNCOMMENT
+    // await pushoverNotify(c, msg) // PRODUCTION:UNCOMMENT
+
+    removeCookie(c, COOKIES.EMAIL_ENTERED)
+    removeCookie(c, COOKIES.ERROR_FOUND)
+    addCookie(c, COOKIES.SESSION, session.id, {
       expires: expiresAt,
     })
 

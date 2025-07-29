@@ -7,7 +7,7 @@ import { Hono } from 'hono'
 import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
-import { clearCurrentDelta } from '../../lib/time-access'  // PRODUCTION:REMOVE
+import { clearCurrentDelta } from '../../lib/time-access' // PRODUCTION:REMOVE
 
 /**
  * Attach the reset clock GET route to the app.
@@ -20,6 +20,6 @@ export const handleResetClock = (app: Hono<{ Bindings: Bindings }>): void => {
     clearCurrentDelta(c)
     // For test: pretend to reset the server clock (no-op in prod)
     // In a real implementation, you would reset the test clock here
-    return redirectWithMessage(c, PATHS.HOME, 'Clock reset!')
+    return redirectWithMessage(c, PATHS.ROOT, 'Clock reset!')
   })
 }

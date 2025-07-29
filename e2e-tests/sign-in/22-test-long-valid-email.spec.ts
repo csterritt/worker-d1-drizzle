@@ -9,7 +9,7 @@ test.describe('Email Validation Edge Cases', () => {
     page,
   }) => {
     // Start sign in and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
@@ -35,7 +35,7 @@ test.describe('Email Validation Edge Cases', () => {
 
   test('rejects email with maximum local part (64 chars)', async ({ page }) => {
     // Start sign in and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
@@ -106,7 +106,7 @@ test.describe('Email Validation Edge Cases', () => {
 
   test('accepts standard email format', async ({ page }) => {
     // Start sign in and verify
-    await page.goto('http://localhost:3000/home')
+    await page.goto('http://localhost:3000')
     await verifyOnStartupPage(page)
     await startSignIn(page)
 
