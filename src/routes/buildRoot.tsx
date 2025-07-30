@@ -3,7 +3,8 @@
  * @module routes/buildRoot
  */
 import { Hono, Context } from 'hono'
-import { PATHS, COOKIES } from '../constants'
+import { secureHeaders } from 'hono/secure-headers'
+import { PATHS, COOKIES, ALLOW_SCRIPTS_SECURE_HEADERS } from '../constants'
 import { useLayout } from './buildLayout'
 import { Bindings } from '../local-types'
 
@@ -89,5 +90,15 @@ const renderRoot = (c: Context) => {
  * @param app - Hono app instance
  */
 export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.ROOT, (c) => c.render(useLayout(c, renderRoot(c))))
+  const secureHeadersWithNonce = {
+    ...ALLOW_SCRIPTS_SECURE_HEADERS,
+    contentSecurityPolicy: {
+      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
+      scriptSrc: ["'sha256-je2dq3b/WBE98PDRLxXs4N6tC2cAsKOzYQsStnT2de0='"],
+    },
+  }
+
+  app.get(PATHS.ROOT, secureHeaders(secureHeadersWithNonce), (c) =>
+    c.render(useLayout(c, renderRoot(c)))
+  )
 }

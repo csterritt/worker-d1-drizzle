@@ -3,8 +3,9 @@
  * @module routes/auth/buildAwaitCode
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../../constants'
+import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -110,21 +111,30 @@ const renderAwaitCode = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildAwaitCode = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.AWAIT_CODE, (c) => {
-    if (c.env.Session == null || c.env.Session.isNothing) {
-      return redirectWithError(
-        c,
-        PATHS.AUTH.SIGN_IN,
-        'Sign in flow problem, please sign in again'
-      )
+  app.get(
+    PATHS.AUTH.AWAIT_CODE,
+    secureHeaders(ALLOW_SCRIPTS_SECURE_HEADERS),
+    (c) => {
+      if (c.env.Session == null || c.env.Session.isNothing) {
+        return redirectWithError(
+          c,
+          PATHS.AUTH.SIGN_IN,
+          'Sign in flow problem, please sign in again'
+        )
+      }
+
+      if (c.env.Session.value.signedIn) {
+        return redirectWithMessage(
+          c,
+          PATHS.PRIVATE,
+          'You are already signed in.'
+        )
+      }
+
+      const emailEntered: string =
+        retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
+
+      return c.render(useLayout(c, renderAwaitCode(c, emailEntered)))
     }
-
-    if (c.env.Session.value.signedIn) {
-      return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
-    }
-
-    const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
-
-    return c.render(useLayout(c, renderAwaitCode(c, emailEntered)))
-  })
+  )
 }

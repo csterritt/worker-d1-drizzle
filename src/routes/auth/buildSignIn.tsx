@@ -3,8 +3,9 @@
  * @module routes/auth/buildSignIn
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../../constants'
+import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -84,7 +85,15 @@ const renderSignIn = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.SIGN_IN, (c) => {
+  const secureHeadersWithNonce = {
+    ...ALLOW_SCRIPTS_SECURE_HEADERS,
+    contentSecurityPolicy: {
+      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
+      scriptSrc: ["'sha256-vuT4jLBPWwBahBVDX9kIwvULuCqVeGJue9++ZZPtFb8='"],
+    },
+  }
+
+  app.get(PATHS.AUTH.SIGN_IN, secureHeaders(secureHeadersWithNonce), (c) => {
     if (c.env.Session.isJust && c.env.Session.value.signedIn === true) {
       console.log('Already signed in')
       return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')

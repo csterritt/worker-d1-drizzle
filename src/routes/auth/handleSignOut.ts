@@ -3,8 +3,9 @@
  * @module routes/auth/handleSignOut
  */
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
 import { deleteSession } from '../../lib/db/auth-access'
@@ -19,17 +20,23 @@ import {
  * @param app - Hono app instance
  */
 export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.post(PATHS.AUTH.SIGN_OUT, async (c) => {
-    const sessionId: string = (retrieveCookie(c, COOKIES.SESSION) ?? '').trim()
-    if (sessionId !== '') {
-      await deleteSession(c.env.PROJECT_DB, sessionId)
+  app.post(
+    PATHS.AUTH.SIGN_OUT,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    async (c) => {
+      const sessionId: string = (
+        retrieveCookie(c, COOKIES.SESSION) ?? ''
+      ).trim()
+      if (sessionId !== '') {
+        await deleteSession(c.env.PROJECT_DB, sessionId)
+      }
+
+      removeCookie(c, COOKIES.SESSION)
+
+      // Set sign-out message cookie
+      addCookie(c, COOKIES.SIGN_OUT_MESSAGE, 'Signed out successfully.')
+
+      return redirectWithMessage(c, PATHS.ROOT, '')
     }
-
-    removeCookie(c, COOKIES.SESSION)
-
-    // Set sign-out message cookie
-    addCookie(c, COOKIES.SIGN_OUT_MESSAGE, 'Signed out successfully.')
-
-    return redirectWithMessage(c, PATHS.ROOT, '')
-  })
+  )
 }

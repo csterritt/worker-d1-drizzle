@@ -121,3 +121,53 @@ export const STANDARD_RETRY_OPTIONS = {
 export const API_URLS = {
   PUSHOVER: 'https://api.pushover.net/1/messages.json',
 }
+
+// Security headers
+export const STANDARD_SECURE_HEADERS: any = {
+  referrerPolicy: 'strict-origin-when-cross-origin',
+  contentSecurityPolicy: {
+    // defaultSrc: ["'self'", 'https://mini-auth.example.com', 'https://mini-auth.workers.dev'], // PRODUCTION:UNCOMMENT
+    defaultSrc: ["'self'"], // PRODUCTION:REMOVE
+    baseUri: ["'self'"],
+    childSrc: ["'self'"],
+    connectSrc: ["'self'"],
+    fontSrc: ["'self'", 'https:', 'data:'],
+    // formAction: ["'self'", 'https://mini-auth.example.com', 'https://mini-auth.workers.dev'], // PRODUCTION:UNCOMMENT
+    formAction: ["'self'"], // PRODUCTION:REMOVE
+    frameAncestors: ["'self'"],
+    frameSrc: ["'self'"],
+    imgSrc: ["'self'", 'data:'],
+    manifestSrc: ["'self'"],
+    mediaSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    reportTo: 'endpoint-1',
+    sandbox: ['allow-same-origin', 'allow-forms'],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+    styleSrcAttr: ["'none'"],
+    styleSrcElem: ["'self'", 'https:', "'unsafe-inline'"],
+    upgradeInsecureRequests: [],
+    workerSrc: ["'none'"],
+  },
+  permissionsPolicy: {
+    fullscreen: ['self'],
+    bluetooth: ['self'],
+    payment: ['self'],
+    syncXhr: [],
+    camera: ['self'],
+    microphone: ['self'],
+    geolocation: ['self'],
+    usb: ['self'],
+    accelerometer: ['self'],
+    gyroscope: ['self'],
+    magnetometer: ['self'],
+  },
+}
+
+export const ALLOW_SCRIPTS_SECURE_HEADERS: any = {
+  ...STANDARD_SECURE_HEADERS,
+  contentSecurityPolicy: {
+    ...STANDARD_SECURE_HEADERS.contentSecurityPolicy,
+    sandbox: ['allow-same-origin', 'allow-scripts', 'allow-forms'],
+  },
+}

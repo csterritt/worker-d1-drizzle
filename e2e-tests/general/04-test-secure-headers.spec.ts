@@ -14,7 +14,7 @@ test.describe('Security Headers', () => {
   }) => {
     // Get the response headers - bit of a hack, the root page doesn't get automatic headers
     // in development, so we use a non-existent page
-    const response = await request.get('http://localhost:3000/404-page')
+    const response = await request.get('http://localhost:3000/auth/sign-in')
     const headers = response.headers()
 
     // Verify security headers are present and have appropriate values
@@ -91,7 +91,7 @@ test.describe('Security Headers', () => {
   }) => {
     // Test multiple endpoints to ensure headers are consistent
     const endpoints = [
-      '/home', // Home page
+      '/', // Home page
       '/auth/sign-in', // Sign-in page
     ]
 

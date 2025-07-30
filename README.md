@@ -45,6 +45,5 @@ root directory of the project.
 
 ### Setting up for production
 
-Change the host name in the `constants.ts` `STANDARD_COOKIE_OPTIONS` object from `mini-auth.example.com`
-to the domain name you want to use for the worker. It will also need to be set in the `CSRF`
-middleware call in `index.ts`.
+Change the host name in the files that have the domain name as `mini-auth.example.com` (and `mini-auth.workers.dev`
+if needed) to the domain name you want to use for the worker.
