@@ -43,6 +43,28 @@ export const addCookie = (
 }
 
 /**
+ * Sets a cookie without the standard cookie options, so it can be read/deleted
+ * by javascript
+ * @param c - Hono context
+ * @param name - Cookie name
+ * @param value - Cookie value
+ * @param extraOptions - Additional cookie options
+ */
+export const addSimpleCookie = (
+  c: Context<{ Bindings: Bindings }>,
+  name: string,
+  value: string,
+  extraOptions?: object
+): void => {
+  let options = {}
+  if (extraOptions) {
+    options = { ...options, ...extraOptions }
+  }
+
+  setCookie(c, name, value, options)
+}
+
+/**
  * Removes a cookie with standard cookie options
  * @param c - Hono context
  * @param name - Cookie name

@@ -10,7 +10,7 @@ import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
 import { deleteSession } from '../../lib/db/auth-access'
 import {
-  addCookie,
+  addSimpleCookie,
   removeCookie,
   retrieveCookie,
 } from '../../lib/cookie-support'
@@ -34,7 +34,7 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
       removeCookie(c, COOKIES.SESSION)
 
       // Set sign-out message cookie
-      addCookie(c, COOKIES.SIGN_OUT_MESSAGE, 'Signed out successfully.')
+      addSimpleCookie(c, COOKIES.SIGN_OUT_MESSAGE, 'Signed out successfully.')
 
       return redirectWithMessage(c, PATHS.ROOT, '')
     }
