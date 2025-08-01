@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 def check_git_modified_files
     res = `/opt/homebrew/bin/git diff --name-only`.split(/[\r\n]+/)
     if res.length > 0
