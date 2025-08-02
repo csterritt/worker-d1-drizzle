@@ -47,3 +47,6 @@ root directory of the project.
 
 Change the host name in the files that have the domain name as `mini-auth.example.com` (and `mini-auth.workers.dev`
 if needed) to the domain name you want to use for the worker.
+
+### Licensing
+See LICENSE.txt
