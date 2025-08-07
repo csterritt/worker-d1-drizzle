@@ -1,5 +1,10 @@
 ### Basic CloudFlare worker+d1+drizzle app with magic-code sign-in
 
+# DO NOT USE THIS CODE FOR ANYTHING IMPORTANT
+## Particularly if it is a project that folks pay to use.
+## See [this comment thread](https://news.ycombinator.com/item?id=44820331) for reasons why not.
+# YOU HAVE BEEN WARNED.
+
 #### Setup for development
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
