@@ -10,23 +10,22 @@ import { bodyLimit } from 'hono/body-limit'
 
 import { HTML_STATUS } from './constants'
 import { renderer } from './renderer'
-import { provideSession } from './middleware/provide-session'
 import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
 import { buildPrivate } from './routes/buildPrivate'
 import { build404 } from './routes/build404'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
-import { handleStartOtp } from './routes/auth/handleStartOtp'
-import { buildAwaitCode } from './routes/auth/buildAwaitCode'
-import { handleFinishOtp } from './routes/auth/handleFinishOtp'
-import { handleResendCode } from './routes/auth/handleResendCode'
-import { handleCancelSignIn } from './routes/auth/handleCancelSignIn'
+import { handleSignIn } from './routes/auth/handleSignIn'
+import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleSignOut } from './routes/auth/handleSignOut'
+import { setupBetterAuth, setupBetterAuthMiddleware } from './routes/auth/better-auth-handler'
+import { setupBetterAuthResponseInterceptor } from './routes/auth/betterAuthResponseInterceptor'
+
 import { Bindings } from './local-types'
 import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMOVE
 import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
-import { handleCleanSessions } from './routes/auth/handleCleanSessions' // PRODUCTION:REMOVE
+
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -65,7 +64,6 @@ app.use(
 
 app.use(logger())
 app.use(renderer)
-app.use(provideSession)
 
 // Initialize db client for each request
 app.use(async (c, next) => {
@@ -76,21 +74,23 @@ app.use(async (c, next) => {
   await next()
 })
 
+// Setup auth middleware and routes
+setupBetterAuthMiddleware(app)
+setupBetterAuthResponseInterceptor(app) // Must come before setupBetterAuth to intercept responses
+setupBetterAuth(app)
+
 // Route declarations
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
-handleStartOtp(app)
-buildAwaitCode(app)
-handleFinishOtp(app)
-handleResendCode(app)
-handleCancelSignIn(app)
+handleSignUp(app)
 handleSignOut(app)
+
 
 handleSetClock(app) // PRODUCTION:REMOVE
 handleResetClock(app) // PRODUCTION:REMOVE
 handleSetDbFailures(app) // PRODUCTION:REMOVE
-handleCleanSessions(app) // PRODUCTION:REMOVE
+
 
 // this MUST be the last route declared!
 build404(app)

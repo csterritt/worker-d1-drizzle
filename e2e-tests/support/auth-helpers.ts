@@ -24,18 +24,23 @@ export async function submitCode(page: Page, code: string) {
   await clickLink(page, 'submit')
 }
 
-export async function submitEmail(page: Page, email: string) {
-  await fillInput(page, 'email', email)
+export async function submitEmailAndPassword(page: Page, email: string, password: string) {
+  await fillInput(page, 'email-input', email)
+  await fillInput(page, 'password-input', password)
   await clickLink(page, 'submit')
-  await verifyOnAwaitCodePage(page)
+  // For successful login, we should be redirected to the protected page
+  await verifyOnProtectedPage(page)
+}
 
-  // Verify instruction message
-  const message = await getElementText(page, 'please-enter-code-message')
-  expect(message).toBe(`Please enter the one-time code sent to${email}`)
+// Legacy function for backward compatibility - now just submits email field
+export async function submitEmail(page: Page, email: string) {
+  await fillInput(page, 'email-input', email)
+  // Note: This function is deprecated in favor of submitEmailAndPassword
+  // In the new flow, password is also required
 }
 
 export async function submitInvalidEmail(page: Page, email: string) {
-  await fillInput(page, 'email', email)
+  await fillInput(page, 'email-input', email)
   await clickLink(page, 'submit')
   await verifyOnSignInPage(page)
   await verifyAlert(page, `Please enter a valid email address`)
@@ -44,9 +49,37 @@ export async function submitInvalidEmail(page: Page, email: string) {
   await expect(page.getByTestId('email-input')).toHaveValue(email)
 }
 
+export async function signUpUser(page: Page, name: string, email: string, password: string) {
+  // Navigate to sign-in page first
+  await startSignIn(page)
+  
+  // Show the signup form
+  await clickLink(page, 'show-signup')
+  
+  // Fill in signup form using correct data-testid selectors
+  await fillInput(page, 'signup-name-input', name)
+  await fillInput(page, 'signup-email-input', email)
+  await fillInput(page, 'signup-password-input', password)
+  
+  // Submit signup form
+  await clickLink(page, 'signup-submit')
+  
+  // Should be redirected to protected page after successful signup
+  await verifyOnProtectedPage(page)
+}
+
+export async function signInUser(page: Page, email: string, password: string) {
+  // Navigate to sign-in page if not already there
+  await startSignIn(page)
+  
+  // Fill and submit login form
+  await submitEmailAndPassword(page, email, password)
+}
+
+// Legacy function - no longer needed in better-auth flow
 export async function cancelSignIn(page: Page) {
-  // Cancel sign-in and verify return to startup page (resets internal state)
-  await clickLink(page, 'cancel-sign-in-link')
+  // Note: Cancel functionality may not be needed in better-auth flow
+  // as there's no intermediate "await code" state
   await verifyOnStartupPage(page)
 }
 

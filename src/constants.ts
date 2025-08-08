@@ -32,20 +32,7 @@ export const PATHS = {
     // Sign in page
     SIGN_IN: '/auth/sign-in',
 
-    // Start OTP verification process
-    START_OTP: '/auth/start-otp',
 
-    // Finish OTP verification process
-    FINISH_OTP: '/auth/finish-otp',
-
-    // Await code page
-    AWAIT_CODE: '/auth/await-code',
-
-    // Cancel OTP verification
-    CANCEL_OTP: '/auth/cancel-otp',
-
-    // Resend OTP code
-    RESEND_CODE: '/auth/resend-code',
 
     // Set and reset clock (for testing) // PRODUCTION:REMOVE
     SET_CLOCK: '/auth/set-clock', // PRODUCTION:REMOVE
@@ -70,8 +57,7 @@ export const COOKIES = {
   ERROR_FOUND: 'ERROR_FOUND',
   // Email entered cookie
   EMAIL_ENTERED: 'EMAIL_ENTERED',
-  // OTP setup timestamp cookie (encrypted)
-  OTP_SETUP: 'OTP_SETUP',
+
   // Session cookie
   SESSION: 'SESSION',
   // Sign out message cookie
@@ -99,7 +85,7 @@ export const VALIDATION = {
   // Messages
   REQUIRED: 'This field is required',
   EMAIL_INVALID: 'Please enter a valid email address',
-  OTP_INVALID: 'Please enter a valid 6-digit code',
+
 } as const
 
 export const DURATIONS = {

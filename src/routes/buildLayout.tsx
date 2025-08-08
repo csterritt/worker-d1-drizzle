@@ -42,7 +42,7 @@ export const useLayout = (c: Context, children: any) => {
           </div>
         </div>
         <div className='navbar-end flex items-center'>
-          {(c.env.Session.isNothing || !c.env.Session.value.signedIn) && (
+          {!c.get('user') && (
             <a
               href={PATHS.AUTH.SIGN_IN}
               className='btn btn-primary btn-sm mx-2'
@@ -52,9 +52,12 @@ export const useLayout = (c: Context, children: any) => {
             </a>
           )}
 
-          {c.env.Session.isJust && c.env.Session.value.signedIn && (
+          {c.get('user') && (
             <div className='flex flex-row align-center space-x-4'>
-              <form method='post' action={PATHS.AUTH.SIGN_OUT}>
+              <span className='text-sm mr-2'>
+                Welcome, {c.get('user')?.name || c.get('user')?.email || 'User'}!
+              </span>
+              <form method='post' action='/auth/sign-out'>
                 <button
                   type='submit'
                   className='btn btn-ghost btn-sm'

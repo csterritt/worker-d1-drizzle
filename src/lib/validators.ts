@@ -39,43 +39,9 @@ export const EmailSchema = pipe(
   custom(validateEmail)
 )
 
-// OTP validation function
-const validateOtp = (value: unknown) => {
-  if (typeof value !== 'string') return false
-  return /^\d{6}$/.test(value)
-}
 
-/**
- * OTP (One-Time Password) validation schema
- * - Must be a string
- * - Must be exactly 6 digits
- */
-export const OtpSchema = pipe(
-  string(VALIDATION.OTP_INVALID),
-  custom(validateOtp)
-)
 
-/**
- * Start OTP request schema
- */
-export const StartOtpSchema = object({
-  email: EmailSchema,
-})
 
-/**
- * Finish OTP request schema
- */
-export const FinishOtpSchema = object({
-  email: EmailSchema,
-  otp: OtpSchema,
-})
-
-/**
- * Resend code request schema (typically just needs email)
- */
-export const ResendCodeSchema = object({
-  email: EmailSchema,
-})
 
 /**
  * Increment request schema

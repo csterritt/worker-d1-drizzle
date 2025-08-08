@@ -30,53 +30,126 @@ const renderSignIn = (c: Context, emailEntered: string) => {
         <div className='card-body'>
           <h2 className='card-title text-2xl font-bold mb-4'>Sign In</h2>
 
-          {/* Position container for the cancel link */}
-          <div className='relative'>
-            <form
-              method='post'
-              action={PATHS.AUTH.START_OTP}
-              className='flex flex-col gap-4'
-              aria-label='Sign in form'
-            >
-              <div className='form-control w-full'>
-                <label className='label' htmlFor='email'>
-                  <span className='label-text'>Email</span>
-                </label>
-                <input
-                  id='email'
-                  name='email'
-                  type='email'
-                  placeholder='Enter your email'
-                  required
-                  className='input input-bordered w-full'
-                  autoFocus
-                  value={emailEntered}
-                  data-testid='email-input'
-                  aria-label='Email'
-                />
-              </div>
-              <div className='card-actions justify-end mt-4'>
-                <button
-                  type='submit'
-                  className='btn btn-primary'
-                  data-testid='submit'
-                >
-                  Sign In
-                </button>
-              </div>
-            </form>
-
-            {/* Cancel button positioned outside form but visually in the same place */}
-            <form method='post' action={PATHS.AUTH.CANCEL_OTP}>
+          {/* Better-auth sign-in form */}
+          <form
+            method='post'
+            action='/api/auth/sign-in/email'
+            className='flex flex-col gap-4'
+            aria-label='Sign in form'
+          >
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='email'>
+                <span className='label-text'>Email</span>
+              </label>
+              <input
+                id='email'
+                name='email'
+                type='email'
+                placeholder='Enter your email'
+                required
+                className='input input-bordered w-full'
+                autoFocus
+                value={emailEntered}
+                data-testid='email-input'
+                aria-label='Email'
+              />
+            </div>
+            
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='password'>
+                <span className='label-text'>Password</span>
+              </label>
+              <input
+                id='password'
+                name='password'
+                type='password'
+                placeholder='Enter your password'
+                required
+                minLength={8}
+                className='input input-bordered w-full'
+                data-testid='password-input'
+                aria-label='Password'
+              />
+            </div>
+            
+            <div className='card-actions justify-end mt-4'>
               <button
                 type='submit'
-                className='btn btn-ghost absolute bottom-0 left-0'
-                data-testid='cancel-sign-in-link'
+                className='btn btn-primary'
+                data-testid='submit'
               >
-                Cancel
+                Sign In
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
+
+          {/* Sign up form for new users */}
+          <div className='divider'>New user?</div>
+          <form
+            method='post'
+            action='/auth/sign-up'
+            className='flex flex-col gap-4'
+            aria-label='Sign up form'
+          >
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='signup-name'>
+                <span className='label-text'>Name</span>
+              </label>
+              <input
+                id='signup-name'
+                name='name'
+                type='text'
+                placeholder='Enter your full name'
+                required
+                className='input input-bordered w-full'
+                data-testid='signup-name-input'
+                aria-label='Name'
+              />
+            </div>
+            
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='signup-email'>
+                <span className='label-text'>Email</span>
+              </label>
+              <input
+                id='signup-email'
+                name='email'
+                type='email'
+                placeholder='Enter your email'
+                required
+                className='input input-bordered w-full'
+                data-testid='signup-email-input'
+                aria-label='Email'
+              />
+            </div>
+            
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='signup-password'>
+                <span className='label-text'>Password</span>
+              </label>
+              <input
+                id='signup-password'
+                name='password'
+                type='password'
+                placeholder='Enter your password (min 8 characters)'
+                required
+                minLength={8}
+                className='input input-bordered w-full'
+                data-testid='signup-password-input'
+                aria-label='Password'
+              />
+            </div>
+            
+            <div className='card-actions justify-end mt-4'>
+              <button
+                type='submit'
+                className='btn btn-secondary w-full'
+                data-testid='signup-submit'
+              >
+                Create Account
+              </button>
+            </div>
+          </form>
         </div>
       </div>
       {reloadOnBackButton()}
@@ -98,16 +171,17 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
   }
 
   app.get(PATHS.AUTH.SIGN_IN, secureHeaders(secureHeadersWithNonce), (c) => {
-    if (c.env.Session.isJust && c.env.Session.value.signedIn === true) {
+    // Check if user is already signed in using better-auth session
+    // Better-auth middleware sets user context, access it properly
+    const user = (c as any).get('user')
+    if (user) {
       console.log('Already signed in')
       return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
     }
 
-    if (c.env.Session.isJust && c.env.Session.value.signedIn !== true) {
-      console.log('Already in the process of signing in')
-      return redirectWithMessage(c, PATHS.AUTH.AWAIT_CODE, '')
-    }
-
+    // No need to check for intermediate "signing in" state with better-auth
+    // since it's direct username/password authentication
+    
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     setupNoCacheHeaders(c)

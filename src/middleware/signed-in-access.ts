@@ -5,21 +5,23 @@
 import { Context } from 'hono'
 import { createMiddleware } from 'hono/factory'
 
-import { COOKIES, PATHS } from '../constants'
-import { redirectWithError, redirectWithMessage } from '../lib/redirects'
-import { Bindings, SignInSession } from '../local-types'
+import { PATHS } from '../constants'
+import { redirectWithError } from '../lib/redirects'
+import { Bindings } from '../local-types'
 import { setupNoCacheHeaders } from '../lib/setup-no-cache-headers'
-import { deleteSession } from '../lib/db/auth-access'
-import { getCurrentTime } from '../lib/time-access'
-import { removeCookie } from '../lib/cookie-support'
 
 /**
  * Middleware to restrict access to signed-in users only.
  * If the user is not signed in, redirect to sign-in page with an error message.
+ * Updated for better-auth integration.
  */
 export const signedInAccess = createMiddleware<{ Bindings: Bindings }>(
   async (c: Context, next) => {
-    if (c.env.Session.isNothing) {
+    // Check if user is authenticated using better-auth session context
+    const user = c.get('user')
+    const session = c.get('session')
+    
+    if (!user || !session) {
       return redirectWithError(
         c,
         PATHS.AUTH.SIGN_IN,
@@ -27,29 +29,10 @@ export const signedInAccess = createMiddleware<{ Bindings: Bindings }>(
       )
     }
 
-    const maybeSession: SignInSession = c.env.Session.value
-    if (!maybeSession.signedIn) {
-      return redirectWithError(
-        c,
-        PATHS.AUTH.SIGN_IN,
-        'You must sign in to visit that page'
-      )
-    }
-
-    // Check if session has expired
-    if (maybeSession.expiresAt < getCurrentTime(c).getTime()) {
-      await deleteSession(c.env.PROJECT_DB, maybeSession.id.toString())
-      removeCookie(c, COOKIES.SESSION)
-
-      return redirectWithMessage(
-        c,
-        PATHS.AUTH.SIGN_IN,
-        'You must sign in to visit that page'
-      )
-    }
+    // Better-auth handles session expiration automatically
+    // No need to manually check expiration
 
     setupNoCacheHeaders(c)
-
     await next()
   }
 )

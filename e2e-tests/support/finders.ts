@@ -11,6 +11,15 @@ export const clickLink = async (page: Page, testId: string) => {
 
 export const fillInput = async (
   page: Page,
+  testId: string,
+  value: string
+) => {
+  return page.getByTestId(testId).fill(value)
+}
+
+// Legacy function for backward compatibility with old tests
+export const fillInputByPlaceholder = async (
+  page: Page,
   placeholder: string,
   value: string
 ) => {
