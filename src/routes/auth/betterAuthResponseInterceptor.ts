@@ -30,7 +30,7 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
             // Create a new response with the same cookies but redirect instead of JSON
             const redirectResponse = redirectWithMessage(
               c,
-              PATHS.ROOT,
+              PATHS.PRIVATE,
               'Welcome! You have been signed in successfully.'
             )
 

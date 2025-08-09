@@ -51,6 +51,8 @@ export function createAuth(db: D1Database) {
       'http://127.0.0.1:3000',
       // Add production origins as needed
     ],
+    baseURL: 'http://localhost:3000',
+    redirectTo: '/private', // Redirect to protected page after successful sign-in
     secret: process.env.BETTER_AUTH_SECRET || 'your-secret-key-change-this-in-production',
   })
 }

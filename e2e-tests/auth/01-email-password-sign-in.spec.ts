@@ -1,69 +1,96 @@
 import { test, expect } from '@playwright/test'
 import { startSignIn } from '../support/auth-helpers'
-import { verifyOnSignInPage, verifyOnProtectedPage } from '../support/page-verifiers'
+import {
+  verifyOnSignInPage,
+  verifyOnProtectedPage,
+} from '../support/page-verifiers'
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { testWithDatabase } from '../support/db-helpers'
 
 test.describe('Better-Auth Email/Password Sign In', () => {
-  test('successful sign-in with valid email and password', async ({ page }) => {
-    // Navigate to sign-in page
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+  test(
+    'redirect to sign-in for unauthenticated users',
+    testWithDatabase(async ({ page }) => {
+      // Try to access protected page without signing in
+      await page.goto('http://localhost:3000/private')
 
-    // Fill in valid credentials
-    await fillInput(page, 'email-input', 'test@example.com')
-    await fillInput(page, 'password-input', 'validpassword123')
+      // Should be redirected to sign-in page
+      await verifyOnSignInPage(page)
+    })
+  )
 
-    // Submit form
-    await clickLink(page, 'submit')
+  test(
+    'successful sign-in with valid email and password',
+    testWithDatabase(async ({ page }) => {
+      // Navigate to sign-in page
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Should be redirected to protected page
-    await verifyOnProtectedPage(page)
-  })
+      // Fill in valid credentials
+      await fillInput(page, 'email-input', 'csterritt@gmail.com')
+      await fillInput(page, 'password-input', 'asdfasdfasdf')
 
-  test('sign-in fails with invalid email format', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+      // Submit form
+      await clickLink(page, 'submit')
 
-    // Fill in invalid email format
-    await fillInput(page, 'email-input', 'not-an-email')
-    await fillInput(page, 'password-input', 'validpassword123')
+      // Should be redirected to protected page
+      await verifyOnProtectedPage(page)
+    })
+  )
 
-    // Submit form
-    await clickLink(page, 'submit')
+  test(
+    'sign-in fails with invalid email',
+    testWithDatabase(async ({ page }) => {
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Should stay on sign-in page
-    await verifyOnSignInPage(page)
-  })
+      // Fill in invalid email
+      await fillInput(page, 'email-input', 'nonexistent@example.com')
+      await fillInput(page, 'password-input', 'anypassword123')
 
-  test('sign-in fails with missing password', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+      // Submit form
+      await clickLink(page, 'submit')
 
-    // Fill in only email
-    await fillInput(page, 'email-input', 'test@example.com')
-    // Leave password empty
+      // Should stay on sign-in page
+      await verifyOnSignInPage(page)
+    })
+  )
 
-    // Submit form
-    await clickLink(page, 'submit')
+  test(
+    'sign-in fails with missing password',
+    testWithDatabase(async ({ page }) => {
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Should stay on sign-in page
-    await verifyOnSignInPage(page)
-  })
+      // Fill in only email
+      await fillInput(page, 'email-input', 'csterritt@gmail.com')
+      // Leave password empty
 
-  test('sign-in fails with password too short', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+      // Submit form
+      await clickLink(page, 'submit')
 
-    // Fill in email and short password
-    await fillInput(page, 'email-input', 'test@example.com')
-    await fillInput(page, 'password-input', '123') // Less than 8 characters
+      // Should stay on sign-in page
+      await verifyOnSignInPage(page)
+    })
+  )
 
-    // Submit form
-    await clickLink(page, 'submit')
+  test(
+    'sign-in fails with password too short',
+    testWithDatabase(async ({ page }) => {
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Should stay on sign-in page
-    await verifyOnSignInPage(page)
-  })
+      // Fill in email and short password
+      await fillInput(page, 'email-input', 'csterritt@gmail.com')
+      await fillInput(page, 'password-input', '123') // Less than 8 characters
+
+      // Submit form
+      await clickLink(page, 'submit')
+
+      // Should stay on sign-in page
+      await verifyOnSignInPage(page)
+    })
+  )
 
   test('sign-in fails with non-existent user', async ({ page, request }) => {
     await page.goto('http://localhost:3000')
@@ -80,29 +107,35 @@ test.describe('Better-Auth Email/Password Sign In', () => {
     await verifyOnSignInPage(page)
   })
 
-  test('sign-in fails with wrong password', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+  test(
+    'sign-in fails with wrong password',
+    testWithDatabase(async ({ page }) => {
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Fill in valid email but wrong password
-    await fillInput(page, 'email-input', 'test@example.com')
-    await fillInput(page, 'password-input', 'wrongpassword123')
+      // Fill in valid email but wrong password
+      await fillInput(page, 'email-input', 'csterritt@gmail.com')
+      await fillInput(page, 'password-input', 'wrongpassword123')
 
-    // Submit form
-    await clickLink(page, 'submit')
+      // Submit form
+      await clickLink(page, 'submit')
 
-    // Should stay on sign-in page
-    await verifyOnSignInPage(page)
-  })
+      // Should stay on sign-in page
+      await verifyOnSignInPage(page)
+    })
+  )
 
-  test('form validation prevents submission with empty fields', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-    await startSignIn(page)
+  test(
+    'form validation prevents submission with empty fields',
+    testWithDatabase(async ({ page }) => {
+      await page.goto('http://localhost:3000')
+      await startSignIn(page)
 
-    // Try to submit empty form
-    await clickLink(page, 'submit')
+      // Try to submit empty form
+      await clickLink(page, 'submit')
 
-    // Should stay on sign-in page - HTML5 validation should prevent submission
-    await verifyOnSignInPage(page)
-  })
+      // Should stay on sign-in page - HTML5 validation should prevent submission
+      await verifyOnSignInPage(page)
+    })
+  )
 })

@@ -25,6 +25,7 @@ import { Bindings } from './local-types'
 import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMOVE
 import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
+import { testDatabaseRouter } from './routes/test/database' // PRODUCTION:REMOVE
 
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -37,19 +38,29 @@ if (process.env.ALTERNATE_ORIGIN) {
 
 // Apply middleware
 app.use(secureHeaders({ referrerPolicy: 'strict-origin-when-cross-origin' }))
+// Apply CSRF protection to all routes except test endpoints
 app.use(
-  '*',
-  csrf({
-    origin: (origin: string) => {
-      // return /https:\/\/mini-auth.example.com$/.test(origin) || // PRODUCTION:UNCOMMENT
-      //  /https:\/\/mini-auth.example.workers.dev$/.test(origin)  // PRODUCTION:UNCOMMENT
-      // PRODUCTION:REMOVE-NEXT-LINE
-      return (
-        /http:\/\/localhost(:\d+)?$/.test(origin) || // PRODUCTION:REMOVE
-        alternateOrigin.test(origin) // PRODUCTION:REMOVE
-      ) // PRODUCTION:REMOVE
-    },
-  })
+  async (c, next) => {
+    // Skip CSRF for test endpoints // PRODUCTION:REMOVE
+    if (c.req.path.startsWith('/test/')) { // PRODUCTION:REMOVE
+      return next() // PRODUCTION:REMOVE
+    } // PRODUCTION:REMOVE
+    
+    // Apply CSRF protection to all other routes
+    const csrfMiddleware = csrf({
+      origin: (origin: string) => {
+        // return /https:\/\/mini-auth.example.com$/.test(origin) || // PRODUCTION:UNCOMMENT
+        //  /https:\/\/mini-auth.example.workers.dev$/.test(origin)  // PRODUCTION:UNCOMMENT
+        // PRODUCTION:REMOVE-NEXT-LINE
+        return (
+          /http:\/\/localhost(:\d+)?$/.test(origin) || // PRODUCTION:REMOVE
+          alternateOrigin.test(origin) // PRODUCTION:REMOVE
+        ) // PRODUCTION:REMOVE
+      },
+    })
+    
+    return csrfMiddleware(c, next)
+  }
 )
 app.use(
   bodyLimit({
@@ -90,6 +101,9 @@ handleSignOut(app)
 handleSetClock(app) // PRODUCTION:REMOVE
 handleResetClock(app) // PRODUCTION:REMOVE
 handleSetDbFailures(app) // PRODUCTION:REMOVE
+
+// Test-only database endpoints // PRODUCTION:REMOVE
+app.route('/test/database', testDatabaseRouter) // PRODUCTION:REMOVE
 
 
 // this MUST be the last route declared!
