@@ -20,13 +20,24 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
         return next()
       }
 
-      // Check if this was a successful sign-in (status 200 with user data)
+      // Check if this was a successful auth response (status 200)
       if (response.status === 200) {
         try {
-          const responseData = await response.json()
+          const responseData = await response.json() as any
           
-          // If the response contains user data, it was a successful sign-in
-          if (responseData && responseData.user && responseData.user.id) {
+          // Handle successful sign-up that requires email verification
+          if (responseData && responseData.user && !responseData.user.emailVerified && c.req.url.includes('/sign-up')) {
+            // User signed up but needs to verify email
+            const email = responseData.user.email
+            return redirectWithMessage(
+              c,
+              `${PATHS.AUTH.EMAIL_SENT}?email=${encodeURIComponent(email)}`,
+              'Account created! Please check your email to verify your account.'
+            )
+          }
+          
+          // If the response contains user data and user is verified, it was a successful sign-in
+          if (responseData && responseData.user && responseData.user.id && responseData.user.emailVerified) {
             // Create a new response with the same cookies but redirect instead of JSON
             const redirectResponse = redirectWithMessage(
               c,

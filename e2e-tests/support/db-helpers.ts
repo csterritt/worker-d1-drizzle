@@ -1,7 +1,9 @@
 /**
  * Database helpers for e2e tests
  * Provides functions to clear and seed test database via server endpoints
+ * Also provides smtp-tester mail server for email testing
  */
+import { test } from '@playwright/test'
 
 /**
  * Clear all data from authentication-related tables
@@ -107,6 +109,11 @@ export const seedDatabase = async (): Promise<void> => {
 type PlaywrightTestFunction = ({ page }: { page: any }) => Promise<void>
 
 /**
+ * Wrapper type for Playwright test function with mail server
+ */
+type PlaywrightTestFunctionWithEmail = ({ page, mailServer }: { page: any; mailServer: any }) => Promise<void>
+
+/**
  * Enhanced test wrapper that provides database isolation
  * Clears and seeds database before each test, cleans up after
  */
@@ -118,19 +125,46 @@ export const testWithDatabase = (
       // Setup: Clear and seed database
       await clearDatabase()
       await seedDatabase()
+      await clearSessions()
 
-      // Run the actual test
+      // Run the test
       await testFn({ page })
-    } catch (error) {
-      console.error('Test failed:', error)
-      throw error
     } finally {
-      // Cleanup: Clear database
-      try {
-        await clearSessions()
-      } catch (cleanupError) {
-        console.error('Test cleanup failed:', cleanupError)
-      }
+      // Cleanup: Clear database after test
+      await clearDatabase()
     }
   }
+}
+
+/**
+ * Enhanced test wrapper that provides database isolation and smtp-tester
+ * Clears and seeds database before each test, starts smtp server, cleans up after
+ */
+export const testWithDatabaseAndEmail = (
+  testName: string,
+  testFn: PlaywrightTestFunctionWithEmail
+): void => {
+  test(testName, async ({ page }) => {
+    let mailServer: any = null
+    
+    try {
+      // Setup: Start SMTP test server
+      const { default: smtpTester } = await import('smtp-tester')
+      mailServer = smtpTester.init(2500)
+      
+      // Setup: Clear and seed database
+      await clearDatabase()
+      await seedDatabase()
+      await clearSessions()
+
+      // Run the test with mail server support
+      await testFn({ page, mailServer })
+    } finally {
+      // Cleanup: Stop mail server and clear database
+      if (mailServer && typeof mailServer.stop === 'function') {
+        mailServer.stop()
+      }
+      await clearDatabase()
+    }
+  })
 }

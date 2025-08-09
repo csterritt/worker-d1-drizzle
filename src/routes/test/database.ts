@@ -25,22 +25,19 @@ testDatabaseRouter.delete('/clear', async (c) => {
 
     console.log('Test database cleared successfully')
 
-    return c.json({
-      success: true,
-      message: 'Database cleared successfully',
-      timestamp: new Date().toISOString(),
+    return new Response(JSON.stringify({ success: true, message: 'Database cleared successfully' }), {
+      headers: { 'Content-Type': 'application/json' }
     })
   } catch (error) {
     console.error('Failed to clear test database:', error)
 
-    return c.json(
-      {
-        success: false,
-        error: 'Failed to clear database',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      500
-    )
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error clearing test database'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 })
 

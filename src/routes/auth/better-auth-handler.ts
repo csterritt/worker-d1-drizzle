@@ -28,11 +28,49 @@ type BetterAuthHono = Hono<{
  * @param app - Hono app instance
  */
 export const setupBetterAuth = (app: any) => {
-  // Mount better-auth API endpoints
-  app.on(['POST', 'GET'], '/api/auth/*', async (c: any) => {
-    const auth = createAuth(c.env.PROJECT_DB)
-    return auth.handler(c.req.raw)
+  console.log('🔧 Setting up better-auth routes...')
+  
+  // Better-auth handler with enhanced debugging
+  app.all('/api/auth/*', async (c: any) => {
+    console.log('🔔 Better-auth route hit:', c.req.method, c.req.url)
+    console.log('🔧 Environment check:', { 
+      PROJECT_DB: !!c.env.PROJECT_DB,
+      envKeys: Object.keys(c.env || {})
+    })
+    
+    try {
+      console.log('🔧 Creating auth instance...')
+      const auth = createAuth(c.env.PROJECT_DB)
+      console.log('🔧 Auth instance created successfully')
+      
+      console.log('🔧 Calling auth.handler with request...')
+      console.log('🔧 Request details:', {
+        method: c.req.method,
+        url: c.req.url,
+        headers: Object.fromEntries(c.req.raw.headers.entries())
+      })
+      
+      const response = await auth.handler(c.req.raw)
+      console.log('✅ Auth handler response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+      
+      return response
+    } catch (error) {
+      console.error('❌ Better-auth handler error:', error)
+      console.error('❌ Error stack:', (error as Error)?.stack)
+      return new Response('Internal Server Error: ' + (error as Error)?.message, { status: 500 })
+    }
   })
+  
+  // Add a simple test route for debugging (after wildcard)
+  app.get('/api/auth/test', async (c: any) => {
+    return c.json({ message: 'Test route working', url: c.req.url })
+  })
+  
+  console.log('✅ Better-auth routes setup complete')
 }
 
 /**

@@ -10,6 +10,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createDbClient } from '../db/client'
 import { schema } from '../db/schema'
+import { sendConfirmationEmail } from './email-service'
 
 /**
  * Create and configure better-auth instance
@@ -17,8 +18,9 @@ import { schema } from '../db/schema'
  * @returns Configured better-auth instance
  */
 export function createAuth(db: D1Database) {
+  console.log('========> Entering createAuth...')
   const dbClient = createDbClient(db)
-  
+
   return betterAuth({
     database: drizzleAdapter(dbClient, {
       provider: 'sqlite',
@@ -28,9 +30,32 @@ export function createAuth(db: D1Database) {
     }),
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false, // We'll start simple, can enable later
+      requireEmailVerification: true, // Enable email verification for sign-ups
       minPasswordLength: 8,
       maxPasswordLength: 128,
+      sendVerificationEmail: async ({
+        user,
+        url,
+        token,
+      }: {
+        user: { email: string; name: string }
+        url: string
+        token: string
+      }) => {
+        console.log('🔔 better-auth sendVerificationEmail triggered:', {
+          user: user.email,
+          url,
+          token,
+        })
+        try {
+          // Send confirmation email using our email service
+          await sendConfirmationEmail(user.email, user.name, url, token)
+          console.log('✅ Email sent successfully via sendConfirmationEmail')
+        } catch (error) {
+          console.error('❌ Error in sendVerificationEmail:', error)
+          throw error
+        }
+      },
     },
     session: {
       expiresIn: 60 * 60 * 24 * 30, // 30 days
@@ -53,7 +78,9 @@ export function createAuth(db: D1Database) {
     ],
     baseURL: 'http://localhost:3000',
     redirectTo: '/private', // Redirect to protected page after successful sign-in
-    secret: process.env.BETTER_AUTH_SECRET || 'your-secret-key-change-this-in-production',
+    secret:
+      process.env.BETTER_AUTH_SECRET ||
+      'your-secret-key-change-this-in-production',
   })
 }
 

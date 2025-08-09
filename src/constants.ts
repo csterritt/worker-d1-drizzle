@@ -32,6 +32,9 @@ export const PATHS = {
     // Sign in page
     SIGN_IN: '/auth/sign-in',
 
+    // Email confirmation pages
+    VERIFY_EMAIL: '/auth/verify-email',
+    EMAIL_SENT: '/auth/email-sent',
 
 
     // Set and reset clock (for testing) // PRODUCTION:REMOVE

@@ -13,6 +13,7 @@ import { renderer } from './renderer'
 import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
 import { buildPrivate } from './routes/buildPrivate'
 import { build404 } from './routes/build404'
+import { buildEmailConfirmation } from './routes/auth/buildEmailConfirmation'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
 import { handleSignIn } from './routes/auth/handleSignIn'
@@ -86,14 +87,19 @@ app.use(async (c, next) => {
 })
 
 // Setup auth middleware and routes
+console.log('🔧 Setting up auth middleware...')
 setupBetterAuthMiddleware(app)
+console.log('🔧 Setting up auth response interceptor...')
 setupBetterAuthResponseInterceptor(app) // Must come before setupBetterAuth to intercept responses
+console.log('🔧 About to call setupBetterAuth...')
 setupBetterAuth(app)
+console.log('🔧 setupBetterAuth call completed')
 
 // Route declarations
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
+buildEmailConfirmation(app)
 handleSignUp(app)
 handleSignOut(app)
 
