@@ -100,7 +100,7 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
         // Sign-in was successful! Create redirect response
         const response = redirectWithMessage(
           c,
-          PATHS.ROOT,
+          PATHS.PRIVATE,
           'Welcome! You have been signed in successfully.'
         )
 

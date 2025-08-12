@@ -57,13 +57,6 @@ export const setupBetterAuthResponseInterceptor = (
               'Welcome! You have been signed in successfully.'
             )
 
-            // Forward all cookies from better-auth response
-            const cookies = response.headers.get('set-cookie')
-            if (cookies) {
-              // Handle single cookie header
-              redirectResponse.headers.set('Set-Cookie', cookies)
-            }
-
             // Handle multiple cookie headers if they exist
             const allCookieHeaders = response.headers.getSetCookie?.() || []
             allCookieHeaders.forEach((cookie) => {
