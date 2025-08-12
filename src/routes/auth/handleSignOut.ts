@@ -36,12 +36,6 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
             'You have been signed out successfully.'
           )
 
-          // Forward cookie clearing headers from better-auth response
-          const cookies = authResponse.headers.get('set-cookie')
-          if (cookies) {
-            redirectResponse.headers.set('Set-Cookie', cookies)
-          }
-
           // Handle multiple cookie headers if they exist
           const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
           allCookieHeaders.forEach((cookie) => {
