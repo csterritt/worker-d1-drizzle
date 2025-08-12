@@ -148,7 +148,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       return redirectWithMessage(
         c,
         PATHS.AUTH.SIGN_IN,
-        'Account created successfully! You can now sign in with your credentials.'
+        'Account created! Please check your email to verify your account.'
       )
     } catch (error) {
       console.error('Sign-up error:', error)
