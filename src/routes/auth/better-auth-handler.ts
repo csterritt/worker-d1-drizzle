@@ -18,7 +18,7 @@ export interface BetterAuthVariables {
 }
 
 // Extended Hono type with better-auth variables
-type BetterAuthHono = Hono<{ 
+type BetterAuthHono = Hono<{
   Bindings: Bindings
   Variables: BetterAuthVariables
 }>
@@ -29,47 +29,50 @@ type BetterAuthHono = Hono<{
  */
 export const setupBetterAuth = (app: any) => {
   console.log('🔧 Setting up better-auth routes...')
-  
+
   // Better-auth handler with enhanced debugging
   app.all('/api/auth/*', async (c: any) => {
     console.log('🔔 Better-auth route hit:', c.req.method, c.req.url)
-    console.log('🔧 Environment check:', { 
+    console.log('🔧 Environment check:', {
       PROJECT_DB: !!c.env.PROJECT_DB,
-      envKeys: Object.keys(c.env || {})
+      envKeys: Object.keys(c.env || {}),
     })
-    
+
     try {
       console.log('🔧 Creating auth instance...')
-      const auth = createAuth(c.env.PROJECT_DB)
+      const auth = createAuth(c.env)
       console.log('🔧 Auth instance created successfully')
-      
+
       console.log('🔧 Calling auth.handler with request...')
       console.log('🔧 Request details:', {
         method: c.req.method,
         url: c.req.url,
-        headers: Object.fromEntries(c.req.raw.headers.entries())
+        headers: Object.fromEntries(c.req.raw.headers.entries()),
       })
-      
+
       const response = await auth.handler(c.req.raw)
       console.log('✅ Auth handler response:', {
         status: response.status,
         statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries())
+        headers: Object.fromEntries(response.headers.entries()),
       })
-      
+
       return response
     } catch (error) {
       console.error('❌ Better-auth handler error:', error)
       console.error('❌ Error stack:', (error as Error)?.stack)
-      return new Response('Internal Server Error: ' + (error as Error)?.message, { status: 500 })
+      return new Response(
+        'Internal Server Error: ' + (error as Error)?.message,
+        { status: 500 }
+      )
     }
   })
-  
+
   // Add a simple test route for debugging (after wildcard)
   app.get('/api/auth/test', async (c: any) => {
     return c.json({ message: 'Test route working', url: c.req.url })
   })
-  
+
   console.log('✅ Better-auth routes setup complete')
 }
 
@@ -80,9 +83,9 @@ export const setupBetterAuth = (app: any) => {
 export const setupBetterAuthMiddleware = (app: any) => {
   app.use('*', async (c: any, next: any) => {
     try {
-      const auth = createAuth(c.env.PROJECT_DB)
-      const session = await auth.api.getSession({ 
-        headers: c.req.raw.headers 
+      const auth = createAuth(c.env)
+      const session = await auth.api.getSession({
+        headers: c.req.raw.headers,
       })
 
       if (!session) {

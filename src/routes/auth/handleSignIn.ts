@@ -44,23 +44,23 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
       }
 
       // Create better-auth instance
-      const auth = createAuth(c.env.PROJECT_DB)
+      const auth = createAuth(c.env)
 
       // Invoke better-auth handler directly and forward its cookies to our redirect response
       try {
         // Create a proper request that better-auth handler expects
         const authUrl = new URL(c.req.url)
         authUrl.pathname = '/api/auth/sign-in/email'
-        
+
         const authRequest = new Request(authUrl.toString(), {
           method: 'POST',
           headers: c.req.raw.headers,
-          body: formData
+          body: formData,
         })
 
         // Call better-auth handler to get the actual response with proper cookies
         const authResponse = await auth.handler(authRequest)
-        
+
         if (!authResponse) {
           return redirectWithMessage(
             c,
@@ -72,7 +72,7 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
         // Check response status
         if (authResponse.status !== 200) {
           console.log('Better-auth sign-in status:', authResponse.status)
-          
+
           // Handle specific HTTP status codes
           if (authResponse.status === 401) {
             return redirectWithMessage(
@@ -81,7 +81,7 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
               'Invalid email or password. Please check your credentials and try again.'
             )
           }
-          
+
           if (authResponse.status === 400) {
             return redirectWithMessage(
               c,
@@ -89,7 +89,7 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
               'Please check your email and password and try again.'
             )
           }
-          
+
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
@@ -112,25 +112,26 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Also check for multiple cookie headers
         const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
-        allCookieHeaders.forEach(cookie => {
+        allCookieHeaders.forEach((cookie) => {
           response.headers.append('Set-Cookie', cookie)
         })
 
         return response
-
       } catch (apiError: any) {
         console.error('Better-auth sign-in API error:', apiError)
-        
+
         // Check if it's an authentication error
         const errorMessage = apiError?.message || String(apiError)
         const errorString = errorMessage.toLowerCase()
-        
-        if (errorString.includes('invalid') || 
-            errorString.includes('credentials') ||
-            errorString.includes('unauthorized') ||
-            errorString.includes('authentication') ||
-            errorString.includes('password') ||
-            errorString.includes('wrong')) {
+
+        if (
+          errorString.includes('invalid') ||
+          errorString.includes('credentials') ||
+          errorString.includes('unauthorized') ||
+          errorString.includes('authentication') ||
+          errorString.includes('password') ||
+          errorString.includes('wrong')
+        ) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
@@ -138,8 +139,10 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           )
         }
 
-        if (errorString.includes('not found') ||
-            errorString.includes('user') && errorString.includes('exist')) {
+        if (
+          errorString.includes('not found') ||
+          (errorString.includes('user') && errorString.includes('exist'))
+        ) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
@@ -153,10 +156,9 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           'Something went wrong during sign-in. Please try again.'
         )
       }
-
     } catch (error) {
       console.error('Sign-in handler error:', error)
-      
+
       // Handle network/form errors gracefully
       return redirectWithMessage(
         c,

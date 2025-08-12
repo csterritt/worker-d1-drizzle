@@ -1,9 +1,4 @@
-### Basic CloudFlare worker+d1+drizzle app with magic-code sign-in
-
-# DO NOT USE THIS CODE FOR ANYTHING IMPORTANT
-## Particularly if it is a project that folks pay to use.
-## See [this comment thread](https://news.ycombinator.com/item?id=44820331) for reasons why not.
-# YOU HAVE BEEN WARNED.
+### Basic CloudFlare worker+d1+drizzle app with username and password authentication
 
 #### Setup for development
 
@@ -46,7 +41,9 @@ To run in production, set the following environment variables:
     PO_USER_ID='<your pushover user id>'
 
 For development, set the same environment variables as above, but put them in a `.dev.vars` file in the
-root directory of the project.
+root directory of the project. Also set the `NODE_ENV` environment variable to `development`. For testing
+email sign up, you'll have to run the [mailpit](https://github.com/axllent/mailpit) server locally with its
+SMTP server port set to 1025 (which is the default).
 
 ### Setting up for production
 

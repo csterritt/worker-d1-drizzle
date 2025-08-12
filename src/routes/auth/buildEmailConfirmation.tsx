@@ -23,12 +23,18 @@ import { createAuth } from '../../lib/auth'
  * @param message - Success or error message
  * @param isSuccess - Whether the confirmation was successful
  */
-const renderEmailConfirmation = (c: Context, message: string, isSuccess: boolean) => {
+const renderEmailConfirmation = (
+  c: Context,
+  message: string,
+  isSuccess: boolean
+) => {
   return (
     <div data-testid='email-confirmation-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
         <div className='card-body'>
-          <div className={`alert ${isSuccess ? 'alert-success' : 'alert-error'} mb-4`}>
+          <div
+            className={`alert ${isSuccess ? 'alert-success' : 'alert-error'} mb-4`}
+          >
             <div>
               <h2 className='font-bold text-lg'>
                 {isSuccess ? 'Email Confirmed!' : 'Confirmation Failed'}
@@ -36,7 +42,7 @@ const renderEmailConfirmation = (c: Context, message: string, isSuccess: boolean
               <p>{message}</p>
             </div>
           </div>
-          
+
           {isSuccess ? (
             <div className='card-actions justify-center'>
               <a
@@ -87,16 +93,17 @@ const renderEmailSent = (c: Context, email: string) => {
               <h2 className='font-bold text-lg'>Check Your Email</h2>
               <p>
                 We've sent a confirmation link to <strong>{email}</strong>.
-                Please check your email and click the link to verify your account.
+                Please check your email and click the link to verify your
+                account.
               </p>
             </div>
           </div>
-          
+
           <div className='text-center text-sm text-gray-600 mb-4'>
             <p>Didn't receive the email? Check your spam folder.</p>
             <p>The confirmation link will expire in 24 hours.</p>
           </div>
-          
+
           <div className='card-actions justify-center'>
             <a
               href={PATHS.AUTH.SIGN_IN}
@@ -117,7 +124,9 @@ const renderEmailSent = (c: Context, email: string) => {
  * Attach the email confirmation routes to the app.
  * @param app - Hono app instance
  */
-export const buildEmailConfirmation = (app: Hono<{ Bindings: Bindings }>): void => {
+export const buildEmailConfirmation = (
+  app: Hono<{ Bindings: Bindings }>
+): void => {
   const secureHeadersWithNonce = {
     ...ALLOW_SCRIPTS_SECURE_HEADERS,
     contentSecurityPolicy: {
@@ -127,57 +136,85 @@ export const buildEmailConfirmation = (app: Hono<{ Bindings: Bindings }>): void 
   }
 
   // Email confirmation endpoint - handles verification tokens
-  app.get('/auth/verify-email', secureHeaders(secureHeadersWithNonce), async (c) => {
-    setupNoCacheHeaders(c)
-    
-    const token = c.req.query('token')
-    const callbackUrl = c.req.query('callbackUrl')
-    
-    if (!token) {
-      return c.render(useLayout(c, renderEmailConfirmation(
-        c, 
-        'No verification token provided. Please check your email for the correct link.',
-        false
-      )))
-    }
+  app.get(
+    '/auth/verify-email',
+    secureHeaders(secureHeadersWithNonce),
+    async (c) => {
+      setupNoCacheHeaders(c)
 
-    try {
-      // Use better-auth to verify the email token
-      const auth = createAuth(c.env.PROJECT_DB)
-      const verification = await auth.api.verifyEmail({
-        query: { token, callbackURL: callbackUrl }
-      })
+      const token = c.req.query('token')
+      const callbackUrl = c.req.query('callbackUrl')
 
-      if (verification && 'status' in verification && verification.status) {
-        return c.render(useLayout(c, renderEmailConfirmation(
-          c,
-          'Your email has been successfully verified! You can now sign in to your account.',
-          true
-        )))
-      } else {
-        return c.render(useLayout(c, renderEmailConfirmation(
-          c,
-          'The verification link is invalid or has expired. Please try signing up again.',
-          false
-        )))
+      if (!token) {
+        return c.render(
+          useLayout(
+            c,
+            renderEmailConfirmation(
+              c,
+              'No verification token provided. Please check your email for the correct link.',
+              false
+            )
+          )
+        )
       }
-    } catch (error) {
-      console.error('Email verification error:', error)
-      return c.render(useLayout(c, renderEmailConfirmation(
-        c,
-        'There was an error verifying your email. Please try again or contact support.',
-        false
-      )))
+
+      try {
+        // Use better-auth to verify the email token
+        const auth = createAuth(c.env)
+        const verification = await auth.api.verifyEmail({
+          query: { token, callbackURL: callbackUrl },
+        })
+
+        if (verification && 'status' in verification && verification.status) {
+          return c.render(
+            useLayout(
+              c,
+              renderEmailConfirmation(
+                c,
+                'Your email has been successfully verified! You can now sign in to your account.',
+                true
+              )
+            )
+          )
+        } else {
+          return c.render(
+            useLayout(
+              c,
+              renderEmailConfirmation(
+                c,
+                'The verification link is invalid or has expired. Please try signing up again.',
+                false
+              )
+            )
+          )
+        }
+      } catch (error) {
+        console.error('Email verification error:', error)
+        return c.render(
+          useLayout(
+            c,
+            renderEmailConfirmation(
+              c,
+              'There was an error verifying your email. Please try again or contact support.',
+              false
+            )
+          )
+        )
+      }
     }
-  })
+  )
 
   // Email sent confirmation page
   app.get('/auth/email-sent', secureHeaders(secureHeadersWithNonce), (c) => {
     setupNoCacheHeaders(c)
-    
+
     const email = c.req.query('email')
     if (!email) {
-      return redirectWithMessage(c, PATHS.AUTH.SIGN_IN, 'Please sign up to continue.')
+      return redirectWithMessage(
+        c,
+        PATHS.AUTH.SIGN_IN,
+        'Please sign up to continue.'
+      )
     }
 
     return c.render(useLayout(c, renderEmailSent(c, email)))

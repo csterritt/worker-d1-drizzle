@@ -24,43 +24,34 @@ interface EmailConfig {
 /**
  * Get email configuration based on environment
  */
-const getEmailConfig = (): EmailConfig => {
+const getEmailConfig = (env: any): EmailConfig => {
   // More robust test environment detection
   const isTestMode =
-    process.env.NODE_ENV === 'test' ||
-    process.env.NODE_ENV === 'development' ||
-    process.env.PLAYWRIGHT === '1' || // Playwright sets this
+    env.NODE_ENV === 'test' ||
+    env.NODE_ENV === 'development' ||
+    env.PLAYWRIGHT === '1' || // Playwright sets this
     process.argv.includes('playwright') || // Running via playwright
     typeof (globalThis as any).test !== 'undefined' // Test environment
-  console.log(`========> isTestMode: ${JSON.stringify(isTestMode)}`)
-
-  console.log('📧 Email config:', {
-    NODE_ENV: process.env.NODE_ENV,
-    PLAYWRIGHT: process.env.PLAYWRIGHT,
-    isTestMode,
-    port: isTestMode ? 2500 : 587,
-  })
 
   return {
     isTestMode,
-    smtpHost: isTestMode ? 'localhost' : process.env.SMTP_HOST || 'localhost',
-    smtpPort: isTestMode ? 2500 : parseInt(process.env.SMTP_PORT || '587'),
-    smtpUser: process.env.SMTP_USER,
-    smtpPass: process.env.SMTP_PASS,
+    smtpHost: isTestMode ? '127.0.0.1' : env.SMTP_HOST || '127.0.0.1',
+    smtpPort: isTestMode ? 1025 : parseInt(env.SMTP_PORT || '587'),
+    smtpUser: env.SMTP_USER,
+    smtpPass: env.SMTP_PASS,
   }
 }
 
 /**
  * Create email transporter based on configuration
  */
-const createTransporter = () => {
-  const config = getEmailConfig()
-
+const createTransporter = (env: any) => {
+  const config = getEmailConfig(env)
   if (config.isTestMode) {
-    // Use smtp-tester for testing (assumes server running on port 2500)
+    // Use smtp-tester for testing (assumes server running on port 1025)
     return nodemailer.createTransport({
-      host: 'localhost',
-      port: 2500,
+      host: '127.0.0.1',
+      port: 1025,
       secure: false,
       tls: {
         rejectUnauthorized: false,
@@ -85,12 +76,14 @@ const createTransporter = () => {
 
 /**
  * Send confirmation email to user
+ * @param env - Cloudflare environment
  * @param email - User's email address
  * @param name - User's name
  * @param confirmationUrl - URL for email confirmation
  * @param token - Confirmation token
  */
 export const sendConfirmationEmail = async (
+  env: any,
   email: string,
   name: string,
   confirmationUrl: string,
@@ -105,10 +98,10 @@ export const sendConfirmationEmail = async (
 
   try {
     console.log('📧 Creating email transporter...')
-    const transporter = createTransporter()
+    const transporter = createTransporter(env)
 
     const mailOptions = {
-      from: process.env.FROM_EMAIL || 'noreply@example.com',
+      from: env.FROM_EMAIL || 'noreply@example.com',
       to: email,
       subject: 'Confirm Your Email Address',
       html: `
@@ -149,25 +142,4 @@ export const sendConfirmationEmail = async (
     console.error('Failed to send confirmation email:', error)
     throw new Error('Failed to send confirmation email')
   }
-}
-
-/**
- * Initialize SMTP test server for testing (used in test setup)
- */
-export const initTestSmtpServer = () => {
-  if (
-    process.env.NODE_ENV === 'test' ||
-    process.env.NODE_ENV === 'development'
-  ) {
-    try {
-      const smtpTester = require('smtp-tester')
-      const mailServer = smtpTester.init(2500)
-      console.log('SMTP test server started on port 2500')
-      return mailServer
-    } catch (error) {
-      console.error('Failed to start SMTP test server:', error)
-      return null
-    }
-  }
-  return null
 }

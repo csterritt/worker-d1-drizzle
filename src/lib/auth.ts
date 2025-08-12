@@ -14,11 +14,11 @@ import { sendConfirmationEmail } from './email-service'
 
 /**
  * Create and configure better-auth instance
- * @param db - D1Database instance from Cloudflare environment
+ * @param env - Cloudflare environment
  * @returns Configured better-auth instance
  */
-export function createAuth(db: D1Database) {
-  console.log('========> Entering createAuth...')
+export function createAuth(env: any) {
+  const db: D1Database = env.PROJECT_DB
   const dbClient = createDbClient(db)
 
   return betterAuth({
@@ -33,6 +33,8 @@ export function createAuth(db: D1Database) {
       requireEmailVerification: true, // Enable email verification for sign-ups
       minPasswordLength: 8,
       maxPasswordLength: 128,
+    },
+    emailVerification: {
       sendVerificationEmail: async ({
         user,
         url,
@@ -49,7 +51,7 @@ export function createAuth(db: D1Database) {
         })
         try {
           // Send confirmation email using our email service
-          await sendConfirmationEmail(user.email, user.name, url, token)
+          await sendConfirmationEmail(env, user.email, user.name, url, token)
           console.log('✅ Email sent successfully via sendConfirmationEmail')
         } catch (error) {
           console.error('❌ Error in sendVerificationEmail:', error)

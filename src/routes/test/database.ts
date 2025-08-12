@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import { createDbClient } from '../../db/client'
 import { user, account, session } from '../../db/schema'
-import { createAuth } from '../../lib/auth'
 
 /**
  * Test-only database manipulation endpoints
@@ -25,19 +24,31 @@ testDatabaseRouter.delete('/clear', async (c) => {
 
     console.log('Test database cleared successfully')
 
-    return new Response(JSON.stringify({ success: true, message: 'Database cleared successfully' }), {
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'Database cleared successfully',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   } catch (error) {
     console.error('Failed to clear test database:', error)
 
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error clearing test database'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Unknown error clearing test database',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 })
 

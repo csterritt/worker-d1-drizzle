@@ -15,7 +15,6 @@
 		"drizzle-orm": "^0.44.2",
 		"hono": "^4.8.2",
 		"nodemailer": "^7.0.3",
-		"smtp-tester": "^2.1.0",
 		"tailwindcss": "^4.1.8",
 		"true-myth": "^9.0.1",
 		"ulid": "^3.0.1",

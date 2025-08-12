@@ -45,7 +45,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       }
 
       // Create better-auth instance
-      const auth = createAuth(c.env.PROJECT_DB)
+      const auth = createAuth(c.env)
 
       // Attempt to sign up via better-auth API with comprehensive error handling
       try {
@@ -53,8 +53,8 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           body: {
             name,
             email,
-            password
-          }
+            password,
+          },
         })
 
         if (!signUpResponse) {
@@ -67,15 +67,18 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Check if there was an error in the response
         if ('error' in signUpResponse) {
-          const errorMessage = (signUpResponse.error as any)?.message || 'Registration failed'
+          const errorMessage =
+            (signUpResponse.error as any)?.message || 'Registration failed'
           console.log('Better-auth error response:', errorMessage)
-          
+
           // Handle specific error cases
-          if (errorMessage.toLowerCase().includes('already exists') || 
-              errorMessage.toLowerCase().includes('duplicate') || 
-              errorMessage.toLowerCase().includes('unique constraint') ||
-              errorMessage.toLowerCase().includes('unique') ||
-              errorMessage.toLowerCase().includes('email')) {
+          if (
+            errorMessage.toLowerCase().includes('already exists') ||
+            errorMessage.toLowerCase().includes('duplicate') ||
+            errorMessage.toLowerCase().includes('unique constraint') ||
+            errorMessage.toLowerCase().includes('unique') ||
+            errorMessage.toLowerCase().includes('email')
+          ) {
             return redirectWithMessage(
               c,
               PATHS.AUTH.SIGN_IN,
@@ -99,20 +102,21 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             'Registration failed. Please try again.'
           )
         }
-
       } catch (apiError: any) {
         console.error('Better-auth sign-up API error:', apiError)
-        
+
         // Check if it's a duplicate email error from database or API
         const errorMessage = apiError?.message || String(apiError)
         const errorString = errorMessage.toLowerCase()
-        
-        if (errorString.includes('already exists') || 
-            errorString.includes('duplicate') || 
-            errorString.includes('unique constraint') ||
-            errorString.includes('unique') ||
-            errorString.includes('violates unique') ||
-            errorString.includes('email') && errorString.includes('exists')) {
+
+        if (
+          errorString.includes('already exists') ||
+          errorString.includes('duplicate') ||
+          errorString.includes('unique constraint') ||
+          errorString.includes('unique') ||
+          errorString.includes('violates unique') ||
+          (errorString.includes('email') && errorString.includes('exists'))
+        ) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
@@ -121,7 +125,10 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         }
 
         // Check for specific database constraint errors
-        if (errorString.includes('constraint') || errorString.includes('sqlite_constraint')) {
+        if (
+          errorString.includes('constraint') ||
+          errorString.includes('sqlite_constraint')
+        ) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
@@ -136,17 +143,16 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         )
       }
 
-      // Successful sign-up! 
+      // Successful sign-up!
       // Redirect to a welcome page or sign-in with success message
       return redirectWithMessage(
         c,
         PATHS.AUTH.SIGN_IN,
         'Account created successfully! You can now sign in with your credentials.'
       )
-
     } catch (error) {
       console.error('Sign-up error:', error)
-      
+
       // Handle network/API errors gracefully
       return redirectWithMessage(
         c,

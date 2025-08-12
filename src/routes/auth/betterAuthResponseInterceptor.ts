@@ -8,14 +8,16 @@ import type { Bindings } from '../../local-types'
  * Better-auth response interceptor to convert JSON responses to user-friendly redirects
  * This middleware intercepts successful better-auth API responses and redirects appropriately
  */
-export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Bindings }>) => {
+export const setupBetterAuthResponseInterceptor = (
+  app: Hono<{ Bindings: Bindings }>
+) => {
   // Intercept sign-in endpoint specifically
   app.on(['POST'], '/api/auth/sign-in/email', async (c, next) => {
     try {
       // Create better-auth instance and handle the request normally
-      const auth = createAuth(c.env.PROJECT_DB)
+      const auth = createAuth(c.env)
       const response = await auth.handler(c.req.raw)
-      
+
       if (!response) {
         return next()
       }
@@ -23,10 +25,15 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
       // Check if this was a successful auth response (status 200)
       if (response.status === 200) {
         try {
-          const responseData = await response.json() as any
-          
+          const responseData = (await response.json()) as any
+
           // Handle successful sign-up that requires email verification
-          if (responseData && responseData.user && !responseData.user.emailVerified && c.req.url.includes('/sign-up')) {
+          if (
+            responseData &&
+            responseData.user &&
+            !responseData.user.emailVerified &&
+            c.req.url.includes('/sign-up')
+          ) {
             // User signed up but needs to verify email
             const email = responseData.user.email
             return redirectWithMessage(
@@ -35,9 +42,14 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
               'Account created! Please check your email to verify your account.'
             )
           }
-          
+
           // If the response contains user data and user is verified, it was a successful sign-in
-          if (responseData && responseData.user && responseData.user.id && responseData.user.emailVerified) {
+          if (
+            responseData &&
+            responseData.user &&
+            responseData.user.id &&
+            responseData.user.emailVerified
+          ) {
             // Create a new response with the same cookies but redirect instead of JSON
             const redirectResponse = redirectWithMessage(
               c,
@@ -54,14 +66,16 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
 
             // Handle multiple cookie headers if they exist
             const allCookieHeaders = response.headers.getSetCookie?.() || []
-            allCookieHeaders.forEach(cookie => {
+            allCookieHeaders.forEach((cookie) => {
               redirectResponse.headers.append('Set-Cookie', cookie)
             })
 
             return redirectResponse
           }
         } catch (jsonError) {
-          console.log('Response was not JSON, continuing with original response')
+          console.log(
+            'Response was not JSON, continuing with original response'
+          )
         }
       }
 
@@ -92,10 +106,9 @@ export const setupBetterAuthResponseInterceptor = (app: Hono<{ Bindings: Binding
 
       // Return the original response for any other cases
       return response
-
     } catch (error) {
       console.error('Better-auth response interceptor error:', error)
-      
+
       // Graceful fallback - redirect to sign-in with error message
       return redirectWithMessage(
         c,

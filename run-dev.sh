@@ -13,6 +13,7 @@ if [ -e public/style-[0-9]*.css ]; then
 fi
 
 concurrently -c auto \
-  -n tw-build,wrangler \
+  -n tw-build,mailpit,wrangler \
   "npx @tailwindcss/cli -i ./src/style.css -o ${styleFile} --watch" \
+  "mailpit" \
    "wrangler dev"
