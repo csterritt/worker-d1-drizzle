@@ -65,6 +65,20 @@ export const setupBetterAuthResponseInterceptor = (
 
             return redirectResponse
           }
+
+          // If the response contains user data but email is not verified
+          if (
+            responseData &&
+            responseData.user &&
+            responseData.user.id &&
+            !responseData.user.emailVerified
+          ) {
+            return redirectWithMessage(
+              c,
+              PATHS.AUTH.SIGN_IN,
+              'Please verify your email address before signing in. Check your email for a verification link.'
+            )
+          }
         } catch (jsonError) {
           console.log(
             'Response was not JSON, continuing with original response'
@@ -78,6 +92,14 @@ export const setupBetterAuthResponseInterceptor = (
           c,
           PATHS.AUTH.SIGN_IN,
           'Invalid email or password. Please check your credentials and try again.'
+        )
+      }
+
+      if (response.status === 403) {
+        return redirectWithMessage(
+          c,
+          PATHS.AUTH.SIGN_IN,
+          'Please verify your email address before signing in. Check your email for a verification link.'
         )
       }
 
