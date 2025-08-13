@@ -36,6 +36,7 @@ export const PATHS = {
     VERIFY_EMAIL: '/auth/verify-email',
     EMAIL_SENT: '/auth/email-sent',
     AWAIT_VERIFICATION: '/auth/await-verification',
+    RESEND_EMAIL: '/auth/resend-email',
 
     // Set and reset clock (for testing) // PRODUCTION:REMOVE
     SET_CLOCK: '/auth/set-clock', // PRODUCTION:REMOVE

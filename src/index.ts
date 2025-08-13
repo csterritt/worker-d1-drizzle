@@ -20,6 +20,7 @@ import { buildSignIn } from './routes/auth/buildSignIn'
 import { handleSignIn } from './routes/auth/handleSignIn'
 import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleSignOut } from './routes/auth/handleSignOut'
+import { handleResendEmail } from './routes/auth/handleResendEmail'
 import { setupBetterAuth, setupBetterAuthMiddleware } from './routes/auth/better-auth-handler'
 import { setupBetterAuthResponseInterceptor } from './routes/auth/betterAuthResponseInterceptor'
 
@@ -104,7 +105,7 @@ buildEmailConfirmation(app)
 buildAwaitVerification(app)
 handleSignUp(app)
 handleSignOut(app)
-
+handleResendEmail(app)
 
 handleSetClock(app) // PRODUCTION:REMOVE
 handleResetClock(app) // PRODUCTION:REMOVE

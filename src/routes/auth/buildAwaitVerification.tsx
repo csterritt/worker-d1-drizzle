@@ -81,6 +81,18 @@ const renderAwaitVerification = (c: Context, email?: string) => {
               >
                 Back to Sign In
               </a>
+              {email && (
+                <form method='post' action={PATHS.AUTH.RESEND_EMAIL}>
+                  <input type='hidden' name='email' value={email} />
+                  <button
+                    type='submit'
+                    className='btn btn-secondary'
+                    data-testid='resend-email-button'
+                  >
+                    Resend Email
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
