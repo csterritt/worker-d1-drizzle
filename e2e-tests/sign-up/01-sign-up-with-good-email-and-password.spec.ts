@@ -1,7 +1,7 @@
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage } from '../support/page-verifiers'
+import { fillInput, clickLink } from '../support/finders'
+import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
@@ -23,13 +23,12 @@ test(
     await fillInput(page, 'signup-password-input', newPassword)
     await clickLink(page, 'signup-submit')
 
-    // Should be redirected back to sign-in page with success message
-    await verifyOnSignInPage(page)
+    // Should be redirected to await verification page
+    await verifyOnAwaitVerificationPage(page)
 
-    // Should show success message directing user to check email
-    await verifyAlert(
-      page,
-      'Account created! Please check your email to verify your account.'
-    )
+    // Verify the URL contains the email parameter
+    const currentUrl = page.url()
+    expect(currentUrl).toContain('/auth/await-verification')
+    expect(currentUrl).toContain(`email=${encodeURIComponent(newEmail)}`)
   })
 )

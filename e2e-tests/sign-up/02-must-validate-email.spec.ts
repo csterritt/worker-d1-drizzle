@@ -1,7 +1,7 @@
 import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage } from '../support/page-verifiers'
+import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
@@ -23,12 +23,12 @@ test(
     await fillInput(page, 'signup-password-input', newPassword)
     await clickLink(page, 'signup-submit')
 
-    // Should be redirected back to sign-in page with success message
+    // Should be redirected to await verification page
+    await verifyOnAwaitVerificationPage(page)
+
+    // Navigate back to sign-in page to attempt sign-in
+    await page.goto('http://localhost:3000/auth/sign-in')
     await verifyOnSignInPage(page)
-    await verifyAlert(
-      page,
-      'Account created! Please check your email to verify your account.'
-    )
 
     // Now try to sign in with the same credentials without verifying email
     await fillInput(page, 'email-input', newEmail)

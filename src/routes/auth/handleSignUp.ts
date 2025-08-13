@@ -144,12 +144,8 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       }
 
       // Successful sign-up!
-      // Redirect to a welcome page or sign-in with success message
-      return redirectWithMessage(
-        c,
-        PATHS.AUTH.SIGN_IN,
-        'Account created! Please check your email to verify your account.'
-      )
+      // Redirect to await verification page with email parameter
+      return c.redirect(`${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`)
     } catch (error) {
       console.error('Sign-up error:', error)
 

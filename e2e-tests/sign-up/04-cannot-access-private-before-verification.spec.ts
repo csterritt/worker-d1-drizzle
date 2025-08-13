@@ -1,7 +1,7 @@
 import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage } from '../support/page-verifiers'
+import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
@@ -23,12 +23,8 @@ test(
     await fillInput(page, 'signup-password-input', newPassword)
     await clickLink(page, 'signup-submit')
 
-    // Should be redirected back to sign-in page with success message
-    await verifyOnSignInPage(page)
-    await verifyAlert(
-      page,
-      'Account created! Please check your email to verify your account.'
-    )
+    // Should be redirected to await verification page
+    await verifyOnAwaitVerificationPage(page)
 
     // Now try to directly access the private page without being signed in
     await page.goto('http://localhost:3000/private')
@@ -52,7 +48,7 @@ test(
     // Try to access private page again after failed sign-in attempt
     await page.goto('http://localhost:3000/private')
 
-    // Should still be redirected back to sign-in page
+    // Should still be redirected back to sign-in page with access denied message
     await verifyOnSignInPage(page)
     await verifyAlert(page, 'You must sign in to visit that page')
   })

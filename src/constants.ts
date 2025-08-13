@@ -35,7 +35,7 @@ export const PATHS = {
     // Email confirmation pages
     VERIFY_EMAIL: '/auth/verify-email',
     EMAIL_SENT: '/auth/email-sent',
-
+    AWAIT_VERIFICATION: '/auth/await-verification',
 
     // Set and reset clock (for testing) // PRODUCTION:REMOVE
     SET_CLOCK: '/auth/set-clock', // PRODUCTION:REMOVE

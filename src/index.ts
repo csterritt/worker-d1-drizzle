@@ -14,6 +14,7 @@ import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
 import { buildPrivate } from './routes/buildPrivate'
 import { build404 } from './routes/build404'
 import { buildEmailConfirmation } from './routes/auth/buildEmailConfirmation'
+import { buildAwaitVerification } from './routes/auth/buildAwaitVerification'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
 import { handleSignIn } from './routes/auth/handleSignIn'
@@ -100,6 +101,7 @@ buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
 buildEmailConfirmation(app)
+buildAwaitVerification(app)
 handleSignUp(app)
 handleSignOut(app)
 

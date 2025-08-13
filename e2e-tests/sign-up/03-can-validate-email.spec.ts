@@ -4,6 +4,7 @@ import { fillInput, clickLink, verifyAlert } from '../support/finders'
 import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
+  verifyOnAwaitVerificationPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
@@ -49,12 +50,8 @@ test(
     await fillInput(page, 'signup-password-input', newPassword)
     await clickLink(page, 'signup-submit')
 
-    // Should be redirected back to sign-in page with success message
-    await verifyOnSignInPage(page)
-    await verifyAlert(
-      page,
-      'Account created! Please check your email to verify your account.'
-    )
+    // Should be redirected to await verification page
+    await verifyOnAwaitVerificationPage(page)
 
     // Wait a moment for the email to be sent
     await page.waitForTimeout(2000)
