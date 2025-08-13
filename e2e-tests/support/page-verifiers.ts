@@ -9,16 +9,8 @@ export async function verifyOnSignInPage(page: Page) {
   expect(await verifyElementExists(page, 'sign-in-page-banner')).toBe(true)
 }
 
-export async function verifyOnAwaitCodePage(page: Page) {
-  expect(await verifyElementExists(page, 'await-code-page-banner')).toBe(true)
-}
-
 export async function verifyOnProtectedPage(page: Page) {
   expect(await verifyElementExists(page, 'private-page-banner')).toBe(true)
-}
-
-export async function verifyHaveSignInLink(page: Page) {
-  expect(await verifyElementExists(page, 'sign-in-link')).toBe(true)
 }
 
 export async function verifyOn404Page(page: Page) {

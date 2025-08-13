@@ -5,7 +5,7 @@ import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
 } from '../support/page-verifiers'
-import { testWithDatabase } from '../support/db-helpers'
+import { testWithDatabase } from '../support/test-helpers'
 
 // Helper function to get the latest email from Mailpit
 async function getLatestEmailFromMailpit() {

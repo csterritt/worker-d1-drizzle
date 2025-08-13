@@ -2,7 +2,7 @@ import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
-import { testWithDatabase } from '../support/db-helpers'
+import { testWithDatabase } from '../support/test-helpers'
 
 test(
   'sign up with good email and password',

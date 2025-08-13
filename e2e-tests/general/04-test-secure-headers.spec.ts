@@ -1,11 +1,8 @@
 import { test, expect } from '@playwright/test'
-import {
-  signOutAndVerify,
-  startSignIn,
-  submitEmail,
-  submitValidCode,
-} from '../support/auth-helpers'
+import { signOutAndVerify, signInUser } from '../support/auth-helpers'
 import { verifyOnStartupPage } from '../support/page-verifiers'
+
+import { testWithDatabase } from '../support/test-helpers'
 
 test.describe('Security Headers', () => {
   test('server sets appropriate security headers on responses', async ({
@@ -27,64 +24,66 @@ test.describe('Security Headers', () => {
     // Strict-Transport-Security is typically only set in production environments
   })
 
-  test('server rejects requests with invalid CSRF headers', async ({
-    page,
-    request,
-  }) => {
-    // First sign in to get a valid session
-    await page.goto('http://localhost:3000')
-    await verifyOnStartupPage(page)
-    await startSignIn(page)
+  test(
+    'server rejects requests with invalid CSRF headers',
+    testWithDatabase(async ({ page, request }) => {
+      // First sign in to get a valid session
+      await page.goto('http://localhost:3000')
+      await verifyOnStartupPage(page)
 
-    // Submit known email and valid code to authenticate
-    await submitEmail(page, 'fredfred@team439980.testinator.com')
-    await submitValidCode(page, '123456')
+      // Sign in with known email and password
+      await signInUser(
+        page,
+        'fredfred@team439980.testinator.com',
+        'freds-clever-password'
+      )
 
-    // Try to POST to the increment endpoint with an invalid Origin header
-    const invalidOriginResponse = await request.post(
-      'http://localhost:3000/increment',
-      {
-        headers: {
-          Origin: 'https://malicious-site.com', // Invalid origin
-        },
-        failOnStatusCode: false,
-      }
-    )
+      // Try to POST to the increment endpoint with an invalid Origin header
+      const invalidOriginResponse = await request.post(
+        'http://localhost:3000/increment',
+        {
+          headers: {
+            Origin: 'https://malicious-site.com', // Invalid origin
+          },
+          failOnStatusCode: false,
+        }
+      )
 
-    // Verify the request is rejected with a 403 Forbidden status
-    expect(invalidOriginResponse.status()).toBe(403)
+      // Verify the request is rejected with a 403 Forbidden status
+      expect(invalidOriginResponse.status()).toBe(403)
 
-    // Try to POST without any Origin header
-    const noOriginResponse = await request.post(
-      'http://localhost:3000/increment',
-      {
-        headers: {
-          // No Origin header
-        },
-        failOnStatusCode: false,
-      }
-    )
+      // Try to POST without any Origin header
+      const noOriginResponse = await request.post(
+        'http://localhost:3000/increment',
+        {
+          headers: {
+            // No Origin header
+          },
+          failOnStatusCode: false,
+        }
+      )
 
-    // Verify the request is rejected with a 403 Forbidden status
-    expect(noOriginResponse.status()).toBe(403)
+      // Verify the request is rejected with a 403 Forbidden status
+      expect(noOriginResponse.status()).toBe(403)
 
-    // Try with a valid Origin to confirm the CSRF protection is working correctly
-    const validOriginResponse = await request.post(
-      'http://localhost:3000/increment',
-      {
-        headers: {
-          Origin: 'http://localhost:3000', // Valid origin
-        },
-        failOnStatusCode: false,
-      }
-    )
+      // Try with a valid Origin to confirm the CSRF protection is working correctly
+      const validOriginResponse = await request.post(
+        'http://localhost:3000/increment',
+        {
+          headers: {
+            Origin: 'http://localhost:3000', // Valid origin
+          },
+          failOnStatusCode: false,
+        }
+      )
 
-    // This should succeed (not be rejected due to CSRF)
-    expect(validOriginResponse.status()).not.toBe(403)
+      // This should succeed (not be rejected due to CSRF)
+      expect(validOriginResponse.status()).not.toBe(403)
 
-    // Sign out to clean up the authenticated session
-    await signOutAndVerify(page)
-  })
+      // Sign out to clean up the authenticated session
+      await signOutAndVerify(page)
+    })
+  )
 
   test('security headers are consistent across different endpoints', async ({
     request,

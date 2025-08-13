@@ -1,10 +1,4 @@
 /**
- * Database helpers for e2e tests
- * Provides functions to clear and seed test database via server endpoints
- */
-import { test } from '@playwright/test'
-
-/**
  * Clear all data from authentication-related tables
  * Calls test-only server endpoint to clear database
  */
@@ -99,33 +93,5 @@ export const seedDatabase = async (): Promise<void> => {
   } catch (error) {
     console.error('Failed to seed database:', error)
     throw error
-  }
-}
-
-/**
- * Wrapper type for Playwright test function
- */
-type PlaywrightTestFunction = ({ page }: { page: any }) => Promise<void>
-
-/**
- * Enhanced test wrapper that provides database isolation
- * Clears and seeds database before each test, cleans up after
- */
-export const testWithDatabase = (
-  testFn: PlaywrightTestFunction
-): PlaywrightTestFunction => {
-  return async ({ page }) => {
-    try {
-      // Setup: Clear and seed database
-      await clearDatabase()
-      await seedDatabase()
-      await clearSessions()
-
-      // Run the test
-      await testFn({ page })
-    } finally {
-      // Cleanup: Clear database after test
-      await clearDatabase()
-    }
   }
 }

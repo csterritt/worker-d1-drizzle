@@ -2,8 +2,12 @@ import { test } from '@playwright/test'
 
 import { startSignIn, signOutAndVerify } from '../support/auth-helpers'
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnProtectedPage, verifyOnStartupPage, verifyOnSignInPage } from '../support/page-verifiers'
-import { testWithDatabase } from '../support/db-helpers'
+import {
+  verifyOnProtectedPage,
+  verifyOnStartupPage,
+  verifyOnSignInPage,
+} from '../support/page-verifiers'
+import { testWithDatabase } from '../support/test-helpers'
 
 test(
   'sign out successfully after signing in',
@@ -37,10 +41,10 @@ test(
 
     // Try to access the private page again - should be redirected to sign-in
     await page.goto('http://localhost:3000/private')
-    
+
     // Should be redirected to sign-in page
     await verifyOnSignInPage(page)
-    
+
     // Should show the access denied message
     await verifyAlert(page, 'You must sign in to visit that page')
   })
