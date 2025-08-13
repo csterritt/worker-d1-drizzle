@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage, verifyOnProtectedPage } from '../support/page-verifiers'
+import {
+  verifyOnSignInPage,
+  verifyOnProtectedPage,
+} from '../support/page-verifiers'
 import { testWithDatabase } from '../support/db-helpers'
 
 // Helper function to get the latest email from Mailpit
@@ -16,13 +19,14 @@ async function getLatestEmailFromMailpit() {
 // Helper function to extract verification link from email HTML
 function extractVerificationLink(htmlContent: string): string {
   // Look for links that contain 'verify-email' or 'token='
-  const linkRegex = /<a[^>]+href=["']([^"']*(?:verify-email|token=)[^"']*)["'][^>]*>/gi
+  const linkRegex =
+    /<a[^>]+href=["']([^"']*(?:verify-email|token=)[^"']*)["'][^>]*>/gi
   const matches = linkRegex.exec(htmlContent)
-  
+
   if (!matches || !matches[1]) {
     throw new Error('Verification link not found in email content')
   }
-  
+
   return matches[1]
 }
 
@@ -56,13 +60,15 @@ test(
     await page.waitForTimeout(2000)
 
     // Retrieve the verification email from Mailpit
-    const emailData = await getLatestEmailFromMailpit()
-    expect(emailData.To.some((recipient: any) => recipient.Address === newEmail)).toBe(true)
+    const emailData: any = await getLatestEmailFromMailpit()
+    expect(
+      emailData.To.some((recipient: any) => recipient.Address === newEmail)
+    ).toBe(true)
     expect(emailData.Subject).toContain('Confirm Your Email Address')
 
     // Get the HTML content directly from the email data
     const htmlContent = emailData.HTML
-    
+
     // Extract the verification link
     const verificationLink = extractVerificationLink(htmlContent)
 
