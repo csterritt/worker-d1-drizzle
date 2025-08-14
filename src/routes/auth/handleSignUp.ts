@@ -3,7 +3,9 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS } from '../../constants'
 import type { Bindings } from '../../local-types'
-import { lastResendTimes } from './handleResendEmail'
+import { eq } from 'drizzle-orm'
+import { account, user } from '../../db/schema'
+import { createDbClient } from '../../db/client'
 
 /**
  * Handle sign-up form submission with proper UX flow
@@ -145,8 +147,28 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       }
 
       // Successful sign-up!
-      // Track the initial email send time
-      lastResendTimes.set(email, Date.now())
+      // Update the account's updatedAt field to track the initial email send time
+      try {
+        const dbClient = createDbClient(c.env.PROJECT_DB)
+        
+        // Find the user that was just created
+        const userData = await dbClient
+          .select({ id: user.id })
+          .from(user)
+          .where(eq(user.email, email))
+          .limit(1)
+        
+        if (userData.length > 0) {
+          // Update the account's updatedAt field for this user
+          await dbClient
+            .update(account)
+            .set({ updatedAt: new Date() })
+            .where(eq(account.userId, userData[0].id))
+        }
+      } catch (dbError) {
+        console.error('Error updating account timestamp:', dbError)
+        // Don't fail the sign-up process if this fails
+      }
 
       // Redirect to await verification page with email parameter
       return c.redirect(`${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`)

@@ -12,18 +12,13 @@ import { PATHS, DURATIONS } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
 import { eq } from 'drizzle-orm'
-import { user } from '../../db/schema'
+import { user, account } from '../../db/schema'
 import { createDbClient } from '../../db/client'
-
-// In-memory store for tracking last resend times by email
-// In production, this could be moved to a database table or cache
-// Exported so other handlers can track initial email send times
-export const lastResendTimes = new Map<string, number>()
 
 /**
  * Handle resend verification email form submission
  * Uses better-auth's built-in verification system for proper token management
- * Includes server-side rate limiting to prevent abuse
+ * Includes server-side rate limiting using database updatedAt field for scalability
  */
 export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
   app.post(PATHS.AUTH.RESEND_EMAIL, async (c) => {
@@ -50,37 +45,27 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         )
       }
 
-      // Check rate limiting
-      const now = Date.now()
-      const lastResendTime = lastResendTimes.get(email) || 0
-      const timeSinceLastResend = now - lastResendTime
-      const waitTimeMs = DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
-
-      if (timeSinceLastResend < waitTimeMs) {
-        const remainingSeconds = Math.ceil((waitTimeMs - timeSinceLastResend) / 1000)
-        return redirectWithMessage(
-          c,
-          `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
-          `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another verification email.`
-        )
-      }
-
       try {
         // Create database client and auth instance
         const db = createDbClient(c.env.PROJECT_DB)
         const auth = createAuth(c.env)
 
-        // Check if user exists and get their verification status
-        const userData = await db
-          .select()
+        // Check if user exists and get their verification status along with account info for rate limiting
+        const userWithAccount = await db
+          .select({
+            userId: user.id,
+            userName: user.name,
+            userEmail: user.email,
+            emailVerified: user.emailVerified,
+            accountUpdatedAt: account.updatedAt,
+          })
           .from(user)
+          .leftJoin(account, eq(account.userId, user.id))
           .where(eq(user.email, email))
           .limit(1)
 
-        if (userData.length === 0) {
+        if (userWithAccount.length === 0) {
           // Don't reveal that user doesn't exist for security
-          // But still update the rate limit to prevent enumeration attacks
-          lastResendTimes.set(email, now)
           return redirectWithMessage(
             c,
             `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
@@ -88,14 +73,33 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           )
         }
 
-        const userRecord = userData[0]
+        const userData = userWithAccount[0]
 
         // Check if user is already verified
-        if (userRecord.emailVerified) {
+        if (userData.emailVerified) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
             'Your email is already verified. You can sign in now.'
+          )
+        }
+
+        // Check rate limiting using account.updatedAt
+        const now = Date.now()
+        const lastEmailTime = userData.accountUpdatedAt
+          ? userData.accountUpdatedAt.getTime()
+          : 0
+        const timeSinceLastEmail = now - lastEmailTime
+        const waitTimeMs = DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
+
+        if (timeSinceLastEmail < waitTimeMs) {
+          const remainingSeconds = Math.ceil(
+            (waitTimeMs - timeSinceLastEmail) / 1000
+          )
+          return redirectWithMessage(
+            c,
+            `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+            `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another verification email.`
           )
         }
 
@@ -108,8 +112,11 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           },
         })
 
-        // Update the last resend time after successful send
-        lastResendTimes.set(email, now)
+        // Update the account's updatedAt field to track this email send
+        await db
+          .update(account)
+          .set({ updatedAt: new Date() })
+          .where(eq(account.userId, userData.userId))
 
         return redirectWithMessage(
           c,
