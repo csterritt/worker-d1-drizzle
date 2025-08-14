@@ -50,7 +50,11 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         const auth = createAuth(c.env)
 
         // Check if user exists and get their verification status
-        const userData = await db.select().from(user).where(eq(user.email, email)).limit(1)
+        const userData = await db
+          .select()
+          .from(user)
+          .where(eq(user.email, email))
+          .limit(1)
 
         if (userData.length === 0) {
           // Don't reveal that user doesn't exist for security
@@ -77,8 +81,8 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         await auth.api.sendVerificationEmail({
           body: {
             email: email,
-            callbackURL: `${c.req.url.split('/')[0]}//${c.req.url.split('/')[2]}/auth/verify-email`
-          }
+            callbackURL: `${c.req.url.split('/')[0]}//${c.req.url.split('/')[2]}${PATHS.AUTH.SIGN_IN}`,
+          },
         })
 
         return redirectWithMessage(
