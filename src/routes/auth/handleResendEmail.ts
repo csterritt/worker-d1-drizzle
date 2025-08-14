@@ -8,16 +8,22 @@
  */
 import { Hono } from 'hono'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS } from '../../constants'
+import { PATHS, DURATIONS } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
 import { eq } from 'drizzle-orm'
 import { user } from '../../db/schema'
 import { createDbClient } from '../../db/client'
 
+// In-memory store for tracking last resend times by email
+// In production, this could be moved to a database table or cache
+// Exported so other handlers can track initial email send times
+export const lastResendTimes = new Map<string, number>()
+
 /**
  * Handle resend verification email form submission
  * Uses better-auth's built-in verification system for proper token management
+ * Includes server-side rate limiting to prevent abuse
  */
 export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
   app.post(PATHS.AUTH.RESEND_EMAIL, async (c) => {
@@ -44,6 +50,21 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         )
       }
 
+      // Check rate limiting
+      const now = Date.now()
+      const lastResendTime = lastResendTimes.get(email) || 0
+      const timeSinceLastResend = now - lastResendTime
+      const waitTimeMs = DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
+
+      if (timeSinceLastResend < waitTimeMs) {
+        const remainingSeconds = Math.ceil((waitTimeMs - timeSinceLastResend) / 1000)
+        return redirectWithMessage(
+          c,
+          `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+          `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another verification email.`
+        )
+      }
+
       try {
         // Create database client and auth instance
         const db = createDbClient(c.env.PROJECT_DB)
@@ -58,6 +79,8 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         if (userData.length === 0) {
           // Don't reveal that user doesn't exist for security
+          // But still update the rate limit to prevent enumeration attacks
+          lastResendTimes.set(email, now)
           return redirectWithMessage(
             c,
             `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
@@ -84,6 +107,9 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
             callbackURL: `${c.req.url.split('/')[0]}//${c.req.url.split('/')[2]}${PATHS.AUTH.SIGN_IN}`,
           },
         })
+
+        // Update the last resend time after successful send
+        lastResendTimes.set(email, now)
 
         return redirectWithMessage(
           c,

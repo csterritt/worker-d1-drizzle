@@ -3,6 +3,7 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS } from '../../constants'
 import type { Bindings } from '../../local-types'
+import { lastResendTimes } from './handleResendEmail'
 
 /**
  * Handle sign-up form submission with proper UX flow
@@ -144,6 +145,9 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       }
 
       // Successful sign-up!
+      // Track the initial email send time
+      lastResendTimes.set(email, Date.now())
+
       // Redirect to await verification page with email parameter
       return c.redirect(`${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`)
     } catch (error) {

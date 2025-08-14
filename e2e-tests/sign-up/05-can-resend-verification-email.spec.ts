@@ -83,13 +83,21 @@ test(
     // Verify on await verification page
     await verifyOnAwaitVerificationPage(page)
 
-    // Click resend email button
-    await resendButton.click()
+    // Verify the resend button is available
+    await expect(resendButton).toBeVisible()
 
     // Should stay on await verification page
     await verifyOnAwaitVerificationPage(page)
 
-    // Should show success message about email being sent
+    // Wait for the rate limit period to expire (3 seconds in test environment)
+    // This is necessary because we now track the initial email send time
+    console.log('Waiting for rate limit to expire...')
+    await page.waitForTimeout(4000) // Wait 4 seconds to be safe
+
+    // Click the resend email button (should now work since rate limit expired)
+    await resendButton.click()
+
+    // Should get success message
     await verifyAlert(
       page,
       'A new verification email has been sent. Please check your inbox.'
