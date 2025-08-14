@@ -11,9 +11,8 @@ import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, DURATIONS } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
-import { eq } from 'drizzle-orm'
-import { user, account } from '../../db/schema'
 import { createDbClient } from '../../db/client'
+import { getUserWithAccountByEmail, updateAccountTimestamp } from '../../lib/db-access'
 
 /**
  * Handle resend verification email form submission
@@ -51,18 +50,18 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         const auth = createAuth(c.env)
 
         // Check if user exists and get their verification status along with account info for rate limiting
-        const userWithAccount = await db
-          .select({
-            userId: user.id,
-            userName: user.name,
-            userEmail: user.email,
-            emailVerified: user.emailVerified,
-            accountUpdatedAt: account.updatedAt,
-          })
-          .from(user)
-          .leftJoin(account, eq(account.userId, user.id))
-          .where(eq(user.email, email))
-          .limit(1)
+        const userWithAccountResult = await getUserWithAccountByEmail(db, email)
+        
+        if (userWithAccountResult.isErr) {
+          console.error('Database error getting user with account:', userWithAccountResult.error)
+          return redirectWithMessage(
+            c,
+            `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+            'A new verification email has been sent. Please check your inbox.'
+          )
+        }
+
+        const userWithAccount = userWithAccountResult.value
 
         if (userWithAccount.length === 0) {
           // Don't reveal that user doesn't exist for security
@@ -86,16 +85,12 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Check rate limiting using account.updatedAt
         const now = Date.now()
-        const lastEmailTime = userData.accountUpdatedAt
-          ? userData.accountUpdatedAt.getTime()
-          : 0
+        const lastEmailTime = userData.accountUpdatedAt ? userData.accountUpdatedAt.getTime() : 0
         const timeSinceLastEmail = now - lastEmailTime
         const waitTimeMs = DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
 
         if (timeSinceLastEmail < waitTimeMs) {
-          const remainingSeconds = Math.ceil(
-            (waitTimeMs - timeSinceLastEmail) / 1000
-          )
+          const remainingSeconds = Math.ceil((waitTimeMs - timeSinceLastEmail) / 1000)
           return redirectWithMessage(
             c,
             `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
@@ -113,10 +108,12 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         })
 
         // Update the account's updatedAt field to track this email send
-        await db
-          .update(account)
-          .set({ updatedAt: new Date() })
-          .where(eq(account.userId, userData.userId))
+        const updateResult = await updateAccountTimestamp(db, userData.userId)
+        
+        if (updateResult.isErr) {
+          console.error('Database error updating account timestamp:', updateResult.error)
+          // Don't fail the process if timestamp update fails
+        }
 
         return redirectWithMessage(
           c,

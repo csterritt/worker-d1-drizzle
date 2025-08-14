@@ -3,9 +3,8 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS } from '../../constants'
 import type { Bindings } from '../../local-types'
-import { eq } from 'drizzle-orm'
-import { account, user } from '../../db/schema'
 import { createDbClient } from '../../db/client'
+import { getUserIdByEmail, updateAccountTimestamp } from '../../lib/db-access'
 
 /**
  * Handle sign-up form submission with proper UX flow
@@ -152,18 +151,16 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         const dbClient = createDbClient(c.env.PROJECT_DB)
         
         // Find the user that was just created
-        const userData = await dbClient
-          .select({ id: user.id })
-          .from(user)
-          .where(eq(user.email, email))
-          .limit(1)
+        const userIdResult = await getUserIdByEmail(dbClient, email)
         
-        if (userData.length > 0) {
+        if (userIdResult.isOk && userIdResult.value.length > 0) {
           // Update the account's updatedAt field for this user
-          await dbClient
-            .update(account)
-            .set({ updatedAt: new Date() })
-            .where(eq(account.userId, userData[0].id))
+          const updateResult = await updateAccountTimestamp(dbClient, userIdResult.value[0].id)
+          
+          if (updateResult.isErr) {
+            console.error('Database error updating account timestamp:', updateResult.error)
+            // Don't fail the sign-up process if this fails
+          }
         }
       } catch (dbError) {
         console.error('Error updating account timestamp:', dbError)
