@@ -53,9 +53,10 @@ export const useLayout = (c: Context, children: any) => {
           )}
 
           {c.get('user') && (
-            <div className='flex flex-row align-center space-x-4'>
+            <div className='flex flex-row items-center space-x-4'>
               <span className='text-sm mr-2'>
-                Welcome, {c.get('user')?.name || c.get('user')?.email || 'User'}!
+                Welcome, {c.get('user')?.name || c.get('user')?.email || 'User'}
+                !
               </span>
               <form method='post' action='/auth/sign-out'>
                 <button
