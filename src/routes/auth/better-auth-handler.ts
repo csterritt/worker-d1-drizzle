@@ -7,6 +7,7 @@
  * @module routes/auth/better-auth-handler
  */
 import { Hono } from 'hono'
+
 import { createAuth, type Auth } from '../../lib/auth'
 import { Bindings } from '../../local-types'
 

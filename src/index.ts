@@ -17,6 +17,7 @@ import { buildEmailConfirmation } from './routes/auth/buildEmailConfirmation'
 import { buildAwaitVerification } from './routes/auth/buildAwaitVerification'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
+import { buildSignUp } from './routes/auth/buildSignUp'
 import { handleSignIn } from './routes/auth/handleSignIn'
 import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleSignOut } from './routes/auth/handleSignOut'
@@ -101,6 +102,7 @@ console.log('🔧 setupBetterAuth call completed')
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
+buildSignUp(app)
 buildEmailConfirmation(app)
 buildAwaitVerification(app)
 handleSignUp(app)

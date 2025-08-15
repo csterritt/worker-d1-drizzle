@@ -9,6 +9,10 @@ export async function verifyOnSignInPage(page: Page) {
   expect(await verifyElementExists(page, 'sign-in-page-banner')).toBe(true)
 }
 
+export async function verifyOnSignUpPage(page: Page) {
+  expect(await verifyElementExists(page, 'sign-up-page-banner')).toBe(true)
+}
+
 export async function verifyOnProtectedPage(page: Page) {
   expect(await verifyElementExists(page, 'private-page-banner')).toBe(true)
 }

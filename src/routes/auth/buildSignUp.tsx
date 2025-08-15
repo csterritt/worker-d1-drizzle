@@ -3,8 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 /**
- * Route builder for the sign-in page.
- * @module routes/auth/buildSignIn
+ * Route builder for the sign-up page.
+ * @module routes/auth/buildSignUp
  */
 import { Hono, Context } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
@@ -19,55 +19,71 @@ import { reloadOnBackButton } from '../../lib/reload-on-back-button'
 import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
- * Render the JSX for the sign-in page.
+ * Render the JSX for the sign-up page.
  * @param c - Hono context
  * @param emailEntered - email entered by user, if any
  */
-const renderSignIn = (c: Context, emailEntered: string) => {
+const renderSignUp = (c: Context, emailEntered: string) => {
   return (
-    <div data-testid='sign-in-page-banner' className='flex justify-center'>
+    <div data-testid='sign-up-page-banner' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
         <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold mb-4'>Sign In</h2>
+          <h2 className='card-title text-2xl font-bold mb-4'>Create Account</h2>
 
-          {/* Better-auth sign-in form */}
+          {/* Sign up form */}
           <form
             method='post'
-            action='/api/auth/sign-in/email'
+            action='/auth/sign-up'
             className='flex flex-col gap-4'
-            aria-label='Sign in form'
+            aria-label='Sign up form'
           >
             <div className='form-control w-full'>
-              <label className='label' htmlFor='email'>
+              <label className='label' htmlFor='signup-name'>
+                <span className='label-text'>Name</span>
+              </label>
+              <input
+                id='signup-name'
+                name='name'
+                type='text'
+                placeholder='Enter your full name'
+                required
+                className='input input-bordered w-full'
+                autoFocus
+                data-testid='signup-name-input'
+                aria-label='Name'
+              />
+            </div>
+            
+            <div className='form-control w-full'>
+              <label className='label' htmlFor='signup-email'>
                 <span className='label-text'>Email</span>
               </label>
               <input
-                id='email'
+                id='signup-email'
                 name='email'
                 type='email'
                 placeholder='Enter your email'
                 required
                 className='input input-bordered w-full'
-                autoFocus
                 value={emailEntered}
-                data-testid='email-input'
+                data-testid='signup-email-input'
                 aria-label='Email'
               />
             </div>
             
             <div className='form-control w-full'>
-              <label className='label' htmlFor='password'>
+              <label className='label' htmlFor='signup-password'>
                 <span className='label-text'>Password</span>
               </label>
               <input
-                id='password'
+                id='signup-password'
                 name='password'
                 type='password'
-                placeholder='Enter your password'
+                placeholder='Enter your password (min 8 characters)'
                 required
                 minLength={8}
                 className='input input-bordered w-full'
-                data-testid='password-input'
+                data-testid='signup-password-input'
                 aria-label='Password'
               />
             </div>
@@ -75,23 +91,23 @@ const renderSignIn = (c: Context, emailEntered: string) => {
             <div className='card-actions justify-end mt-4'>
               <button
                 type='submit'
-                className='btn btn-primary'
-                data-testid='submit'
+                className='btn btn-primary w-full'
+                data-testid='signup-submit'
               >
-                Sign In
+                Create Account
               </button>
             </div>
           </form>
 
-          {/* Navigation to sign-up page */}
-          <div className='divider'>New user?</div>
+          {/* Navigation to sign-in page */}
+          <div className='divider'>Already have an account?</div>
           <div className='card-actions justify-center'>
             <a
-              href={PATHS.AUTH.SIGN_UP}
+              href={PATHS.AUTH.SIGN_IN}
               className='btn btn-outline btn-secondary'
-              data-testid='go-to-sign-up-button'
+              data-testid='go-to-sign-in-button'
             >
-              Create Account
+              Sign In Instead
             </a>
           </div>
         </div>
@@ -102,10 +118,10 @@ const renderSignIn = (c: Context, emailEntered: string) => {
 }
 
 /**
- * Attach the sign-in route to the app.
+ * Attach the sign-up route to the app.
  * @param app - Hono app instance
  */
-export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
+export const buildSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
   const secureHeadersWithNonce = {
     ...ALLOW_SCRIPTS_SECURE_HEADERS,
     contentSecurityPolicy: {
@@ -114,7 +130,7 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
     },
   }
 
-  app.get(PATHS.AUTH.SIGN_IN, secureHeaders(secureHeadersWithNonce), (c) => {
+  app.get(PATHS.AUTH.SIGN_UP, secureHeaders(secureHeadersWithNonce), (c) => {
     // Check if user is already signed in using better-auth session
     // Better-auth middleware sets user context, access it properly
     const user = (c as any).get('user')
@@ -123,12 +139,9 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
       return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
     }
 
-    // No need to check for intermediate "signing in" state with better-auth
-    // since it's direct username/password authentication
-    
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderSignIn(c, emailEntered)))
+    return c.render(useLayout(c, renderSignUp(c, emailEntered)))
   })
 }

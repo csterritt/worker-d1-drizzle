@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, COOKIES } from '../../constants'
@@ -57,6 +58,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             name,
             email,
             password,
+            callbackURL: PATHS.AUTH.SIGN_IN,
           },
         })
 

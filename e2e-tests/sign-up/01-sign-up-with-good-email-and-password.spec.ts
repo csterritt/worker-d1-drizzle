@@ -1,17 +1,17 @@
 import { test, expect } from '@playwright/test'
 
 import { fillInput, clickLink } from '../support/finders'
-import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import { verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
   'sign up with good email and password',
   testWithDatabase(async ({ page }) => {
-    // Navigate to sign-in page (which contains the sign-up form)
-    await page.goto('http://localhost:3000/auth/sign-in')
+    // Navigate to sign-up page
+    await page.goto('http://localhost:3000/auth/sign-up')
 
-    // Verify we're on the sign-in page
-    await verifyOnSignInPage(page)
+    // Verify we're on the sign-up page
+    await verifyOnSignUpPage(page)
 
     // Fill out the sign-up form with new credentials
     const newName = 'Test User'

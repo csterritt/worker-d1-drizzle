@@ -1,17 +1,17 @@
 import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import { verifyOnSignInPage, verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
   'duplicate unverified sign-up redirects to await verification page',
   testWithDatabase(async ({ page }) => {
-    // Navigate to sign-in page (which contains the sign-up form)
-    await page.goto('http://localhost:3000/auth/sign-in')
+    // Navigate to sign-up page
+    await page.goto('http://localhost:3000/auth/sign-up')
 
-    // Verify we're on the sign-in page
-    await verifyOnSignInPage(page)
+    // Verify we're on the sign-up page
+    await verifyOnSignUpPage(page)
 
     // First, sign up with new credentials
     const newName = 'Duplicate Test User'
@@ -26,9 +26,9 @@ test(
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)
 
-    // Navigate back to sign-in page to attempt duplicate sign-up
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    // Navigate back to sign-up page to attempt duplicate sign-up
+    await page.goto('http://localhost:3000/auth/sign-up')
+    await verifyOnSignUpPage(page)
 
     // Now try to sign up again with the same email (but different name/password)
     await fillInput(page, 'signup-name-input', 'Different Name')

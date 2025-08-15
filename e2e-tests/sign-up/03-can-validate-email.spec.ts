@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
 import {
   verifyOnSignInPage,
+  verifyOnSignUpPage,
   verifyOnProtectedPage,
   verifyOnAwaitVerificationPage,
 } from '../support/page-verifiers'
@@ -34,11 +35,11 @@ function extractVerificationLink(htmlContent: string): string {
 test(
   'can validate email and sign in successfully',
   testWithDatabase(async ({ page }) => {
-    // Navigate to sign-in page (which contains the sign-up form)
-    await page.goto('http://localhost:3000/auth/sign-in')
+    // Navigate to sign-up page
+    await page.goto('http://localhost:3000/auth/sign-up')
 
-    // Verify we're on the sign-in page
-    await verifyOnSignInPage(page)
+    // Verify we're on the sign-up page
+    await verifyOnSignUpPage(page)
 
     // Sign up with new credentials
     const newName = 'Email Validator'

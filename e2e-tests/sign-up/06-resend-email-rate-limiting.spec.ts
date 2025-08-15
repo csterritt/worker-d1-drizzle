@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test'
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import { verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
   'resend email button enforces rate limiting from first attempt',
   testWithDatabase(async ({ page }) => {
-    // Navigate to sign-in page (which contains the sign-up form)
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    // Navigate to sign-up page
+    await page.goto('http://localhost:3000/auth/sign-up')
+    await verifyOnSignUpPage(page)
 
     // Sign up with new credentials
     const newName = 'Rate Limit Test User'
