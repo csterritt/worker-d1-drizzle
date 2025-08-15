@@ -82,10 +82,12 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             errorMessage.toLowerCase().includes('unique') ||
             errorMessage.toLowerCase().includes('email')
           ) {
+            // Redirect to await verification page with email cookie for duplicate emails
+            addCookie(c, COOKIES.EMAIL_ENTERED, email)
             return redirectWithMessage(
               c,
-              PATHS.AUTH.SIGN_IN,
-              'An account with this email already exists. Please sign in instead.'
+              PATHS.AUTH.AWAIT_VERIFICATION,
+              'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
             )
           }
 
@@ -120,10 +122,12 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           errorString.includes('violates unique') ||
           (errorString.includes('email') && errorString.includes('exists'))
         ) {
+          // Redirect to await verification page with email cookie for duplicate emails
+          addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
-            PATHS.AUTH.SIGN_IN,
-            'An account with this email already exists. Please sign in instead.'
+            PATHS.AUTH.AWAIT_VERIFICATION,
+            'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
           )
         }
 
@@ -132,10 +136,12 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           errorString.includes('constraint') ||
           errorString.includes('sqlite_constraint')
         ) {
+          // Redirect to await verification page with email cookie for constraint errors (likely duplicate email)
+          addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
-            PATHS.AUTH.SIGN_IN,
-            'An account with this email already exists. Please sign in instead.'
+            PATHS.AUTH.AWAIT_VERIFICATION,
+            'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
           )
         }
 
