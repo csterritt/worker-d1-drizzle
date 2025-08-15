@@ -9,12 +9,13 @@
 import { Hono, Context } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
+import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS, COOKIES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
-import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 import { reloadOnBackButton } from '../../lib/reload-on-back-button'
+import { redirectWithMessage } from '../../lib/redirects'
+import { retrieveCookie, removeCookie } from '../../lib/cookie-support'
 import { createAuth } from '../../lib/auth'
 
 /**
@@ -208,7 +209,7 @@ export const buildEmailConfirmation = (
   app.get('/auth/email-sent', secureHeaders(secureHeadersWithNonce), (c) => {
     setupNoCacheHeaders(c)
 
-    const email = c.req.query('email')
+    const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
     if (!email) {
       return redirectWithMessage(
         c,
@@ -216,6 +217,9 @@ export const buildEmailConfirmation = (
         'Please sign up to continue.'
       )
     }
+
+    // Clear the email cookie after successful retrieval
+    removeCookie(c, COOKIES.EMAIL_ENTERED)
 
     return c.render(useLayout(c, renderEmailSent(c, email)))
   })

@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS } from '../../constants'
+import { PATHS, COOKIES } from '../../constants'
 import type { Bindings } from '../../local-types'
+import { addCookie } from '../../lib/cookie-support'
 
 /**
  * Better-auth response interceptor to convert JSON responses to user-friendly redirects
@@ -36,9 +37,10 @@ export const setupBetterAuthResponseInterceptor = (
           ) {
             // User signed up but needs to verify email
             const email = responseData.user.email
+            addCookie(c, COOKIES.EMAIL_ENTERED, email)
             return redirectWithMessage(
               c,
-              `${PATHS.AUTH.EMAIL_SENT}?email=${encodeURIComponent(email)}`,
+              `${PATHS.AUTH.EMAIL_SENT}`,
               'Account created! Please check your email to verify your account.'
             )
           }

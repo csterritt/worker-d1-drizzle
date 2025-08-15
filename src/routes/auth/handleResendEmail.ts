@@ -8,11 +8,12 @@
  */
 import { Hono } from 'hono'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, DURATIONS } from '../../constants'
+import { PATHS, DURATIONS, COOKIES } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import { getUserWithAccountByEmail, updateAccountTimestamp } from '../../lib/db-access'
+import { addCookie } from '../../lib/cookie-support'
 
 /**
  * Handle resend verification email form submission
@@ -54,9 +55,10 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         
         if (userWithAccountResult.isErr) {
           console.error('Database error getting user with account:', userWithAccountResult.error)
+          addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
-            `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+            PATHS.AUTH.AWAIT_VERIFICATION,
             'A new verification email has been sent. Please check your inbox.'
           )
         }
@@ -65,9 +67,10 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         if (userWithAccount.length === 0) {
           // Don't reveal that user doesn't exist for security
+          addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
-            `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+            PATHS.AUTH.AWAIT_VERIFICATION,
             'A new verification email has been sent. Please check your inbox.'
           )
         }
@@ -91,9 +94,10 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         if (timeSinceLastEmail < waitTimeMs) {
           const remainingSeconds = Math.ceil((waitTimeMs - timeSinceLastEmail) / 1000)
+          addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
-            `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+            PATHS.AUTH.AWAIT_VERIFICATION,
             `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another verification email.`
           )
         }
@@ -115,16 +119,19 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           // Don't fail the process if timestamp update fails
         }
 
+        addCookie(c, COOKIES.EMAIL_ENTERED, email)
+
         return redirectWithMessage(
           c,
-          `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+          PATHS.AUTH.AWAIT_VERIFICATION,
           'A new verification email has been sent. Please check your inbox.'
         )
       } catch (emailError) {
         console.error('Error in resend email process:', emailError)
+        addCookie(c, COOKIES.EMAIL_ENTERED, email)
         return redirectWithMessage(
           c,
-          `${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`,
+          PATHS.AUTH.AWAIT_VERIFICATION,
           'A new verification email has been sent. Please check your inbox.'
         )
       }

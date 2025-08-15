@@ -26,9 +26,8 @@ test(
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)
 
-    // Verify the URL contains the email parameter
+    // Verify the URL is the await verification page (no email parameter needed since we use cookies now)
     const currentUrl = page.url()
     expect(currentUrl).toContain('/auth/await-verification')
-    expect(currentUrl).toContain(`email=${encodeURIComponent(newEmail)}`)
   })
 )

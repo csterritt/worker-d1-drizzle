@@ -71,10 +71,9 @@ test(
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)
 
-    // Verify the URL contains the email parameter
+    // Verify the URL is the await verification page (no email parameter needed since we use cookies now)
     const currentUrl = page.url()
     expect(currentUrl).toContain('/auth/await-verification')
-    expect(currentUrl).toContain(`email=${encodeURIComponent(newEmail)}`)
 
     // Verify that the resend email button is visible
     const resendButton = page.getByTestId('resend-email-button')
@@ -103,10 +102,9 @@ test(
       'A new verification email has been sent. Please check your inbox.'
     )
 
-    // Verify we're still on the correct page with email parameter
+    // Verify we're still on the correct page (no email parameter needed since we use cookies now)
     const newUrl = page.url()
     expect(newUrl).toContain('/auth/await-verification')
-    expect(newUrl).toContain(`email=${encodeURIComponent(newEmail)}`)
 
     // Verify the resend button is still available for future use
     await expect(resendButton).toBeVisible()

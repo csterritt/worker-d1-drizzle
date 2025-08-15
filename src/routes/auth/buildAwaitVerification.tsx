@@ -7,13 +7,12 @@
  * @module routes/auth/buildAwaitVerification
  */
 import { Hono, Context } from 'hono'
-import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
+import { PATHS, COOKIES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
-import { reloadOnBackButton } from '../../lib/reload-on-back-button'
+import { retrieveCookie, removeCookie } from '../../lib/cookie-support'
 
 /**
  * Render the JSX for the await verification page.
@@ -110,9 +109,17 @@ export const buildAwaitVerification = (
 ): void => {
   app.get(PATHS.AUTH.AWAIT_VERIFICATION, async (c) => {
     setupNoCacheHeaders(c)
+
+    // Get email from COOKIES.EMAIL_ENTERED cookie
+    const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
     
-    // Get email from query parameter if provided
-    const email = c.req.query('email')
+    // If no email cookie is present, redirect to sign-in page
+    if (!email) {
+      return c.redirect(PATHS.AUTH.SIGN_IN)
+    }
+
+    // Remove the email cookie after retrieving it
+    removeCookie(c, COOKIES.EMAIL_ENTERED)
 
     return c.render(useLayout(c, renderAwaitVerification(c, email)))
   })

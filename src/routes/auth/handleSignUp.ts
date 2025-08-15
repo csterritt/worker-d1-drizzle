@@ -1,17 +1,18 @@
 import { Hono } from 'hono'
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS } from '../../constants'
+import { PATHS, COOKIES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import { getUserIdByEmail, updateAccountTimestamp } from '../../lib/db-access'
+import { addCookie } from '../../lib/cookie-support'
 
 /**
  * Handle sign-up form submission with proper UX flow
  * Processes registration via better-auth and redirects to appropriate page
  */
 export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.post('/auth/sign-up', async (c) => {
+  app.post(PATHS.AUTH.SIGN_UP, async (c) => {
     try {
       const formData = await c.req.formData()
       const name = formData.get('name') as string
@@ -149,16 +150,22 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
       // Update the account's updatedAt field to track the initial email send time
       try {
         const dbClient = createDbClient(c.env.PROJECT_DB)
-        
+
         // Find the user that was just created
         const userIdResult = await getUserIdByEmail(dbClient, email)
-        
+
         if (userIdResult.isOk && userIdResult.value.length > 0) {
           // Update the account's updatedAt field for this user
-          const updateResult = await updateAccountTimestamp(dbClient, userIdResult.value[0].id)
-          
+          const updateResult = await updateAccountTimestamp(
+            dbClient,
+            userIdResult.value[0].id
+          )
+
           if (updateResult.isErr) {
-            console.error('Database error updating account timestamp:', updateResult.error)
+            console.error(
+              'Database error updating account timestamp:',
+              updateResult.error
+            )
             // Don't fail the sign-up process if this fails
           }
         }
@@ -167,8 +174,9 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         // Don't fail the sign-up process if this fails
       }
 
-      // Redirect to await verification page with email parameter
-      return c.redirect(`${PATHS.AUTH.AWAIT_VERIFICATION}?email=${encodeURIComponent(email)}`)
+      // Redirect to await verification page with email cookie
+      addCookie(c, COOKIES.EMAIL_ENTERED, email)
+      return c.redirect(PATHS.AUTH.AWAIT_VERIFICATION)
     } catch (error) {
       console.error('Sign-up error:', error)
 

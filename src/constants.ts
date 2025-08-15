@@ -32,6 +32,9 @@ export const PATHS = {
     // Sign in page
     SIGN_IN: '/auth/sign-in',
 
+    // Sign up page
+    SIGN_UP: '/auth/sign-up',
+
     // Email confirmation pages
     VERIFY_EMAIL: '/auth/verify-email',
     EMAIL_SENT: '/auth/email-sent',
@@ -89,7 +92,6 @@ export const VALIDATION = {
   // Messages
   REQUIRED: 'This field is required',
   EMAIL_INVALID: 'Please enter a valid email address',
-
 } as const
 
 export const DURATIONS = {
