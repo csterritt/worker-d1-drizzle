@@ -4,6 +4,34 @@ import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, COOKIES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { addCookie } from '../../lib/cookie-support'
+import { getUserWithAccountByEmail } from '../../lib/db-access'
+import { createDbClient } from '../../db/client'
+
+/**
+ * Helper function to check if user exists but is unverified
+ */
+const checkUnverifiedUser = async (
+  db: any,
+  email: string
+): Promise<{ isUnverified: boolean; userExists: boolean }> => {
+  try {
+    const userResult = await getUserWithAccountByEmail(db, email)
+    if (userResult.isOk) {
+      const users = userResult.value
+      if (users.length > 0) {
+        const user = users[0]
+        return {
+          isUnverified: !user.emailVerified,
+          userExists: true
+        }
+      }
+    }
+    return { isUnverified: false, userExists: false }
+  } catch (e) {
+    console.log('[DEBUG] Error checking unverified user:', e)
+    return { isUnverified: false, userExists: false }
+  }
+}
 
 /**
  * Better-auth response interceptor to convert JSON responses to user-friendly redirects
@@ -12,9 +40,30 @@ import { addCookie } from '../../lib/cookie-support'
 export const setupBetterAuthResponseInterceptor = (
   app: Hono<{ Bindings: Bindings }>
 ) => {
+  // Add middleware to capture email from sign-in requests without consuming the body
+  app.use('/api/auth/sign-in/email', async (c, next) => {
+    try {
+      // Clone the request to avoid consuming the original body
+      const clonedRequest = c.req.raw.clone()
+      const formData = await clonedRequest.formData()
+      const email = formData.get('email') as string | null
+      
+      if (email) {
+        c.set('signInEmail', email)
+      }
+    } catch (e) {
+      // Silently continue if email capture fails
+    }
+    
+    await next()
+  })
+
   // Intercept sign-in endpoint specifically
   app.on(['POST'], '/api/auth/sign-in/email', async (c, next) => {
     try {
+      // Get the captured email from context
+      const capturedEmail = c.get('signInEmail') as string | null
+      
       // Create better-auth instance and handle the request normally
       const auth = createAuth(c.env)
       const response = await auth.handler(c.req.raw)
@@ -22,6 +71,8 @@ export const setupBetterAuthResponseInterceptor = (
       if (!response) {
         return next()
       }
+
+      // Handle better-auth response based on status
 
       // Check if this was a successful auth response (status 200)
       if (response.status === 200) {
@@ -98,6 +149,28 @@ export const setupBetterAuthResponseInterceptor = (
       }
 
       if (response.status === 403) {
+        // For 403 responses, check if it's specifically for unverified email
+        try {
+          const responseClone = response.clone()
+          const errorData = await responseClone.json()
+          
+          // Check if this is specifically an EMAIL_NOT_VERIFIED error
+          if (errorData && errorData.code === 'EMAIL_NOT_VERIFIED') {
+            // Use the captured email from context
+            if (capturedEmail) {
+              addCookie(c, COOKIES.EMAIL_ENTERED, capturedEmail)
+              return redirectWithMessage(
+                c,
+                PATHS.AUTH.AWAIT_VERIFICATION,
+                'Please verify your email address before signing in. Check your email for a verification link.'
+              )
+            }
+          }
+        } catch (e) {
+          // Could not parse 403 response, continue with fallback
+        }
+        
+        // Fallback to original behavior for other 403 cases or if no email captured
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,

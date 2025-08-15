@@ -5,7 +5,7 @@ import { verifyOnSignInPage, verifyOnAwaitVerificationPage } from '../support/pa
 import { testWithDatabase } from '../support/test-helpers'
 
 test(
-  'must validate email before signing in',
+  'unverified user sign-in redirects to await verification page',
   testWithDatabase(async ({ page }) => {
     // Navigate to sign-in page (which contains the sign-up form)
     await page.goto('http://localhost:3000/auth/sign-in')
@@ -14,9 +14,9 @@ test(
     await verifyOnSignInPage(page)
 
     // First, sign up with new credentials
-    const newName = 'Unverified User'
-    const newEmail = 'unverified@example.com'
-    const newPassword = 'unverifiedpassword123'
+    const newName = 'Redirect Test User'
+    const newEmail = 'redirect-test@example.com'
+    const newPassword = 'redirecttest123'
 
     await fillInput(page, 'signup-name-input', newName)
     await fillInput(page, 'signup-email-input', newEmail)
@@ -35,7 +35,7 @@ test(
     await fillInput(page, 'password-input', newPassword)
     await clickLink(page, 'submit')
 
-    // Should be redirected to await verification page with email verification required message
+    // Should be redirected to await verification page (not stay on sign-in page)
     await verifyOnAwaitVerificationPage(page)
     await verifyAlert(
       page,

@@ -38,8 +38,8 @@ test(
     await fillInput(page, 'password-input', newPassword)
     await clickLink(page, 'submit')
 
-    // Should stay on sign-in page with email verification required message
-    await verifyOnSignInPage(page)
+    // Should be redirected to await verification page with email verification required message
+    await verifyOnAwaitVerificationPage(page)
     await verifyAlert(
       page,
       'Please verify your email address before signing in. Check your email for a verification link.'
