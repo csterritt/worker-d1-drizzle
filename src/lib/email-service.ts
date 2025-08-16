@@ -143,3 +143,81 @@ export const sendConfirmationEmail = async (
     throw new Error('Failed to send confirmation email')
   }
 }
+
+/**
+ * Send password reset email to user
+ * @param env - Cloudflare environment
+ * @param email - User's email address
+ * @param name - User's name
+ * @param resetUrl - Password reset URL with token
+ * @param token - Reset token
+ */
+export async function sendPasswordResetEmail(
+  env: any,
+  email: string,
+  name: string,
+  resetUrl: string,
+  token: string
+): Promise<void> {
+  console.log('🔔 sendPasswordResetEmail called:', {
+    email,
+    name,
+    resetUrl,
+    token,
+  })
+
+  try {
+    console.log('📧 Creating email transporter...')
+    const transporter = createTransporter(env)
+
+    const mailOptions = {
+      from: env.FROM_EMAIL || 'noreply@example.com',
+      to: email,
+      subject: 'Reset Your Password',
+      html: `
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+          <h1 style="color: #333;">Password Reset Request</h1>
+          <p>Hi ${name},</p>
+          <p>You requested to reset your password. Please click the button below to set a new password:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" 
+               style="background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
+              Reset Your Password
+            </a>
+          </div>
+          <p style="color: #666; font-size: 14px;">
+            If the button doesn't work, you can also copy and paste this link into your browser:
+          </p>
+          <p style="word-break: break-all; color: #666; font-size: 14px;">
+            ${resetUrl}
+          </p>
+          <p style="color: #666; font-size: 12px; margin-top: 30px;">
+            This password reset link will expire in 24 hours.
+          </p>
+          <p style="color: #666; font-size: 12px;">
+            If you didn't request this password reset, you can safely ignore this email.
+          </p>
+        </div>
+      `,
+      text: `
+        Password Reset Request
+        
+        Hi ${name},
+        
+        You requested to reset your password. Please visit this link to set a new password:
+        
+        ${resetUrl}
+        
+        This password reset link will expire in 24 hours.
+        
+        If you didn't request this password reset, you can safely ignore this email.
+      `,
+    }
+
+    const result = await transporter.sendMail(mailOptions)
+    console.log('Password reset email sent successfully:', result.messageId)
+  } catch (error) {
+    console.error('Failed to send password reset email:', error)
+    throw new Error('Failed to send password reset email')
+  }
+}

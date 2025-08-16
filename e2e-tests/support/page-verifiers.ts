@@ -1,5 +1,5 @@
-import { Page, expect } from '@playwright/test'
-import { verifyElementExists, getElementText } from './finders'
+import { expect, Page } from '@playwright/test'
+import { getElementText, verifyElementExists } from './finders'
 
 export async function verifyOnStartupPage(page: Page) {
   expect(await verifyElementExists(page, 'startup-page-banner')).toBe(true)
@@ -26,4 +26,20 @@ export async function verifyOn404Page(page: Page) {
   expect(await getElementText(page, '404-message')).toBe(
     'That page does not exist.'
   )
+}
+
+export async function verifyOnForgotPasswordPage(page: any) {
+  expect(await verifyElementExists(page, 'forgot-password-page')).toBe(true)
+}
+
+export async function verifyOnWaitingForResetPage(page: any) {
+  expect(await verifyElementExists(page, 'waiting-for-reset-page')).toBe(true)
+}
+
+export async function verifyOnResetPasswordPage(page: any) {
+  expect(await verifyElementExists(page, 'reset-password-page')).toBe(true)
+}
+
+export async function verifyOnInvalidTokenPage(page: any) {
+  expect(await verifyElementExists(page, 'invalid-token-page')).toBe(true)
 }

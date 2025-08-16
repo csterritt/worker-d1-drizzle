@@ -7,9 +7,8 @@
  * @module routes/auth/buildSignUp
  */
 import { Hono, Context } from 'hono'
-import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
+import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -120,15 +119,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
-  const secureHeadersWithNonce = {
-    ...ALLOW_SCRIPTS_SECURE_HEADERS,
-    contentSecurityPolicy: {
-      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-vuT4jLBPWwBahBVDX9kIwvULuCqVeGJue9++ZZPtFb8='"],
-    },
-  }
-
-  app.get(PATHS.AUTH.SIGN_UP, secureHeaders(secureHeadersWithNonce), (c) => {
+  app.get(PATHS.AUTH.SIGN_UP, (c) => {
     // Check if user is already signed in using better-auth session
     // Better-auth middleware sets user context, access it properly
     const user = (c as any).get('user')

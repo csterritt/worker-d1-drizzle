@@ -18,10 +18,15 @@ import { buildAwaitVerification } from './routes/auth/buildAwaitVerification'
 import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
 import { buildSignUp } from './routes/auth/buildSignUp'
+import { buildForgotPassword } from './routes/auth/buildForgotPassword'
+import { buildWaitingForReset } from './routes/auth/buildWaitingForReset'
+import { buildResetPassword } from './routes/auth/buildResetPassword'
 import { handleSignIn } from './routes/auth/handleSignIn'
 import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleSignOut } from './routes/auth/handleSignOut'
 import { handleResendEmail } from './routes/auth/handleResendEmail'
+import { handleForgotPassword } from './routes/auth/handleForgotPassword'
+import { handleResetPassword } from './routes/auth/handleResetPassword'
 import { setupBetterAuth, setupBetterAuthMiddleware } from './routes/auth/better-auth-handler'
 import { setupBetterAuthResponseInterceptor } from './routes/auth/betterAuthResponseInterceptor'
 
@@ -103,11 +108,16 @@ buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
 buildSignUp(app)
+buildForgotPassword(app)
+buildWaitingForReset(app)
+buildResetPassword(app)
 buildEmailConfirmation(app)
 buildAwaitVerification(app)
 handleSignUp(app)
 handleSignOut(app)
 handleResendEmail(app)
+handleForgotPassword(app)
+handleResetPassword(app)
 
 handleSetClock(app) // PRODUCTION:REMOVE
 handleResetClock(app) // PRODUCTION:REMOVE

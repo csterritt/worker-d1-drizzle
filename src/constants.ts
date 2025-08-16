@@ -41,6 +41,11 @@ export const PATHS = {
     AWAIT_VERIFICATION: '/auth/await-verification',
     RESEND_EMAIL: '/auth/resend-email',
 
+    // Password reset pages
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    WAITING_FOR_RESET: '/auth/waiting-for-reset',
+    RESET_PASSWORD: '/auth/reset-password',
+
     // Set and reset clock (for testing) // PRODUCTION:REMOVE
     SET_CLOCK: '/auth/set-clock', // PRODUCTION:REMOVE
     RESET_CLOCK: '/auth/reset-clock', // PRODUCTION:REMOVE

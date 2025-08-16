@@ -7,9 +7,8 @@
  * @module routes/auth/buildEmailConfirmation
  */
 import { Hono, Context } from 'hono'
-import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS, COOKIES } from '../../constants'
+import { PATHS, COOKIES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -125,85 +124,73 @@ const renderEmailSent = (c: Context, email: string) => {
 export const buildEmailConfirmation = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  const secureHeadersWithNonce = {
-    ...ALLOW_SCRIPTS_SECURE_HEADERS,
-    contentSecurityPolicy: {
-      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-vuT4jLBPWwBahBVDX9kIwvULuCqVeGJue9++ZZPtFb8='"],
-    },
-  }
-
   // Email confirmation endpoint - handles verification tokens
-  app.get(
-    '/auth/verify-email',
-    secureHeaders(secureHeadersWithNonce),
-    async (c) => {
-      setupNoCacheHeaders(c)
+  app.get('/auth/verify-email', async (c) => {
+    setupNoCacheHeaders(c)
 
-      const token = c.req.query('token')
-      const callbackUrl = c.req.query('callbackUrl')
+    const token = c.req.query('token')
+    const callbackUrl = c.req.query('callbackUrl')
 
-      if (!token) {
-        return c.render(
-          useLayout(
+    if (!token) {
+      return c.render(
+        useLayout(
+          c,
+          renderEmailConfirmation(
             c,
-            renderEmailConfirmation(
-              c,
-              'No verification token provided. Please check your email for the correct link.',
-              false
-            )
+            'No verification token provided. Please check your email for the correct link.',
+            false
           )
         )
-      }
-
-      try {
-        // Use better-auth to verify the email token
-        const auth = createAuth(c.env)
-        const verification = await auth.api.verifyEmail({
-          query: { token, callbackURL: callbackUrl },
-        })
-
-        if (verification && 'status' in verification && verification.status) {
-          return c.render(
-            useLayout(
-              c,
-              renderEmailConfirmation(
-                c,
-                'Your email has been successfully verified! You can now sign in to your account.',
-                true
-              )
-            )
-          )
-        } else {
-          return c.render(
-            useLayout(
-              c,
-              renderEmailConfirmation(
-                c,
-                'The verification link is invalid or has expired. Please try signing up again.',
-                false
-              )
-            )
-          )
-        }
-      } catch (error) {
-        console.error('Email verification error:', error)
-        return c.render(
-          useLayout(
-            c,
-            renderEmailConfirmation(
-              c,
-              'There was an error verifying your email. Please try again or contact support.',
-              false
-            )
-          )
-        )
-      }
+      )
     }
-  )
+
+    try {
+      // Use better-auth to verify the email token
+      const auth = createAuth(c.env)
+      const verification = await auth.api.verifyEmail({
+        query: { token, callbackURL: callbackUrl },
+      })
+
+      if (verification && 'status' in verification && verification.status) {
+        return c.render(
+          useLayout(
+            c,
+            renderEmailConfirmation(
+              c,
+              'Your email has been successfully verified! You can now sign in to your account.',
+              true
+            )
+          )
+        )
+      } else {
+        return c.render(
+          useLayout(
+            c,
+            renderEmailConfirmation(
+              c,
+              'The verification link is invalid or has expired. Please try signing up again.',
+              false
+            )
+          )
+        )
+      }
+    } catch (error) {
+      console.error('Email verification error:', error)
+      return c.render(
+        useLayout(
+          c,
+          renderEmailConfirmation(
+            c,
+            'There was an error verifying your email. Please try again or contact support.',
+            false
+          )
+        )
+      )
+    }
+  })
 
   // Email sent confirmation page
-  app.get('/auth/email-sent', secureHeaders(secureHeadersWithNonce), (c) => {
+  app.get('/auth/email-sent', (c) => {
     setupNoCacheHeaders(c)
 
     const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)

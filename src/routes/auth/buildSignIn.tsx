@@ -7,9 +7,8 @@
  * @module routes/auth/buildSignIn
  */
 import { Hono, Context } from 'hono'
-import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS } from '../../constants'
+import { PATHS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -82,6 +81,17 @@ const renderSignIn = (c: Context, emailEntered: string) => {
             </div>
           </form>
 
+          {/* Forgot password link */}
+          <div className='text-center mt-2'>
+            <a
+              href={PATHS.AUTH.FORGOT_PASSWORD}
+              className='link link-primary text-sm'
+              data-testid='forgot-password-link'
+            >
+              Forgot your password?
+            </a>
+          </div>
+
           {/* Navigation to sign-up page */}
           <div className='divider'>New user?</div>
           <div className='card-actions justify-center'>
@@ -104,15 +114,7 @@ const renderSignIn = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
-  const secureHeadersWithNonce = {
-    ...ALLOW_SCRIPTS_SECURE_HEADERS,
-    contentSecurityPolicy: {
-      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-vuT4jLBPWwBahBVDX9kIwvULuCqVeGJue9++ZZPtFb8='"],
-    },
-  }
-
-  app.get(PATHS.AUTH.SIGN_IN, secureHeaders(secureHeadersWithNonce), (c) => {
+  app.get(PATHS.AUTH.SIGN_IN, (c) => {
     // Check if user is already signed in using better-auth session
     // Better-auth middleware sets user context, access it properly
     const user = (c as any).get('user')

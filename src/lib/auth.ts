@@ -10,7 +10,7 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createDbClient } from '../db/client'
 import { schema } from '../db/schema'
-import { sendConfirmationEmail } from './email-service'
+import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
 
 /**
  * Create and configure better-auth instance
@@ -33,6 +33,29 @@ export function createAuth(env: any) {
       requireEmailVerification: true, // Enable email verification for sign-ups
       minPasswordLength: 8,
       maxPasswordLength: 128,
+      sendResetPassword: async ({
+        user,
+        url,
+        token,
+      }: {
+        user: { email: string; name: string }
+        url: string
+        token: string
+      }) => {
+        console.log('🔔 better-auth sendResetPassword triggered:', {
+          user: user.email,
+          url,
+          token,
+        })
+        try {
+          // Send password reset email using our email service
+          await sendPasswordResetEmail(env, user.email, user.name, url, token)
+          console.log('✅ Password reset email sent successfully')
+        } catch (error) {
+          console.error('❌ Error in sendResetPassword:', error)
+          throw error
+        }
+      },
     },
     emailVerification: {
       sendVerificationEmail: async ({
