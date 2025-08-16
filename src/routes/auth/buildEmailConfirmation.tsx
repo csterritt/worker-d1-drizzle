@@ -13,7 +13,6 @@ import { PATHS, ALLOW_SCRIPTS_SECURE_HEADERS, COOKIES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
-import { reloadOnBackButton } from '../../lib/reload-on-back-button'
 import { redirectWithMessage } from '../../lib/redirects'
 import { retrieveCookie, removeCookie } from '../../lib/cookie-support'
 import { createAuth } from '../../lib/auth'
@@ -74,7 +73,6 @@ const renderEmailConfirmation = (
           )}
         </div>
       </div>
-      {reloadOnBackButton()}
     </div>
   )
 }
@@ -116,7 +114,6 @@ const renderEmailSent = (c: Context, email: string) => {
           </div>
         </div>
       </div>
-      {reloadOnBackButton()}
     </div>
   )
 }

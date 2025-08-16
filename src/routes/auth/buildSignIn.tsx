@@ -15,7 +15,6 @@ import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
-import { reloadOnBackButton } from '../../lib/reload-on-back-button'
 import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
@@ -54,7 +53,7 @@ const renderSignIn = (c: Context, emailEntered: string) => {
                 aria-label='Email'
               />
             </div>
-            
+
             <div className='form-control w-full'>
               <label className='label' htmlFor='password'>
                 <span className='label-text'>Password</span>
@@ -71,7 +70,7 @@ const renderSignIn = (c: Context, emailEntered: string) => {
                 aria-label='Password'
               />
             </div>
-            
+
             <div className='card-actions justify-end mt-4'>
               <button
                 type='submit'
@@ -96,7 +95,6 @@ const renderSignIn = (c: Context, emailEntered: string) => {
           </div>
         </div>
       </div>
-      {reloadOnBackButton()}
     </div>
   )
 }
@@ -125,7 +123,7 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
 
     // No need to check for intermediate "signing in" state with better-auth
     // since it's direct username/password authentication
-    
+
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     setupNoCacheHeaders(c)

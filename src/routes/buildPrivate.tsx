@@ -12,7 +12,6 @@ import { PATHS } from '../constants'
 import { Bindings } from '../local-types'
 import { useLayout } from './buildLayout'
 import { signedInAccess } from '../middleware/signed-in-access'
-import { reloadOnBackButton } from '../lib/reload-on-back-button'
 
 /**
  * Render the JSX for the private page.
@@ -41,7 +40,6 @@ const renderPrivate = (c: Context) => {
           </div>
         </div>
       </div>
-      {reloadOnBackButton()}
     </div>
   )
 }

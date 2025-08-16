@@ -15,7 +15,6 @@ import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
-import { reloadOnBackButton } from '../../lib/reload-on-back-button'
 import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
@@ -53,7 +52,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
                 aria-label='Name'
               />
             </div>
-            
+
             <div className='form-control w-full'>
               <label className='label' htmlFor='signup-email'>
                 <span className='label-text'>Email</span>
@@ -70,7 +69,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
                 aria-label='Email'
               />
             </div>
-            
+
             <div className='form-control w-full'>
               <label className='label' htmlFor='signup-password'>
                 <span className='label-text'>Password</span>
@@ -87,7 +86,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
                 aria-label='Password'
               />
             </div>
-            
+
             <div className='card-actions justify-end mt-4'>
               <button
                 type='submit'
@@ -112,7 +111,6 @@ const renderSignUp = (c: Context, emailEntered: string) => {
           </div>
         </div>
       </div>
-      {reloadOnBackButton()}
     </div>
   )
 }
