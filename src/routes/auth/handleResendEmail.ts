@@ -12,7 +12,10 @@ import { PATHS, DURATIONS, COOKIES } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
-import { getUserWithAccountByEmail, updateAccountTimestamp } from '../../lib/db-access'
+import {
+  getUserWithAccountByEmail,
+  updateAccountTimestamp,
+} from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
 
 /**
@@ -52,9 +55,12 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Check if user exists and get their verification status along with account info for rate limiting
         const userWithAccountResult = await getUserWithAccountByEmail(db, email)
-        
+
         if (userWithAccountResult.isErr) {
-          console.error('Database error getting user with account:', userWithAccountResult.error)
+          console.error(
+            'Database error getting user with account:',
+            userWithAccountResult.error
+          )
           addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
@@ -88,12 +94,16 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Check rate limiting using account.updatedAt
         const now = Date.now()
-        const lastEmailTime = userData.accountUpdatedAt ? userData.accountUpdatedAt.getTime() : 0
+        const lastEmailTime = userData.accountUpdatedAt
+          ? userData.accountUpdatedAt.getTime()
+          : 0
         const timeSinceLastEmail = now - lastEmailTime
-        const waitTimeMs = DURATIONS.THIRTY_SECONDS_IN_MILLISECONDS
+        const waitTimeMs = DURATIONS.EMAIL_RESEND_TIME_IN_MILLISECONDS
 
         if (timeSinceLastEmail < waitTimeMs) {
-          const remainingSeconds = Math.ceil((waitTimeMs - timeSinceLastEmail) / 1000)
+          const remainingSeconds = Math.ceil(
+            (waitTimeMs - timeSinceLastEmail) / 1000
+          )
           addCookie(c, COOKIES.EMAIL_ENTERED, email)
           return redirectWithMessage(
             c,
@@ -113,9 +123,12 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
         // Update the account's updatedAt field to track this email send
         const updateResult = await updateAccountTimestamp(db, userData.userId)
-        
+
         if (updateResult.isErr) {
-          console.error('Database error updating account timestamp:', updateResult.error)
+          console.error(
+            'Database error updating account timestamp:',
+            updateResult.error
+          )
           // Don't fail the process if timestamp update fails
         }
 
