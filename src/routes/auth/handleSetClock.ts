@@ -7,8 +7,9 @@
  * @module routes/auth/handleSetClock
  */
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setCurrentDelta } from '../../lib/time-access' // PRODUCTION:REMOVE
@@ -20,7 +21,7 @@ import { setCurrentDelta } from '../../lib/time-access' // PRODUCTION:REMOVE
 export const handleSetClock = (app: Hono<{ Bindings: Bindings }>): void => {
   // } // PRODUCTION:UNCOMMENT
   // PRODUCTION:STOP
-  app.get(`${PATHS.AUTH.SET_CLOCK}/:delta`, async (c) => {
+  app.get(`${PATHS.AUTH.SET_CLOCK}/:delta`, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     const delta = parseInt(c.req.param('delta'))
     setCurrentDelta(c, delta)
 

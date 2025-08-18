@@ -7,8 +7,9 @@
  * @module routes/handleSetDbFailures
  */
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../constants'
 import { Bindings } from '../local-types'
 import { redirectWithMessage } from '../lib/redirects'
 import { addCookie } from '../lib/cookie-support'
@@ -22,7 +23,7 @@ export const handleSetDbFailures = (
 ): void => {
   // } // PRODUCTION:UNCOMMENT
   // PRODUCTION:STOP
-  app.get(`${PATHS.AUTH.SET_DB_FAILURES}/:name/:times`, async (c) => {
+  app.get(`${PATHS.AUTH.SET_DB_FAILURES}/:name/:times`, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     const name = c.req.param('name')
     if (!name || name.trim() === '') {
       return redirectWithMessage(c, PATHS.ROOT, 'Invalid name parameter')

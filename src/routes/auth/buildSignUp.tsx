@@ -7,8 +7,9 @@
  * @module routes/auth/buildSignUp
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -119,7 +120,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.SIGN_UP, (c) => {
+  app.get(PATHS.AUTH.SIGN_UP, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     // Check if user is already signed in using better-auth session
     // Better-auth middleware sets user context, access it properly
     const user = (c as any).get('user')

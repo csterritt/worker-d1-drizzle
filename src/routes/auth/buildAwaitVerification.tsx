@@ -7,8 +7,9 @@
  * @module routes/auth/buildAwaitVerification
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -107,7 +108,7 @@ const renderAwaitVerification = (c: Context, email?: string) => {
 export const buildAwaitVerification = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.AWAIT_VERIFICATION, async (c) => {
+  app.get(PATHS.AUTH.AWAIT_VERIFICATION, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     setupNoCacheHeaders(c)
 
     // Get email from COOKIES.EMAIL_ENTERED cookie

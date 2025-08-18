@@ -7,10 +7,11 @@
  * @module routes/auth/handleForgotPassword
  */
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { addCookie } from '../../lib/cookie-support'
 import { Bindings } from '../../local-types'
 
@@ -21,7 +22,7 @@ import { Bindings } from '../../local-types'
 export const handleForgotPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.post('/auth/forgot-password', async (c) => {
+  app.post('/auth/forgot-password', secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     try {
       const formData = await c.req.formData()
       const email = formData.get('email') as string

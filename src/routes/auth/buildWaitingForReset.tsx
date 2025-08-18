@@ -7,8 +7,9 @@
  * @module routes/auth/buildWaitingForReset
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -74,7 +75,7 @@ const renderWaitingForReset = (c: Context, email: string) => {
 export const buildWaitingForReset = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.WAITING_FOR_RESET, (c) => {
+  app.get(PATHS.AUTH.WAITING_FOR_RESET, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     setupNoCacheHeaders(c)
 
     const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)

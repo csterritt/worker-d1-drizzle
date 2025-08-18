@@ -7,8 +7,9 @@
  * @module routes/auth/buildEmailConfirmation
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -125,7 +126,7 @@ export const buildEmailConfirmation = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
   // Email confirmation endpoint - handles verification tokens
-  app.get('/auth/verify-email', async (c) => {
+  app.get('/auth/verify-email', secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     setupNoCacheHeaders(c)
 
     const token = c.req.query('token')
@@ -190,7 +191,7 @@ export const buildEmailConfirmation = (
   })
 
   // Email sent confirmation page
-  app.get('/auth/email-sent', (c) => {
+  app.get('/auth/email-sent', secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     setupNoCacheHeaders(c)
 
     const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)

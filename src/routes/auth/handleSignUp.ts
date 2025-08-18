@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import { getUserIdByEmail, updateAccountTimestamp } from '../../lib/db-access'
@@ -13,7 +14,7 @@ import { addCookie } from '../../lib/cookie-support'
  * Processes registration via better-auth and redirects to appropriate page
  */
 export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.post(PATHS.AUTH.SIGN_UP, async (c) => {
+  app.post(PATHS.AUTH.SIGN_UP, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     try {
       const formData = await c.req.formData()
       const name = formData.get('name') as string

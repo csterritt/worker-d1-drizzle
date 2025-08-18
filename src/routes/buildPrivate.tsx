@@ -7,8 +7,9 @@
  * @module routes/buildPrivate
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../constants'
 import { Bindings } from '../local-types'
 import { useLayout } from './buildLayout'
 import { signedInAccess } from '../middleware/signed-in-access'
@@ -49,7 +50,7 @@ const renderPrivate = (c: Context) => {
  * @param app - Hono app instance
  */
 export const buildPrivate = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.PRIVATE, signedInAccess, (c) =>
+  app.get(PATHS.PRIVATE, secureHeaders(STANDARD_SECURE_HEADERS), signedInAccess, (c) =>
     c.render(useLayout(c, renderPrivate(c)))
   )
 }

@@ -7,10 +7,11 @@
  * @module routes/auth/handleResetPassword
  */
 import { Hono } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
-import { PATHS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 
 /**
@@ -20,7 +21,7 @@ import { Bindings } from '../../local-types'
 export const handleResetPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.post('/auth/reset-password', async (c) => {
+  app.post('/auth/reset-password', secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
     try {
       const formData = await c.req.formData()
       const token = formData.get('token') as string

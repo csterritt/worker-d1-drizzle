@@ -7,8 +7,9 @@
  * @module routes/auth/buildForgotPassword
  */
 import { Hono, Context } from 'hono'
+import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -91,7 +92,7 @@ const renderForgotPassword = (c: Context) => {
 export const buildForgotPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.FORGOT_PASSWORD, (c) => {
+  app.get(PATHS.AUTH.FORGOT_PASSWORD, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     setupNoCacheHeaders(c)
     return c.render(useLayout(c, renderForgotPassword(c)))
   })
