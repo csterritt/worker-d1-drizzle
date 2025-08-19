@@ -77,6 +77,12 @@ test(
     // Wait for the page to load and check for success indicators
     await page.waitForTimeout(1000)
 
+    await verifyOnSignInPage(page)
+    await verifyAlert(
+      page,
+      'Your email has been verified successfully. You may now sign in.'
+    )
+
     // Now try to sign in with the verified credentials
     await page.goto('http://localhost:3000/auth/sign-in')
     await verifyOnSignInPage(page)

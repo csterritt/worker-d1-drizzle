@@ -115,21 +115,37 @@ const renderSignIn = (c: Context, emailEntered: string) => {
  * @param app - Hono app instance
  */
 export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.SIGN_IN, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    // Check if user is already signed in using better-auth session
-    // Better-auth middleware sets user context, access it properly
-    const user = (c as any).get('user')
-    if (user) {
-      console.log('Already signed in')
-      return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
+  app.get(
+    `${PATHS.AUTH.SIGN_IN}/:validationSuccessful?`,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      // Check if user is already signed in using better-auth session
+      // Better-auth middleware sets user context, access it properly
+      const user = (c as any).get('user')
+      if (user) {
+        console.log('Already signed in')
+        return redirectWithMessage(
+          c,
+          PATHS.PRIVATE,
+          'You are already signed in.'
+        )
+      }
+
+      // Check if sign-in validation was successful
+      const validationSuccessful = c.req.param('validationSuccessful')
+      let extraMessage = ''
+      if (validationSuccessful === 'true') {
+        extraMessage =
+          'Your email has been verified successfully. You may now sign in.'
+      }
+
+      // No need to check for intermediate "signing in" state with better-auth
+      // since it's direct username/password authentication
+      const emailEntered: string =
+        retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
+
+      setupNoCacheHeaders(c)
+      return c.render(useLayout(c, renderSignIn(c, emailEntered), extraMessage))
     }
-
-    // No need to check for intermediate "signing in" state with better-auth
-    // since it's direct username/password authentication
-
-    const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
-
-    setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderSignIn(c, emailEntered)))
-  })
+  )
 }

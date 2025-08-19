@@ -18,9 +18,9 @@ import { version } from '../version'
  * @param c - Hono context
  * @param children - TSX children
  */
-export const useLayout = (c: Context, children: any) => {
+export const useLayout = (c: Context, children: any, extraMessage?: string) => {
   // Get message and error cookies
-  const message = retrieveCookie(c, COOKIES.MESSAGE_FOUND)
+  const message = retrieveCookie(c, COOKIES.MESSAGE_FOUND) || extraMessage
   if (message) {
     removeCookie(c, COOKIES.MESSAGE_FOUND)
   }
