@@ -44,7 +44,7 @@ const renderSignUp = (c: Context, emailEntered: string) => {
                 id='signup-name'
                 name='name'
                 type='text'
-                placeholder='Enter your full name'
+                placeholder='Enter your name'
                 required
                 className='input input-bordered w-full'
                 autoFocus
