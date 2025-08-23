@@ -3,10 +3,12 @@ import { test, expect } from '@playwright/test'
 import { fillInput, clickLink } from '../support/finders'
 import { verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 test(
   'sign up with good email and password',
   testWithDatabase(async ({ page }) => {
+    await skipIfNotMode('OPEN_SIGN_UP')
     // Navigate to sign-up page
     await page.goto('http://localhost:3000/auth/sign-up')
 

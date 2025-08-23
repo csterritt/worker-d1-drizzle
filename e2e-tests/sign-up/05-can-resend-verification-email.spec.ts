@@ -8,6 +8,7 @@ import {
   verifyOnProtectedPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 // Helper function to get the latest email from Mailpit
 async function getLatestEmailFromMailpit() {
@@ -50,6 +51,7 @@ function extractVerificationLink(htmlContent: string): string {
 test(
   'can resend verification email from await verification page',
   testWithDatabase(async ({ page }) => {
+    await skipIfNotMode('OPEN_SIGN_UP')
     // Clear all emails from Mailpit before the test
     await clearAllEmailsFromMailpit()
 

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 
 import { clickLink } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
+import { skipIfNotMode, detectSignUpMode } from '../support/mode-helpers'
 
 /**
  * Helper function to verify we're on the sign-up page
@@ -11,6 +12,7 @@ async function verifyOnSignUpPage(page: any) {
 }
 
 test('can navigate between sign-in and sign-up pages using buttons', async ({ page }) => {
+  await skipIfNotMode('OPEN_SIGN_UP')
   // Start on the sign-in page
   await page.goto('http://localhost:3000/auth/sign-in')
   await verifyOnSignInPage(page)
@@ -31,6 +33,7 @@ test('can navigate between sign-in and sign-up pages using buttons', async ({ pa
 })
 
 test('sign-up page has correct form elements and navigation', async ({ page }) => {
+  await skipIfNotMode('OPEN_SIGN_UP')
   // Navigate directly to sign-up page
   await page.goto('http://localhost:3000/auth/sign-up')
   await verifyOnSignUpPage(page)
@@ -55,7 +58,15 @@ test('sign-in page has correct form elements and navigation', async ({ page }) =
   expect(await page.locator('[data-testid="email-input"]').isVisible()).toBe(true)
   expect(await page.locator('[data-testid="password-input"]').isVisible()).toBe(true)
   expect(await page.locator('[data-testid="submit"]').isVisible()).toBe(true)
-  expect(await page.locator('[data-testid="go-to-sign-up-button"]').isVisible()).toBe(true)
+  
+  // Check sign-up button visibility based on current mode
+  const currentMode = await detectSignUpMode()
+  if (currentMode === 'OPEN_SIGN_UP') {
+    expect(await page.locator('[data-testid="go-to-sign-up-button"]').isVisible()).toBe(true)
+  } else {
+    // In NO_SIGN_UP mode, the sign-up button should be hidden
+    expect(await page.locator('[data-testid="go-to-sign-up-button"]').count()).toBe(0)
+  }
 
   // Verify page title
   expect(await page.locator('h2').textContent()).toContain('Sign In')

@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test'
 import { verifyOn404Page } from '../support/page-verifiers'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
+  test.beforeEach(async () => {
+    await skipIfNotMode('NO_SIGN_UP')
+  })
   test('POST to /auth/sign-up returns 404 page', async ({ page }) => {
     // Make a POST request to the sign-up endpoint
     const response = await page.request.post('http://localhost:3000/auth/sign-up', {

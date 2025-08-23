@@ -8,6 +8,7 @@ import {
   verifyOnAwaitVerificationPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 // Helper function to get the latest email from Mailpit
 async function getLatestEmailFromMailpit() {
@@ -35,6 +36,7 @@ function extractVerificationLink(htmlContent: string): string {
 test(
   'can validate email and sign in successfully',
   testWithDatabase(async ({ page }) => {
+    await skipIfNotMode('OPEN_SIGN_UP')
     // Navigate to sign-up page
     await page.goto('http://localhost:3000/auth/sign-up')
 

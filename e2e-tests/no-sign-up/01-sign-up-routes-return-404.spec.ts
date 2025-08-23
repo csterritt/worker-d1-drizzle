@@ -1,7 +1,11 @@
 import { test } from '@playwright/test'
 import { verifyOn404Page } from '../support/page-verifiers'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 test.describe('No Sign-Up Mode: Sign-up routes return 404', () => {
+  test.beforeEach(async () => {
+    await skipIfNotMode('NO_SIGN_UP')
+  })
   test('visiting /auth/sign-up returns 404 page with proper banner', async ({ page }) => {
     await page.goto('http://localhost:3000/auth/sign-up')
     await verifyOn404Page(page)

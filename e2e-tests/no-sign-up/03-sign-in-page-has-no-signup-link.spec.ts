@@ -1,8 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { verifyOnSignInPage } from '../support/page-verifiers'
 import { verifyElementExists } from '../support/finders'
+import { skipIfNotMode } from '../support/mode-helpers'
 
 test.describe('No Sign-Up Mode: Sign-in page has no sign-up links', () => {
+  test.beforeEach(async () => {
+    await skipIfNotMode('NO_SIGN_UP')
+  })
   test('sign-in page does not contain "Create Account" button', async ({ page }) => {
     await page.goto('http://localhost:3000/auth/sign-in')
     await verifyOnSignInPage(page)
