@@ -8,7 +8,7 @@ import { csrf } from 'hono/csrf'
 import { secureHeaders } from 'hono/secure-headers'
 import { bodyLimit } from 'hono/body-limit'
 
-import { HTML_STATUS } from './constants'
+import { HTML_STATUS, SIGN_UP_MODES } from './constants'
 import { renderer } from './renderer'
 import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
 import { buildPrivate } from './routes/buildPrivate'
@@ -111,15 +111,17 @@ console.log('🔧 setupBetterAuth call completed')
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
-buildSignUp(app)
+if (process.env.SIGN_UP_MODE === SIGN_UP_MODES.OPEN_SIGN_UP) {
+  buildSignUp(app)
+  handleSignUp(app)
+  buildAwaitVerification(app)
+  handleResendEmail(app)
+}
 buildForgotPassword(app)
 buildWaitingForReset(app)
 buildResetPassword(app)
 buildEmailConfirmation(app)
-buildAwaitVerification(app)
-handleSignUp(app)
 handleSignOut(app)
-handleResendEmail(app)
 handleForgotPassword(app)
 handleResetPassword(app)
 

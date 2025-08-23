@@ -9,7 +9,7 @@
 import { Hono, Context } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS, SIGN_UP_MODES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -93,17 +93,21 @@ const renderSignIn = (c: Context, emailEntered: string) => {
             </a>
           </div>
 
-          {/* Navigation to sign-up page */}
-          <div className='divider'>New user?</div>
-          <div className='card-actions justify-center'>
-            <a
-              href={PATHS.AUTH.SIGN_UP}
-              className='btn btn-outline btn-secondary'
-              data-testid='go-to-sign-up-button'
-            >
-              Create Account
-            </a>
-          </div>
+          {/* Navigation to sign-up page - only show if sign-up is enabled */}
+          {process.env.SIGN_UP_MODE !== SIGN_UP_MODES.NO_SIGN_UP && (
+            <>
+              <div className='divider'>New user?</div>
+              <div className='card-actions justify-center'>
+                <a
+                  href={PATHS.AUTH.SIGN_UP}
+                  className='btn btn-outline btn-secondary'
+                  data-testid='go-to-sign-up-button'
+                >
+                  Create Account
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
