@@ -21,7 +21,8 @@
 	},
 	"vars": {
 		"Session": "",
-		"db": ""
+		"db": "",
+		"signUpType": ""
 	},
 	"d1_databases": [
 		{

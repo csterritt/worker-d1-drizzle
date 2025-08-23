@@ -87,6 +87,16 @@ export const COOKIES = {
   },
 } as const
 
+/*
+ * Sign up modes
+ */
+export const SIGN_UP_MODES = {
+  GATED_SIGN_UP: 'GATED_SIGN_UP' as const,
+  INTEREST_SIGN_UP: 'INTEREST_SIGN_UP' as const,
+  NO_SIGN_UP: 'NO_SIGN_UP' as const,
+  OPEN_SIGN_UP: 'OPEN_SIGN_UP' as const,
+}
+
 /**
  * Validation patterns and messages
  */

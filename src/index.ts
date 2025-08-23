@@ -27,7 +27,10 @@ import { handleSignOut } from './routes/auth/handleSignOut'
 import { handleResendEmail } from './routes/auth/handleResendEmail'
 import { handleForgotPassword } from './routes/auth/handleForgotPassword'
 import { handleResetPassword } from './routes/auth/handleResetPassword'
-import { setupBetterAuth, setupBetterAuthMiddleware } from './routes/auth/better-auth-handler'
+import {
+  setupBetterAuth,
+  setupBetterAuthMiddleware,
+} from './routes/auth/better-auth-handler'
 import { setupBetterAuthResponseInterceptor } from './routes/auth/betterAuthResponseInterceptor'
 
 import { Bindings } from './local-types'
@@ -36,8 +39,10 @@ import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
 import { testDatabaseRouter } from './routes/test/database' // PRODUCTION:REMOVE
 
-
 const app = new Hono<{ Bindings: Bindings }>()
+
+const signUpMode = process.env.SIGN_UP_MODE
+console.log(`🔧 SIGN_UP_MODE: ${signUpMode}`)
 
 let alternateOrigin = /http:\/\/localhost(:\d+)?$/ // PRODUCTION:REMOVE
 // PRODUCTION:REMOVE-NEXT-LINE
@@ -48,29 +53,28 @@ if (process.env.ALTERNATE_ORIGIN) {
 // Apply middleware
 app.use(secureHeaders({ referrerPolicy: 'strict-origin-when-cross-origin' }))
 // Apply CSRF protection to all routes except test endpoints
-app.use(
-  async (c, next) => {
-    // Skip CSRF for test endpoints // PRODUCTION:REMOVE
-    if (c.req.path.startsWith('/test/')) { // PRODUCTION:REMOVE
-      return next() // PRODUCTION:REMOVE
-    } // PRODUCTION:REMOVE
-    
-    // Apply CSRF protection to all other routes
-    const csrfMiddleware = csrf({
-      origin: (origin: string) => {
-        // return /https:\/\/mini-auth.example.com$/.test(origin) || // PRODUCTION:UNCOMMENT
-        //  /https:\/\/mini-auth.example.workers.dev$/.test(origin)  // PRODUCTION:UNCOMMENT
-        // PRODUCTION:REMOVE-NEXT-LINE
-        return (
-          /http:\/\/localhost(:\d+)?$/.test(origin) || // PRODUCTION:REMOVE
-          alternateOrigin.test(origin) // PRODUCTION:REMOVE
-        ) // PRODUCTION:REMOVE
-      },
-    })
-    
-    return csrfMiddleware(c, next)
-  }
-)
+app.use(async (c, next) => {
+  // Skip CSRF for test endpoints // PRODUCTION:REMOVE
+  // PRODUCTION:REMOVE-NEXT-LINE
+  if (c.req.path.startsWith('/test/')) {
+    return next() // PRODUCTION:REMOVE
+  } // PRODUCTION:REMOVE
+
+  // Apply CSRF protection to all other routes
+  const csrfMiddleware = csrf({
+    origin: (origin: string) => {
+      // return /https:\/\/mini-auth.example.com$/.test(origin) || // PRODUCTION:UNCOMMENT
+      //  /https:\/\/mini-auth.example.workers.dev$/.test(origin)  // PRODUCTION:UNCOMMENT
+      // PRODUCTION:REMOVE-NEXT-LINE
+      return (
+        /http:\/\/localhost(:\d+)?$/.test(origin) || // PRODUCTION:REMOVE
+        alternateOrigin.test(origin) // PRODUCTION:REMOVE
+      ) // PRODUCTION:REMOVE
+    },
+  })
+
+  return csrfMiddleware(c, next)
+})
 app.use(
   bodyLimit({
     // maxSize: 4 * 1024, // 4kb // PRODUCTION:UNCOMMENT
@@ -125,7 +129,6 @@ handleSetDbFailures(app) // PRODUCTION:REMOVE
 
 // Test-only database endpoints // PRODUCTION:REMOVE
 app.route('/test/database', testDatabaseRouter) // PRODUCTION:REMOVE
-
 
 // this MUST be the last route declared!
 build404(app)

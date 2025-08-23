@@ -2,7 +2,10 @@
 	"name": "worker-d1-drizzle",
 	"type": "module",
 	"scripts": {
-		"dev": "./run-dev.sh",
+        "dev-open-sign-up": "./run-dev.sh open-sign-up",
+        "dev-no-sign-up": "./run-dev.sh no-sign-up",
+        "dev-gated-sign-up": "./run-dev.sh gated-sign-up",
+        "dev-interest-sign-up": "./run-dev.sh interest-sign-up",
 		"build": "wrangler build",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface Bindings"
