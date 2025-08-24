@@ -38,6 +38,7 @@ import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMO
 import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
 import { testDatabaseRouter } from './routes/test/database' // PRODUCTION:REMOVE
+import { testSignUpModeRouter } from './routes/test/sign-up-mode' // PRODUCTION:REMOVE
 
 const app = new Hono<{ Bindings: Bindings }>()
 
@@ -131,6 +132,7 @@ handleSetDbFailures(app) // PRODUCTION:REMOVE
 
 // Test-only database endpoints // PRODUCTION:REMOVE
 app.route('/test/database', testDatabaseRouter) // PRODUCTION:REMOVE
+app.route('/test/sign-up-mode', testSignUpModeRouter) // PRODUCTION:REMOVE
 
 // this MUST be the last route declared!
 build404(app)
