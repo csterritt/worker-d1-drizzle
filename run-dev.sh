@@ -29,8 +29,8 @@ if [ -e public/style-[0-9]*.css ]; then
   styleFile=$(/bin/ls public/style-[0-9]*.css)
 fi
 
-echo "# DERIVED FILE DO NOT EDIT - edit .dev.vars.without.sign.up.mode instead" > .dev.vars
-cat .dev.vars.without.sign.up.mode >> .dev.vars
+echo "# DERIVED FILE DO NOT EDIT - edit .dev.vars.all instead" > .dev.vars
+cat .dev.vars.all >> .dev.vars
 echo "SIGN_UP_MODE=${SIGN_UP_MODE}" >> .dev.vars
 
 concurrently -c auto \

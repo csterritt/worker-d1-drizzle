@@ -33,3 +33,4 @@ lerna-debug.log*
 test-results
 tmp/
 schema.sql
+.dev.vars.all

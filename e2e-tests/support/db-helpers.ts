@@ -81,6 +81,7 @@ export const seedDatabase = async (): Promise<void> => {
       error?: string
       usersCreated?: number
       accountsCreated?: number
+      singleUseCodesCreated?: number
     }
 
     if (!result.success) {
@@ -88,7 +89,7 @@ export const seedDatabase = async (): Promise<void> => {
     }
 
     console.log(
-      `Database seeded successfully: ${result.usersCreated} users, ${result.accountsCreated} accounts`
+      `Database seeded successfully: ${result.usersCreated} users, ${result.accountsCreated} accounts, ${result.singleUseCodesCreated} codes`
     )
   } catch (error) {
     console.error('Failed to seed database:', error)

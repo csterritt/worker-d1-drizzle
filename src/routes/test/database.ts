@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createDbClient } from '../../db/client'
-import { user, account, session } from '../../db/schema'
+import { user, account, session, singleUseCode } from '../../db/schema'
 import { STANDARD_SECURE_HEADERS } from '../../constants'
 
 /**
@@ -27,6 +27,7 @@ testDatabaseRouter.delete(
       await db.delete(session)
       await db.delete(account)
       await db.delete(user)
+      await db.delete(singleUseCode)
 
       console.log('Test database cleared successfully')
 
@@ -172,6 +173,19 @@ testDatabaseRouter.post(
         await db.insert(account).values(accountData)
       }
 
+      // Insert test single-use codes for gated sign-up testing
+      const testSingleUseCodes = [
+        { code: 'WELCOME2024' },
+        { code: 'BETA-ACCESS-123' },
+        { code: 'EARLY-BIRD-456' },
+        { code: 'TEST-CODE-789' },
+        { code: 'DEMO-ACCESS-111' },
+      ]
+
+      for (const codeData of testSingleUseCodes) {
+        await db.insert(singleUseCode).values(codeData)
+      }
+
       console.log('Test database seeded successfully')
 
       return c.json({
@@ -179,6 +193,7 @@ testDatabaseRouter.post(
         message: 'Database seeded successfully',
         usersCreated: testUsers.length,
         accountsCreated: testAccounts.length,
+        singleUseCodesCreated: testSingleUseCodes.length,
         timestamp: new Date().toISOString(),
       })
     } catch (error) {
@@ -211,6 +226,7 @@ testDatabaseRouter.get(
       const userCount = await db.select().from(user)
       const accountCount = await db.select().from(account)
       const sessionCount = await db.select().from(session)
+      const singleUseCodeCount = await db.select().from(singleUseCode)
 
       return c.json({
         success: true,
@@ -218,6 +234,7 @@ testDatabaseRouter.get(
           users: userCount.length,
           accounts: accountCount.length,
           sessions: sessionCount.length,
+          singleUseCodes: singleUseCodeCount.length,
         },
         timestamp: new Date().toISOString(),
       })

@@ -9,7 +9,7 @@
 import retry from 'async-retry'
 import Result from 'true-myth/result'
 import { eq } from 'drizzle-orm'
-import { user, account } from '../db/schema'
+import { user, account, singleUseCode } from '../db/schema'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
 
 /**
@@ -151,6 +151,50 @@ const updateAccountTimestampActual = async (
       .where(eq(account.userId, userId))
 
     return Result.ok(true)
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}
+
+/**
+ * Consume a single-use code (validate and delete atomically)
+ * @param db - Database instance
+ * @param code - The code to consume
+ * @returns Promise<Result<boolean, Error>> - true if code existed and was consumed, false if code didn't exist
+ */
+export const consumeSingleUseCode = async (
+  db: any,
+  code: string
+): Promise<Result<boolean, Error>> => {
+  let res: Result<boolean, Error>
+  try {
+    res = await retry(
+      () => consumeSingleUseCodeActual(db, code),
+      STANDARD_RETRY_OPTIONS
+    )
+  } catch (err) {
+    console.log(`consumeSingleUseCode final error:`, err)
+    res = Result.err(err instanceof Error ? err : new Error(String(err)))
+  }
+
+  return res
+}
+
+const consumeSingleUseCodeActual = async (
+  db: any,
+  code: string
+): Promise<Result<boolean, Error>> => {
+  try {
+    // Delete the code and return the number of rows affected
+    const result = await db
+      .delete(singleUseCode)
+      .where(eq(singleUseCode.code, code))
+
+    // In SQLite/D1, the number of rows affected is in result.meta.changes
+    const rowsDeleted = result.meta?.changes || 0
+    
+    // Return true if exactly one row was deleted (code existed and was consumed)
+    return Result.ok(rowsDeleted === 1)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
   }
