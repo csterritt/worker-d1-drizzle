@@ -15,7 +15,9 @@ export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
   name: text('name'),
   email: text('email').notNull().unique(),
-  emailVerified: integer('emailVerified', { mode: 'boolean' }).default(false).notNull(),
+  emailVerified: integer('emailVerified', { mode: 'boolean' })
+    .default(false)
+    .notNull(),
   image: text('image'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
@@ -51,7 +53,9 @@ export const account = sqliteTable('account', {
   accessToken: text('accessToken'),
   refreshToken: text('refreshToken'),
   accessTokenExpiresAt: integer('accessTokenExpiresAt', { mode: 'timestamp' }),
-  refreshTokenExpiresAt: integer('refreshTokenExpiresAt', { mode: 'timestamp' }),
+  refreshTokenExpiresAt: integer('refreshTokenExpiresAt', {
+    mode: 'timestamp',
+  }),
   scope: text('scope'),
   idToken: text('idToken'),
   password: text('password'), // For email/password auth
@@ -70,6 +74,10 @@ export const verification = sqliteTable('verification', {
   expiresAt: integer('expiresAt', { mode: 'timestamp' }).notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull(),
+})
+
+export const singleUseCode = sqliteTable('singleUseCode', {
+  code: text('code').primaryKey().unique(),
 })
 
 // Define schema object for export
