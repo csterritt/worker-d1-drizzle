@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test'
 
 import { fillInput, clickLink } from '../support/finders'
-import { verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import {
+  verifyOnSignUpPage,
+  verifyOnAwaitVerificationPage,
+} from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 

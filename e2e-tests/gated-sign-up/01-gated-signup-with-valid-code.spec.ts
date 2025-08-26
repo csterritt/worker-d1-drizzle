@@ -6,7 +6,7 @@ import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 
 test.describe('Gated Sign-Up Mode: Valid Code Tests', () => {
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ page }) => {
     await skipIfNotMode('GATED_SIGN_UP')
   })
 
@@ -22,7 +22,11 @@ test.describe('Gated Sign-Up Mode: Valid Code Tests', () => {
       // Fill in the gated sign-up form with valid code
       await fillInput(page, 'gated-signup-code-input', 'WELCOME2024')
       await fillInput(page, 'gated-signup-name-input', 'Gated Test User')
-      await fillInput(page, 'gated-signup-email-input', 'gated-test@example.com')
+      await fillInput(
+        page,
+        'gated-signup-email-input',
+        'gated-test@example.com'
+      )
       await fillInput(page, 'gated-signup-password-input', 'securepassword123')
 
       // Submit the form
@@ -64,7 +68,10 @@ test.describe('Gated Sign-Up Mode: Valid Code Tests', () => {
 
       // Should be redirected to await verification with message about existing account
       await verifyOnAwaitVerificationPage(page)
-      await verifyAlert(page, 'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.')
+      await verifyAlert(
+        page,
+        'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+      )
     })
   )
 })

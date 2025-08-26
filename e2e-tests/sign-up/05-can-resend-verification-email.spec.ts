@@ -23,9 +23,9 @@ async function getLatestEmailFromMailpit() {
 async function clearAllEmailsFromMailpit() {
   try {
     const response = await fetch('http://localhost:8025/api/v1/messages', {
-      method: 'DELETE'
+      method: 'DELETE',
     })
-    
+
     if (!response.ok) {
       console.warn(`Failed to clear emails: ${response.status}`)
     }

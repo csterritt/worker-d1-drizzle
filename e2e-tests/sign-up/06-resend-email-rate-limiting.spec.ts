@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import { fillInput, clickLink } from '../support/finders'
+import {
+  verifyOnSignUpPage,
+  verifyOnAwaitVerificationPage,
+} from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 
@@ -36,7 +39,9 @@ test(
     const alertElement = page.getByRole('alert')
     await expect(alertElement).toContainText('Please wait')
     await expect(alertElement).toContainText('second')
-    await expect(alertElement).toContainText('before requesting another verification email')
+    await expect(alertElement).toContainText(
+      'before requesting another verification email'
+    )
 
     // Should still be on await verification page
     await verifyOnAwaitVerificationPage(page)
@@ -47,7 +52,9 @@ test(
     // Should still get rate limiting message
     await expect(alertElement).toContainText('Please wait')
     await expect(alertElement).toContainText('second')
-    await expect(alertElement).toContainText('before requesting another verification email')
+    await expect(alertElement).toContainText(
+      'before requesting another verification email'
+    )
 
     // Should still be on await verification page
     await verifyOnAwaitVerificationPage(page)

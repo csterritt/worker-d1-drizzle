@@ -5,7 +5,7 @@ import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 
 test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
-  test.beforeEach(async () => {
+  test.beforeEach(async ({ page }) => {
     await skipIfNotMode('GATED_SIGN_UP')
   })
 
@@ -29,7 +29,10 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should stay on sign-up page with error message
       await page.waitForSelector('[data-testid="gated-sign-up-page-banner"]')
-      await verifyAlert(page, 'Invalid or expired sign-up code. Please check your code and try again.')
+      await verifyAlert(
+        page,
+        'Invalid or expired sign-up code. Please check your code and try again.'
+      )
     })
   )
 
@@ -108,7 +111,10 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should fail with invalid code error (code was consumed)
       await page.waitForSelector('[data-testid="gated-sign-up-page-banner"]')
-      await verifyAlert(page, 'Invalid or expired sign-up code. Please check your code and try again.')
+      await verifyAlert(
+        page,
+        'Invalid or expired sign-up code. Please check your code and try again.'
+      )
     })
   )
 })

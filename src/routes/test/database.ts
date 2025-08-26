@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createDbClient } from '../../db/client'
-import { user, account, session, singleUseCode } from '../../db/schema'
+import { user, account, session, singleUseCode, interestedEmails } from '../../db/schema'
 import { STANDARD_SECURE_HEADERS } from '../../constants'
 
 /**
@@ -28,6 +28,7 @@ testDatabaseRouter.delete(
       await db.delete(account)
       await db.delete(user)
       await db.delete(singleUseCode)
+      await db.delete(interestedEmails)
 
       console.log('Test database cleared successfully')
 
@@ -227,6 +228,7 @@ testDatabaseRouter.get(
       const accountCount = await db.select().from(account)
       const sessionCount = await db.select().from(session)
       const singleUseCodeCount = await db.select().from(singleUseCode)
+      const interestedEmailsCount = await db.select().from(interestedEmails)
 
       return c.json({
         success: true,
@@ -235,6 +237,7 @@ testDatabaseRouter.get(
           accounts: accountCount.length,
           sessions: sessionCount.length,
           singleUseCodes: singleUseCodeCount.length,
+          interestedEmails: interestedEmailsCount.length,
         },
         timestamp: new Date().toISOString(),
       })

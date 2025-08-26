@@ -19,12 +19,14 @@ import { createDbClient } from './db/client'
 import { buildSignIn } from './routes/auth/buildSignIn'
 import { buildSignUp } from './routes/auth/buildSignUp'
 import { buildGatedSignUp } from './routes/auth/buildGatedSignUp'
+import { buildInterestSignUp } from './routes/auth/buildInterestSignUp'
 import { buildForgotPassword } from './routes/auth/buildForgotPassword'
 import { buildWaitingForReset } from './routes/auth/buildWaitingForReset'
 import { buildResetPassword } from './routes/auth/buildResetPassword'
 import { handleSignIn } from './routes/auth/handleSignIn'
 import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleGatedSignUp } from './routes/auth/handleGatedSignUp'
+import { handleInterestSignUp } from './routes/auth/handleInterestSignUp'
 import { handleSignOut } from './routes/auth/handleSignOut'
 import { handleResendEmail } from './routes/auth/handleResendEmail'
 import { handleForgotPassword } from './routes/auth/handleForgotPassword'
@@ -122,6 +124,11 @@ if (process.env.SIGN_UP_MODE === SIGN_UP_MODES.OPEN_SIGN_UP) {
 } else if (process.env.SIGN_UP_MODE === SIGN_UP_MODES.GATED_SIGN_UP) {
   buildGatedSignUp(app)
   handleGatedSignUp(app)
+  buildAwaitVerification(app)
+  handleResendEmail(app)
+} else if (process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP) {
+  buildInterestSignUp(app)
+  handleInterestSignUp(app)
   buildAwaitVerification(app)
   handleResendEmail(app)
 }

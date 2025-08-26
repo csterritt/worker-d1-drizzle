@@ -99,11 +99,17 @@ const renderSignIn = (c: Context, emailEntered: string) => {
               <div className='divider'>New user?</div>
               <div className='card-actions justify-center'>
                 <a
-                  href={PATHS.AUTH.SIGN_UP}
+                  href={
+                    process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP
+                      ? PATHS.AUTH.INTEREST_SIGN_UP
+                      : PATHS.AUTH.SIGN_UP
+                  }
                   className='btn btn-outline btn-secondary'
                   data-testid='go-to-sign-up-button'
                 >
-                  Create Account
+                  {process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP
+                    ? 'Join Waitlist'
+                    : 'Create Account'}
                 </a>
               </div>
             </>

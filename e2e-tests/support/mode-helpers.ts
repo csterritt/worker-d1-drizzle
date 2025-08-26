@@ -4,7 +4,7 @@ import { test } from '@playwright/test'
  * Detects the current sign-up mode by calling the test endpoint
  */
 export async function detectSignUpMode(): Promise<
-  'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP'
+  'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP' | 'INTEREST_SIGN_UP'
 > {
   try {
     const response = await fetch('http://localhost:3000/test/sign-up-mode')
@@ -28,6 +28,8 @@ export async function detectSignUpMode(): Promise<
       return 'OPEN_SIGN_UP'
     } else if (mode === 'GATED_SIGN_UP') {
       return 'GATED_SIGN_UP'
+    } else if (mode === 'INTEREST_SIGN_UP') {
+      return 'INTEREST_SIGN_UP'
     } else {
       console.warn(
         'Unknown sign-up mode returned:',
@@ -47,7 +49,11 @@ export async function detectSignUpMode(): Promise<
  * Skip test if not running in the expected mode
  */
 export async function skipIfNotMode(
-  expectedMode: 'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP'
+  expectedMode:
+    | 'OPEN_SIGN_UP'
+    | 'NO_SIGN_UP'
+    | 'GATED_SIGN_UP'
+    | 'INTEREST_SIGN_UP'
 ) {
   const currentMode = await detectSignUpMode()
 
@@ -62,7 +68,9 @@ export async function skipIfNotMode(
 /**
  * Skip test if running in the specified mode
  */
-export async function skipIfMode(skipMode: 'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP') {
+export async function skipIfMode(
+  skipMode: 'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP' | 'INTEREST_SIGN_UP'
+) {
   const currentMode = await detectSignUpMode()
 
   if (currentMode === skipMode) {

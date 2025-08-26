@@ -9,7 +9,7 @@
 import retry from 'async-retry'
 import Result from 'true-myth/result'
 import { eq } from 'drizzle-orm'
-import { user, account, singleUseCode } from '../db/schema'
+import { user, account, singleUseCode, interestedEmails } from '../db/schema'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
 
 /**
@@ -195,6 +195,101 @@ const consumeSingleUseCodeActual = async (
     
     // Return true if exactly one row was deleted (code existed and was consumed)
     return Result.ok(rowsDeleted === 1)
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}
+
+/**
+ * Add an email to the interested emails list
+ * @param db - Database instance
+ * @param email - Email address to add
+ * @returns Promise<Result<boolean, Error>> - true if added successfully, false if already exists
+ */
+export const addInterestedEmail = async (
+  db: any,
+  email: string
+): Promise<Result<boolean, Error>> => {
+  let res: Result<boolean, Error>
+  try {
+    res = await retry(
+      () => addInterestedEmailActual(db, email),
+      STANDARD_RETRY_OPTIONS
+    )
+  } catch (err) {
+    console.log(`addInterestedEmail final error:`, err)
+    res = Result.err(err instanceof Error ? err : new Error(String(err)))
+  }
+
+  return res
+}
+
+/**
+ * Check if an email is already in the interested emails list
+ * @param db - Database instance
+ * @param email - Email address to check
+ * @returns Promise<Result<boolean, Error>> - true if email exists, false otherwise
+ */
+export const checkInterestedEmailExists = async (
+  db: any,
+  email: string
+): Promise<Result<boolean, Error>> => {
+  let res: Result<boolean, Error>
+  try {
+    res = await retry(
+      () => checkInterestedEmailExistsActual(db, email),
+      STANDARD_RETRY_OPTIONS
+    )
+  } catch (err) {
+    console.log(`checkInterestedEmailExists final error:`, err)
+    res = Result.err(err instanceof Error ? err : new Error(String(err)))
+  }
+
+  return res
+}
+
+/**
+ * Private function: Add an email to the interested emails list (actual implementation)
+ */
+const addInterestedEmailActual = async (
+  db: any,
+  email: string
+): Promise<Result<boolean, Error>> => {
+  try {
+    // First check if email already exists
+    const existingEmails = await db
+      .select()
+      .from(interestedEmails)
+      .where(eq(interestedEmails.email, email))
+
+    if (existingEmails.length > 0) {
+      // Email already exists
+      return Result.ok(false)
+    }
+
+    // Insert the new email
+    await db.insert(interestedEmails).values({ email })
+    
+    return Result.ok(true)
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}
+
+/**
+ * Private function: Check if an email exists in interested emails list (actual implementation)
+ */
+const checkInterestedEmailExistsActual = async (
+  db: any,
+  email: string
+): Promise<Result<boolean, Error>> => {
+  try {
+    const existingEmails = await db
+      .select()
+      .from(interestedEmails)
+      .where(eq(interestedEmails.email, email))
+
+    return Result.ok(existingEmails.length > 0)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
   }

@@ -13,6 +13,14 @@ export async function verifyOnSignUpPage(page: Page) {
   expect(await verifyElementExists(page, 'sign-up-page-banner')).toBe(true)
 }
 
+export async function verifyOnInterestSignUpPage(page: Page) {
+  expect(await verifyElementExists(page, 'interest-sign-up-page-banner')).toBe(true)
+}
+
+export async function verifyOnGatedSignUpPage(page: Page) {
+  expect(await verifyElementExists(page, 'gated-sign-up-page-banner')).toBe(true)
+}
+
 export async function verifyOnProtectedPage(page: Page) {
   expect(await verifyElementExists(page, 'private-page-banner')).toBe(true)
 }

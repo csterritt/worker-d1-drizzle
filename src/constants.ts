@@ -35,6 +35,9 @@ export const PATHS = {
     // Sign up page
     SIGN_UP: '/auth/sign-up',
 
+    // Interest sign up page
+    INTEREST_SIGN_UP: '/auth/interest-sign-up',
+
     // Email confirmation pages
     VERIFY_EMAIL: '/auth/verify-email',
     EMAIL_SENT: '/auth/email-sent',
