@@ -80,6 +80,10 @@ export const singleUseCode = sqliteTable('singleUseCode', {
   code: text('code').primaryKey().unique(),
 })
 
+export const interestedEmails = sqliteTable('interestedEmails', {
+  email: text('email').primaryKey().unique(),
+})
+
 // Define schema object for export
 export const schema = {
   user,
