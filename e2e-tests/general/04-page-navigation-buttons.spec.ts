@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { clickLink } from '../support/finders'
+import { clickLink, isElementVisible } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
 import { detectSignUpMode } from '../support/mode-helpers'
 
@@ -8,13 +8,10 @@ import { detectSignUpMode } from '../support/mode-helpers'
  * Helper function to verify we're on the sign-up page
  * Handles both regular and gated sign-up page banners
  */
-async function verifyOnSignUpPage(page: any) {
+async function verifyOnASignUpPage(page: any) {
   // Check for either regular sign-up banner or gated sign-up banner
-  const regularBanner = page.locator('[data-testid="sign-up-page-banner"]')
-  const gatedBanner = page.locator('[data-testid="gated-sign-up-page-banner"]')
-
-  const regularVisible = await regularBanner.isVisible().catch(() => false)
-  const gatedVisible = await gatedBanner.isVisible().catch(() => false)
+  const regularVisible = await isElementVisible(page, 'sign-up-page-banner')
+  const gatedVisible = await isElementVisible(page, 'gated-sign-up-page-banner')
 
   expect(regularVisible || gatedVisible).toBe(true)
 }
@@ -34,7 +31,7 @@ test('can navigate between sign-in and sign-up pages using buttons', async ({
 
   // Click the "Create Account" button to go to sign-up page
   await clickLink(page, 'go-to-sign-up-button')
-  await verifyOnSignUpPage(page)
+  await verifyOnASignUpPage(page)
 
   // Verify we're on the correct URL
   expect(page.url()).toContain('/auth/sign-up')
@@ -58,60 +55,32 @@ test('sign-up page has correct form elements and navigation', async ({
 
   // Navigate directly to sign-up page
   await page.goto('http://localhost:3000/auth/sign-up')
-  await verifyOnSignUpPage(page)
+  await verifyOnASignUpPage(page)
 
   // Verify common form elements that exist in both modes
   // Check for both regular and gated form element test IDs
   const nameInput =
-    (await page
-      .locator('[data-testid="signup-name-input"]')
-      .isVisible()
-      .catch(() => false)) ||
-    (await page
-      .locator('[data-testid="gated-signup-name-input"]')
-      .isVisible()
-      .catch(() => false))
+    (await isElementVisible(page, 'signup-name-input')) ||
+    (await isElementVisible(page, 'gated-signup-name-input'))
   const emailInput =
-    (await page
-      .locator('[data-testid="signup-email-input"]')
-      .isVisible()
-      .catch(() => false)) ||
-    (await page
-      .locator('[data-testid="gated-signup-email-input"]')
-      .isVisible()
-      .catch(() => false))
+    (await isElementVisible(page, 'signup-email-input')) ||
+    (await isElementVisible(page, 'gated-signup-email-input'))
   const passwordInput =
-    (await page
-      .locator('[data-testid="signup-password-input"]')
-      .isVisible()
-      .catch(() => false)) ||
-    (await page
-      .locator('[data-testid="gated-signup-password-input"]')
-      .isVisible()
-      .catch(() => false))
+    (await isElementVisible(page, 'signup-password-input')) ||
+    (await isElementVisible(page, 'gated-signup-password-input'))
   const submitButton =
-    (await page
-      .locator('[data-testid="signup-submit"]')
-      .isVisible()
-      .catch(() => false)) ||
-    (await page
-      .locator('[data-testid="gated-signup-submit"]')
-      .isVisible()
-      .catch(() => false))
+    (await isElementVisible(page, 'signup-submit')) ||
+    (await isElementVisible(page, 'gated-signup-submit'))
 
   expect(nameInput).toBe(true)
   expect(emailInput).toBe(true)
   expect(passwordInput).toBe(true)
   expect(submitButton).toBe(true)
-  expect(
-    await page.locator('[data-testid="go-to-sign-in-button"]').isVisible()
-  ).toBe(true)
+  expect(await isElementVisible(page, 'go-to-sign-in-button')).toBe(true)
 
   // In GATED_SIGN_UP mode, there should also be a sign-up code field
   if (currentMode === 'GATED_SIGN_UP') {
-    expect(
-      await page.locator('[data-testid="gated-signup-code-input"]').isVisible()
-    ).toBe(true)
+    expect(await isElementVisible(page, 'gated-signup-code-input')).toBe(true)
   }
 
   // Verify page title
@@ -126,21 +95,15 @@ test('sign-in page has correct form elements and navigation', async ({
   await verifyOnSignInPage(page)
 
   // Verify all form elements are present
-  expect(await page.locator('[data-testid="email-input"]').isVisible()).toBe(
-    true
-  )
-  expect(await page.locator('[data-testid="password-input"]').isVisible()).toBe(
-    true
-  )
-  expect(await page.locator('[data-testid="submit"]').isVisible()).toBe(true)
+  expect(await isElementVisible(page, 'email-input')).toBe(true)
+  expect(await isElementVisible(page, 'password-input')).toBe(true)
+  expect(await isElementVisible(page, 'submit')).toBe(true)
 
   // Check sign-up button visibility based on current mode
   const currentMode = await detectSignUpMode()
   if (currentMode === 'OPEN_SIGN_UP' || currentMode === 'GATED_SIGN_UP') {
     // In both OPEN_SIGN_UP and GATED_SIGN_UP modes, the sign-up button should be visible
-    expect(
-      await page.locator('[data-testid="go-to-sign-up-button"]').isVisible()
-    ).toBe(true)
+    expect(await isElementVisible(page, 'go-to-sign-up-button')).toBe(true)
   } else {
     // In NO_SIGN_UP mode, the sign-up button should be hidden
     expect(
@@ -152,13 +115,7 @@ test('sign-in page has correct form elements and navigation', async ({
   expect(await page.locator('h2').textContent()).toContain('Sign In')
 
   // Verify that sign-up form elements are NOT present (since we separated them)
-  expect(
-    await page.locator('[data-testid="signup-name-input"]').isVisible()
-  ).toBe(false)
-  expect(
-    await page.locator('[data-testid="signup-email-input"]').isVisible()
-  ).toBe(false)
-  expect(
-    await page.locator('[data-testid="signup-password-input"]').isVisible()
-  ).toBe(false)
+  expect(await isElementVisible(page, 'signup-name-input')).toBe(false)
+  expect(await isElementVisible(page, 'signup-email-input')).toBe(false)
+  expect(await isElementVisible(page, 'signup-password-input')).toBe(false)
 })

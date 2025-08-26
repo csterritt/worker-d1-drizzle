@@ -38,3 +38,10 @@ export const getElementText = async (
     return null
   }
 }
+
+export const isElementVisible = async (
+  page: Page,
+  testId: string
+): Promise<boolean> => {
+  return page.locator(`[data-testid="${testId}"]`).isVisible().catch(() => false)
+}

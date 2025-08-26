@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { fillInput, clickLink, verifyAlert, isElementVisible } from '../support/finders'
 import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
@@ -93,15 +93,9 @@ test(
     await verifyOnResetPasswordPage(page)
 
     // Verify all form elements are present
-    expect(
-      await page.locator('[data-testid="new-password-input"]').isVisible()
-    ).toBe(true)
-    expect(
-      await page.locator('[data-testid="confirm-password-input"]').isVisible()
-    ).toBe(true)
-    expect(
-      await page.locator('[data-testid="reset-password-submit"]').isVisible()
-    ).toBe(true)
+    expect(await isElementVisible(page, 'new-password-input')).toBe(true)
+    expect(await isElementVisible(page, 'confirm-password-input')).toBe(true)
+    expect(await isElementVisible(page, 'reset-password-submit')).toBe(true)
 
     // Fill in the new password
     await fillInput(page, 'new-password-input', newPassword)

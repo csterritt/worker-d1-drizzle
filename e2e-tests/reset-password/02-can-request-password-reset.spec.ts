@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { clickLink, fillInput, verifyAlert } from '../support/finders'
+import { clickLink, fillInput, verifyAlert, isElementVisible } from '../support/finders'
 import { testWithDatabase } from '../support/test-helpers'
 import {
   verifyOnForgotPasswordPage,
@@ -33,14 +33,8 @@ test(
     )
 
     // Verify all elements are present on waiting page
-    expect(
-      await page
-        .locator('[data-testid="back-to-sign-in-from-waiting"]')
-        .isVisible()
-    ).toBe(true)
-    expect(
-      await page.locator('[data-testid="try-again-button"]').isVisible()
-    ).toBe(true)
+    expect(await isElementVisible(page, 'back-to-sign-in-from-waiting')).toBe(true)
+    expect(await isElementVisible(page, 'try-again-button')).toBe(true)
   })
 )
 

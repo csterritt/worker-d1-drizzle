@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { fillInput, clickLink, verifyAlert, isElementVisible } from '../support/finders'
 import {
   verifyOnResetPasswordPage,
   verifyOnInvalidTokenPage,
@@ -17,14 +17,8 @@ test('shows invalid token page when no token provided', async ({ page }) => {
   expect(await page.locator('h2').textContent()).toContain('Invalid Reset Link')
 
   // Verify navigation buttons are present
-  expect(
-    await page.locator('[data-testid="request-new-reset-link"]').isVisible()
-  ).toBe(true)
-  expect(
-    await page
-      .locator('[data-testid="back-to-sign-in-from-invalid"]')
-      .isVisible()
-  ).toBe(true)
+  expect(await isElementVisible(page, 'request-new-reset-link')).toBe(true)
+  expect(await isElementVisible(page, 'back-to-sign-in-from-invalid')).toBe(true)
 })
 
 test('shows validation errors for password reset form', async ({ page }) => {

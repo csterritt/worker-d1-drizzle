@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { clickLink } from '../support/finders'
+import { clickLink, isElementVisible } from '../support/finders'
 import {
   verifyOnForgotPasswordPage,
   verifyOnResetPasswordPage,
@@ -41,9 +41,7 @@ test('can access forgot password page directly', async ({ page }) => {
   expect(await page.locator('h2').textContent()).toContain(
     'Reset Your Password'
   )
-  expect(
-    await page.locator('[data-testid="forgot-email-input"]').isVisible()
-  ).toBe(true)
+  expect(await isElementVisible(page, 'forgot-email-input')).toBe(true)
 })
 
 test('reset password page shows correct content with token', async ({
@@ -58,15 +56,9 @@ test('reset password page shows correct content with token', async ({
 
   // Verify page content
   expect(await page.locator('h2').textContent()).toContain('Set New Password')
-  expect(
-    await page.locator('[data-testid="new-password-input"]').isVisible()
-  ).toBe(true)
-  expect(
-    await page.locator('[data-testid="confirm-password-input"]').isVisible()
-  ).toBe(true)
-  expect(
-    await page.locator('[data-testid="reset-password-submit"]').isVisible()
-  ).toBe(true)
+  expect(await isElementVisible(page, 'new-password-input')).toBe(true)
+  expect(await isElementVisible(page, 'confirm-password-input')).toBe(true)
+  expect(await isElementVisible(page, 'reset-password-submit')).toBe(true)
 
   // Verify the token is included in the hidden form field
   const tokenInput = page.locator('input[name="token"]')
