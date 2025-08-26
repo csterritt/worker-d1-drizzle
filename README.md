@@ -1,5 +1,17 @@
 ### Basic CloudFlare worker+d1+drizzle app with username and password authentication
 
+#### Sign up modes
+
+The app can be configured to run in one of following four modes, by setting the `SIGNUP_MODE`
+environment variable:
+
+1. `NO_SIGN_UP` - No sign up allowed
+2. `OPEN_SIGN_UP` - Anyone can sign up, as long as they validate their sign in via an email
+3. `GATED_SIGN_UP` - Sign up is allowed, with a validation email, but only for users with a single-use sign up code.
+4. `INTEREST_SIGN_UP` - Sign up is not allowed, but users can express interest in signing up, by giving their email address.
+
+There are tests for each of these modes (and general functionality) in the `e2e-tests` directory.
+
 #### Setup for development
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
@@ -18,15 +30,17 @@ one, **BUT** it will use the file `./schema-prod.sql` which you need to create f
 
 #### Adding initial users via sqlite3:
 
-Change 'your-email@your-provider.com' to your actual email address.
+You can add users to the local sqlite3 database as follows. Change 'your-email@your-provider.com' to
+your actual email address. Note that `createdAt` and `updatedAt` are set to the current time in
+milliseconds since the epoch.
 
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaaa', 'your-email@your-provider.com', true, '1745988806997', '1745988806997');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaab', 'fredfred@team439980.testinator.com', true, '1745988806997', '1745988806997');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaac', 'fredfred2@team439980.testinator.com', true, '1745988806997', '1745988806997');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaad', 'rate-limit-user1@team439980.testinator.com', true, '1745988806997', '1745988806997');
-    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaae', 'rate-limit-user2@team439980.testinator.com', true, '1745988806997', '1745988806997');
+    insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaaa', 'your-email@your-provider.com', true, SELECT strftime('%s', 'now') * 1000, SELECT strftime('%s', 'now') * 1000);
 
-To run in production, set the following environment variables:
+You'll want to use the `wrangler d1` commands to add users to the remote Cloudflare database.
+
+#### Production
+
+To run in production, set the following environment variables on Cloudflare:
 
     SMTP_SERVER_HOST='<your email hosting provider>'
     SMTP_SERVER_PORT='<numeric port>'
@@ -40,10 +54,12 @@ To run in production, set the following environment variables:
     PO_APP_ID='<your pushover app id>'
     PO_USER_ID='<your pushover user id>'
 
-For development, set the same environment variables as above, but put them in a `.dev.vars` file in the
-root directory of the project. Also set the `NODE_ENV` environment variable to `development`. For testing
-email sign up, you'll have to run the [mailpit](https://github.com/axllent/mailpit) server locally with its
-SMTP server port set to 1025 (which is the default).
+#### Development
+
+For development, can copy the `.dev.vars.all.template` into `.dev.vars.all` file (which is in `.gitignore`)
+in the root directory of the project. See the script `run-dev.sh` for how to run the development server,
+and how it sets up `.dev.vars` from the `.dev.vars.all` file. For ease of command line usage, you can use
+the `go` script.
 
 ### Setting up for production
 
