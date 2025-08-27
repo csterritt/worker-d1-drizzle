@@ -5,6 +5,8 @@ import {
   verifyOnResetPasswordPage,
   verifyOnInvalidTokenPage,
 } from '../support/page-verifiers'
+import { navigateToForgotPassword } from '../support/navigation-helpers'
+import { submitResetPasswordForm } from '../support/form-helpers'
 
 test('shows invalid token page when no token provided', async ({ page }) => {
   // Navigate to reset password page without token

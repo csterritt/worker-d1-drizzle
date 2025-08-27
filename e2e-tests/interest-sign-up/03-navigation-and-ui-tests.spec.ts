@@ -9,6 +9,7 @@ import {
 import { skipIfNotMode } from '../support/mode-helpers'
 import { signInUser } from '../support/auth-helpers'
 import { testWithDatabase } from '../support/test-helpers'
+import { navigateToSignIn, navigateToInterestSignUp, navigateToHome } from '../support/navigation-helpers'
 
 test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -19,8 +20,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     page,
   }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await page.waitForSelector('[data-testid="sign-in-page-banner"]')
+    await navigateToSignIn(page)
 
     // Verify "Join Waitlist" button exists and has correct text
     const waitlistButton = page.locator('[data-testid="go-to-sign-up-button"]')
@@ -34,8 +34,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
 
   test('interest sign-up page has correct UI elements', async ({ page }) => {
     // Navigate to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
+    await navigateToInterestSignUp(page)
 
     // Verify page title
     const title = page.locator('h2.card-title')
@@ -72,8 +71,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     page,
   }) => {
     // Start at sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Click "Join Waitlist" to go to interest sign-up
     await clickLink(page, 'go-to-sign-up-button')
@@ -88,7 +86,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     'redirects to sign-in when already authenticated',
     testWithDatabase(async ({ page }) => {
       // Navigate to startup page first
-      await page.goto('http://localhost:3000')
+      await navigateToHome(page)
       
       // Sign in as an existing seeded user
       const knownEmail = 'fredfred@team439980.testinator.com'
@@ -100,6 +98,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
       await verifyOnProtectedPage(page)
 
       // Now try to navigate to interest sign-up page while authenticated
+      // Do not use navigateToInterestSignUp here because we expect a redirect
       await page.goto('http://localhost:3000/auth/interest-sign-up')
 
       // Should be redirected back to protected page with a message about already being signed in
@@ -114,7 +113,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     page,
   }) => {
     // Navigate directly to the interest sign-up URL
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
+    await navigateToInterestSignUp(page)
 
     // Should load the page correctly
     await verifyOnInterestSignUpPage(page)
@@ -128,8 +127,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
 
   test('preserves email in form when validation fails', async ({ page }) => {
     // Navigate to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
+    await navigateToInterestSignUp(page)
 
     // Enter invalid email
     const invalidEmail = 'invalid-email'

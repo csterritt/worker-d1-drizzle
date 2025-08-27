@@ -6,6 +6,7 @@ import {
   verifyOnResetPasswordPage,
   verifyOnSignInPage,
 } from '../support/page-verifiers'
+import { navigateToForgotPassword } from '../support/navigation-helpers'
 
 test('waiting for reset page has correct navigation options', async ({
   page,
@@ -34,8 +35,7 @@ test('reset password page navigation works correctly', async ({ page }) => {
 
 test('can access forgot password page directly', async ({ page }) => {
   // Navigate directly to forgot password page
-  await page.goto('http://localhost:3000/auth/forgot-password')
-  await verifyOnForgotPasswordPage(page)
+  await navigateToForgotPassword(page)
 
   // Verify page loads correctly
   expect(await page.locator('h2').textContent()).toContain(

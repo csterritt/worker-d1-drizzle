@@ -1,19 +1,21 @@
 import { test } from '@playwright/test'
 
 import { startSignIn, signOutAndVerify } from '../support/auth-helpers'
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { clickLink, verifyAlert } from '../support/finders'
 import {
   verifyOnProtectedPage,
   verifyOnStartupPage,
   verifyOnSignInPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
+import { navigateToHome } from '../support/navigation-helpers'
+import { submitSignInForm } from '../support/form-helpers'
 
 test(
   'sign out successfully after signing in',
   testWithDatabase(async ({ page }) => {
     // Navigate to startup page
-    await page.goto('http://localhost:3000')
+    await navigateToHome(page)
 
     // Start the sign-in process
     await startSignIn(page)
@@ -22,9 +24,7 @@ test(
     const knownEmail = 'fredfred@team439980.testinator.com'
     const knownPassword = 'freds-clever-password'
 
-    await fillInput(page, 'email-input', knownEmail)
-    await fillInput(page, 'password-input', knownPassword)
-    await clickLink(page, 'submit')
+    await submitSignInForm(page, { email: knownEmail, password: knownPassword })
 
     // Verify successful sign-in
     await verifyAlert(page, 'Welcome! You have been signed in successfully.')

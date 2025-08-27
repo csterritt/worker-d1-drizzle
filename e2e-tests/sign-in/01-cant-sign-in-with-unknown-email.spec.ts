@@ -1,12 +1,14 @@
 import { test } from '@playwright/test'
 
 import { startSignIn } from '../support/auth-helpers'
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { verifyAlert } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
+import { navigateToHome } from '../support/navigation-helpers'
+import { submitSignInForm } from '../support/form-helpers'
 
 test('cannot sign in with unknown email', async ({ page }) => {
   // Navigate to startup page
-  await page.goto('http://localhost:3000')
+  await navigateToHome(page)
 
   // Start the sign-in process
   await startSignIn(page)
@@ -15,9 +17,7 @@ test('cannot sign in with unknown email', async ({ page }) => {
   const unknownEmail = 'nonexistent@example.com'
   const testPassword = 'testpassword123'
 
-  await fillInput(page, 'email-input', unknownEmail)
-  await fillInput(page, 'password-input', testPassword)
-  await clickLink(page, 'submit')
+  await submitSignInForm(page, { email: unknownEmail, password: testPassword })
 
   // Should remain on sign-in page (not redirect to protected page)
   await verifyOnSignInPage(page)

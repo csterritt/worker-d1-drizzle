@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
-import { verifyOn404Page } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateTo404Route } from '../support/navigation-helpers'
 
 test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
   test.beforeEach(async () => {
@@ -23,8 +23,7 @@ test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
     expect(response.status()).toBe(200)
 
     // Navigate to see the 404 page content
-    await page.goto('http://localhost:3000/auth/sign-up')
-    await verifyOn404Page(page)
+    await navigateTo404Route(page, '/auth/sign-up')
   })
 
   test('POST to /auth/resend-email returns 404 page', async ({ page }) => {
@@ -42,7 +41,6 @@ test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
     expect(response.status()).toBe(200)
 
     // Navigate to see the 404 page content
-    await page.goto('http://localhost:3000/auth/resend-email')
-    await verifyOn404Page(page)
+    await navigateTo404Route(page, '/auth/resend-email')
   })
 })

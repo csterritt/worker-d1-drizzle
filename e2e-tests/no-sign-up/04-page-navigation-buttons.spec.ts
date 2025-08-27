@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 import { isElementVisible } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToSignIn, navigateTo404Route } from '../support/navigation-helpers'
 
 test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,8 +14,7 @@ test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
     page,
   }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Verify all form elements are present
     expect(await isElementVisible(page, 'email-input')).toBe(true)
@@ -37,24 +37,17 @@ test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
 
   test('sign-up URL returns 404 page', async ({ page }) => {
     // Attempt to visit sign-up page directly
-    await page.goto('http://localhost:3000/auth/sign-up')
-
-    // Should be on a 404 page
-    expect(await page.locator('.text-error').textContent()).toContain('404')
+    await navigateTo404Route(page, '/auth/sign-up')
   })
 
   test('interest sign-up URL returns 404 page', async ({ page }) => {
     // Attempt to visit interest sign-up page directly
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-
-    // Should be on a 404 page
-    expect(await page.locator('.text-error').textContent()).toContain('404')
+    await navigateTo404Route(page, '/auth/interest-sign-up')
   })
 
   test('forgot password functionality still works', async ({ page }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Verify forgot password link is still present
     expect(await isElementVisible(page, 'forgot-password-link')).toBe(true)

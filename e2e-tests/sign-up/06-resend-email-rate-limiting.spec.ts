@@ -1,18 +1,20 @@
 import { test, expect } from '@playwright/test'
-import { fillInput, clickLink } from '../support/finders'
+import {  } from '../support/finders'
 import {
   verifyOnSignUpPage,
   verifyOnAwaitVerificationPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToSignUp } from '../support/navigation-helpers'
+import { submitSignUpForm } from '../support/form-helpers'
 
 test(
   'resend email button enforces rate limiting from first attempt',
   testWithDatabase(async ({ page }) => {
     await skipIfNotMode('OPEN_SIGN_UP')
-    // Navigate to sign-up page
-    await page.goto('http://localhost:3000/auth/sign-up')
+    // Navigate to sign-up page and submit form
+    await navigateToSignUp(page)
     await verifyOnSignUpPage(page)
 
     // Sign up with new credentials
@@ -20,10 +22,11 @@ test(
     const newEmail = 'ratelimituser@example.com'
     const newPassword = 'ratelimitpassword123'
 
-    await fillInput(page, 'signup-name-input', newName)
-    await fillInput(page, 'signup-email-input', newEmail)
-    await fillInput(page, 'signup-password-input', newPassword)
-    await clickLink(page, 'signup-submit')
+    await submitSignUpForm(page, {
+      name: newName,
+      email: newEmail,
+      password: newPassword,
+    })
 
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)

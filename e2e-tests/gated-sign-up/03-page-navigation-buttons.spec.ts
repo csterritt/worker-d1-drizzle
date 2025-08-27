@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 import { clickLink, isElementVisible } from '../support/finders'
 import { verifyOnSignInPage, verifyOnGatedSignUpPage } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToSignIn, navigateToGatedSignUp } from '../support/navigation-helpers'
 
 test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,8 +12,7 @@ test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
 
   test('can navigate between sign-in and gated sign-up pages using buttons', async ({ page }) => {
     // Start on the sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Click the "Create Account" button to go to gated sign-up page
     await clickLink(page, 'go-to-sign-up-button')
@@ -31,8 +31,7 @@ test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
 
   test('gated sign-up page has correct form elements and navigation', async ({ page }) => {
     // Navigate directly to gated sign-up page
-    await page.goto('http://localhost:3000/auth/sign-up')
-    await verifyOnGatedSignUpPage(page)
+    await navigateToGatedSignUp(page)
 
     // Verify form elements are present (gated sign-up specific test IDs)
     expect(await isElementVisible(page, 'gated-signup-name-input')).toBe(true)
@@ -48,8 +47,7 @@ test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
 
   test('sign-in page has correct form elements and navigation', async ({ page }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Verify all form elements are present
     expect(await isElementVisible(page, 'email-input')).toBe(true)

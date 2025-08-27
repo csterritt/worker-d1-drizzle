@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { signOutAndVerify, signInUser } from '../support/auth-helpers'
-import { verifyOnStartupPage } from '../support/page-verifiers'
+import { navigateToHome } from '../support/navigation-helpers'
 import { HTML_STATUS } from '../../src/constants'
 
 import { testWithDatabase } from '../support/test-helpers'
@@ -10,8 +10,7 @@ test.describe('Body size limit', () => {
     'returns 413 status when JSON payload exceeds size limit',
     testWithDatabase(async ({ page, request }) => {
       // First sign in to get a valid session
-      await page.goto('http://localhost:3000')
-      await verifyOnStartupPage(page)
+      await navigateToHome(page)
 
       // Sign in with known email and password
       await signInUser(
@@ -50,8 +49,7 @@ test.describe('Body size limit', () => {
     'returns 413 status when form data payload exceeds size limit',
     testWithDatabase(async ({ page, request }) => {
       // First sign in to get a valid session
-      await page.goto('http://localhost:3000')
-      await verifyOnStartupPage(page)
+      await navigateToHome(page)
 
       // Sign in with known email and password
       await signInUser(
@@ -93,8 +91,7 @@ test.describe('Body size limit', () => {
     'correctly handles payloads at the size limit boundary',
     testWithDatabase(async ({ page, request }) => {
       // First sign in to get a valid session
-      await page.goto('http://localhost:3000')
-      await verifyOnStartupPage(page)
+      await navigateToHome(page)
 
       // Sign in with known email and password
       await signInUser(

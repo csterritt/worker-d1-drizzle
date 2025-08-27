@@ -1,8 +1,11 @@
 import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnInterestSignUpPage } from '../support/page-verifiers'
+import { verifyOnInterestSignUpPage, verifyOnSignInPage } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToInterestSignUp } from '../support/navigation-helpers'
+import { submitInterestSignUpForm } from '../support/form-helpers'
+import { testRequiredEmailField, testEmailValidation, testInterestSignUpFormValidation } from '../support/validation-helpers'
 
 test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -10,24 +13,18 @@ test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
   })
 
   test('shows error for empty email submission', async ({ page }) => {
-    // Navigate to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
-
-    // Submit without entering email
-    await clickLink(page, 'interest-submit')
-
-    // Should stay on the same page with error message
-    await verifyOnInterestSignUpPage(page)
-    await verifyAlert(page, 'Email address is required.')
+    await navigateToInterestSignUp(page)
+    await testRequiredEmailField(page, 'interest-submit')
   })
 
   test('shows error for invalid email format', async ({ page }) => {
-    // Navigate to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
+    await navigateToInterestSignUp(page)
+    await testEmailValidation(page, 'interest-email-input', 'interest-submit')
+  })
 
-    // Enter invalid email
+  test('comprehensive form validation', async ({ page }) => {
+    await navigateToInterestSignUp(page)
+    await testInterestSignUpFormValidation(page)
     await fillInput(page, 'interest-email-input', 'invalid-email-format')
     await clickLink(page, 'interest-submit')
 
@@ -38,8 +35,7 @@ test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
 
   test('shows error for malformed email', async ({ page }) => {
     // Navigate to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
+    await navigateToInterestSignUp(page)
 
     // Enter malformed email
     await fillInput(page, 'interest-email-input', 'test@')
@@ -58,16 +54,12 @@ test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
     ]
 
     for (const email of validEmails) {
-      // Navigate to interest sign-up page
-      await page.goto('http://localhost:3000/auth/interest-sign-up')
-      await page.waitForSelector('[data-testid="interest-sign-up-page-banner"]')
-
-      // Enter valid email
-      await fillInput(page, 'interest-email-input', email)
-      await clickLink(page, 'interest-submit')
+      // Navigate and submit with helper
+      await navigateToInterestSignUp(page)
+      await submitInterestSignUpForm(page, email)
 
       // Should redirect to sign-in page with success message
-      await page.waitForSelector('[data-testid="sign-in-page-banner"]')
+      await verifyOnSignInPage(page)
       await verifyAlert(
         page,
         "Thanks! You've been added to our waitlist. We'll notify you when we start accepting new accounts."

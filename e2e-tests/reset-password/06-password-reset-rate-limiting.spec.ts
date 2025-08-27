@@ -1,33 +1,31 @@
 import { expect, test } from '@playwright/test'
 
-import { clickLink, fillInput, verifyAlert } from '../support/finders'
+import { verifyAlert, clickLink, fillInput } from '../support/finders'
 import { testWithDatabase } from '../support/test-helpers'
 import { verifyOnForgotPasswordPage } from '../support/page-verifiers'
+import { navigateToForgotPassword } from '../support/navigation-helpers'
+import { submitForgotPasswordForm } from '../support/form-helpers'
 
 test(
   'enforces rate limiting for password reset requests',
   testWithDatabase(async ({ page }) => {
     // Navigate to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
-    await verifyOnForgotPasswordPage(page)
+    await navigateToForgotPassword(page)
 
     // Use a known email from the test database
     const email = 'fredfred@team439980.testinator.com'
 
     // First password reset request - should succeed
-    await fillInput(page, 'forgot-email-input', email)
-    await clickLink(page, 'forgot-password-submit')
+    await submitForgotPasswordForm(page, email)
 
     // Should be redirected to waiting for reset page
     expect(page.url()).toContain('/auth/waiting-for-reset')
 
     // Navigate back to forgot password page for second attempt
-    await page.goto('http://localhost:3000/auth/forgot-password')
-    await verifyOnForgotPasswordPage(page)
+    await navigateToForgotPassword(page)
 
     // Second password reset request immediately - should be rate limited
-    await fillInput(page, 'forgot-email-input', email)
-    await clickLink(page, 'forgot-password-submit')
+    await submitForgotPasswordForm(page, email)
 
     // Should stay on forgot password page with rate limiting error
     await verifyOnForgotPasswordPage(page)

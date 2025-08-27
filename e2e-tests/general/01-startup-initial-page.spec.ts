@@ -1,16 +1,15 @@
 import { expect, test } from '@playwright/test'
 
 import { verifyElementExists } from '../support/finders'
-import { verifyOnStartupPage } from '../support/page-verifiers'
+import { navigateToHome } from '../support/navigation-helpers'
 
 test('initial startup page has proper banners', async ({ page }) => {
   // Navigate to startup page
-  await page.goto('http://localhost:3000')
-  await verifyOnStartupPage(page)
+  await navigateToHome(page)
 })
 
 test('initial startup page has a sign in link', async ({ page }) => {
   // Navigate to startup page
-  await page.goto('http://localhost:3000')
+  await navigateToHome(page)
   expect(await verifyElementExists(page, 'sign-in-link')).toBe(true)
 })

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { fillInput, clickLink, verifyAlert, isElementVisible } from '../support/finders'
+import { clickLink, verifyAlert, isElementVisible } from '../support/finders'
 import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
@@ -9,6 +9,8 @@ import {
   verifyOnResetPasswordPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
+import { navigateToForgotPassword, navigateToSignIn } from '../support/navigation-helpers'
+import { submitForgotPasswordForm, submitResetPasswordForm, submitSignInForm } from '../support/form-helpers'
 
 // Helper function to get the latest email from Mailpit
 async function getLatestEmailFromMailpit() {
@@ -55,8 +57,7 @@ test(
     await clearAllEmailsFromMailpit()
 
     // Navigate to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
-    await verifyOnForgotPasswordPage(page)
+    await navigateToForgotPassword(page)
 
     // Use a known email from the test database
     const email = 'fredfred@team439980.testinator.com'
@@ -64,8 +65,7 @@ test(
     const newPassword = 'freds-new-password-123'
 
     // Request password reset
-    await fillInput(page, 'forgot-email-input', email)
-    await clickLink(page, 'forgot-password-submit')
+    await submitForgotPasswordForm(page, email)
 
     // Should be redirected to waiting for reset page
     await verifyOnWaitingForResetPage(page)
@@ -98,9 +98,7 @@ test(
     expect(await isElementVisible(page, 'reset-password-submit')).toBe(true)
 
     // Fill in the new password
-    await fillInput(page, 'new-password-input', newPassword)
-    await fillInput(page, 'confirm-password-input', newPassword)
-    await clickLink(page, 'reset-password-submit')
+    await submitResetPasswordForm(page, newPassword)
 
     // Should be redirected to sign-in page with success message
     await verifyOnSignInPage(page)
@@ -110,9 +108,7 @@ test(
     )
 
     // Now try to sign in with the new password
-    await fillInput(page, 'email-input', email)
-    await fillInput(page, 'password-input', newPassword)
-    await clickLink(page, 'submit')
+    await submitSignInForm(page, { email, password: newPassword })
 
     // Should be successfully signed in and redirected to protected page
     await verifyOnProtectedPage(page)
@@ -127,12 +123,8 @@ test(
     await expect(page).toHaveURL('http://localhost:3000/')
 
     // Try to sign in with old password
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
-
-    await fillInput(page, 'email-input', email)
-    await fillInput(page, 'password-input', oldPassword)
-    await clickLink(page, 'submit')
+    await navigateToSignIn(page)
+    await submitSignInForm(page, { email, password: oldPassword })
 
     // Should stay on sign-in page with error message
     await verifyOnSignInPage(page)

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-import { fillInput, clickLink, verifyAlert } from '../support/finders'
+import { verifyAlert } from '../support/finders'
 import {
   verifyOnSignInPage,
   verifyOnSignUpPage,
@@ -9,6 +9,8 @@ import {
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToSignUp, navigateToSignIn } from '../support/navigation-helpers'
+import { submitSignUpForm, submitSignInForm } from '../support/form-helpers'
 
 // Helper function to get the latest email from Mailpit
 async function getLatestEmailFromMailpit() {
@@ -55,10 +57,8 @@ test(
     // Clear all emails from Mailpit before the test
     await clearAllEmailsFromMailpit()
 
-    // Navigate to sign-up page
-    await page.goto('http://localhost:3000/auth/sign-up')
-
-    // Verify we're on the sign-up page
+    // Navigate to sign-up page and submit form
+    await navigateToSignUp(page)
     await verifyOnSignUpPage(page)
 
     // Sign up with new credentials
@@ -66,10 +66,11 @@ test(
     const newEmail = 'resendemail@example.com'
     const newPassword = 'resendpassword123'
 
-    await fillInput(page, 'signup-name-input', newName)
-    await fillInput(page, 'signup-email-input', newEmail)
-    await fillInput(page, 'signup-password-input', newPassword)
-    await clickLink(page, 'signup-submit')
+    await submitSignUpForm(page, {
+      name: newName,
+      email: newEmail,
+      password: newPassword,
+    })
 
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)
@@ -135,13 +136,11 @@ test(
     // Wait for the page to load and check for success indicators
     await page.waitForTimeout(1000)
 
-    // Now try to sign in with the verified credentials
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+      // Now try to sign in with the verified credentials
+      await navigateToSignIn(page)
+      await verifyOnSignInPage(page)
 
-    await fillInput(page, 'email-input', newEmail)
-    await fillInput(page, 'password-input', newPassword)
-    await clickLink(page, 'submit')
+      await submitSignInForm(page, { email: newEmail, password: newPassword })
 
     // Should be successfully signed in and redirected to protected page
     await verifyOnProtectedPage(page)

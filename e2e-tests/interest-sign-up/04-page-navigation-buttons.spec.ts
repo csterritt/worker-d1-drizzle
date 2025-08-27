@@ -6,6 +6,7 @@ import {
   verifyOnInterestSignUpPage,
 } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
+import { navigateToSignIn, navigateToInterestSignUp } from '../support/navigation-helpers'
 
 test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -16,8 +17,7 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     page,
   }) => {
     // Start on the sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Click the "Join Waitlist" button to go to interest sign-up page
     await clickLink(page, 'go-to-sign-up-button')
@@ -38,8 +38,7 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     page,
   }) => {
     // Navigate directly to interest sign-up page
-    await page.goto('http://localhost:3000/auth/interest-sign-up')
-    await verifyOnInterestSignUpPage(page)
+    await navigateToInterestSignUp(page)
 
     // Verify form elements are present (interest sign-up specific test IDs)
     expect(await isElementVisible(page, 'interest-email-input')).toBe(true)
@@ -61,8 +60,7 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     page,
   }) => {
     // Navigate to sign-in page
-    await page.goto('http://localhost:3000/auth/sign-in')
-    await verifyOnSignInPage(page)
+    await navigateToSignIn(page)
 
     // Verify all form elements are present
     expect(await isElementVisible(page, 'email-input')).toBe(true)
