@@ -40,6 +40,10 @@ You'll want to use the `wrangler d1` commands to add users to the remote Cloudfl
 
 #### Production
 
+In production, notifications can be made via the [Pushover](https://pushover.net) web service. None are
+currently done, and this service is optional; if you don't want to use Pushover, just don't set the
+`PO_APP_ID` and `PO_USER_ID` environment variables.
+
 To run in production, set the following environment variables on Cloudflare:
 
     SMTP_SERVER_HOST='<your email hosting provider>'

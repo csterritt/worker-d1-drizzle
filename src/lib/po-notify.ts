@@ -39,15 +39,22 @@ const post = async (url: string, data: any) => {
 }
 
 export const pushoverNotify = async (c: Context, message: string) => {
-  const msg = {
-    token: c.env.PO_APP_ID,
-    user: c.env.PO_USER_ID,
-    message,
-  }
+  if (
+    c.env.PO_APP_ID != null &&
+    c.env.PO_APP_ID !== '' &&
+    c.env.PO_USER_ID != null &&
+    c.env.PO_USER_ID !== ''
+  ) {
+    const msg = {
+      token: c.env.PO_APP_ID,
+      user: c.env.PO_USER_ID,
+      message,
+    }
 
-  try {
-    const res = await post(API_URLS.PUSHOVER, msg)
-  } catch (err) {
-    console.log(`pushoverNotify final error:`, err)
+    try {
+      const res = await post(API_URLS.PUSHOVER, msg)
+    } catch (err) {
+      console.log(`pushoverNotify final error:`, err)
+    }
   }
 }
