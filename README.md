@@ -1,8 +1,10 @@
 ### Basic CloudFlare worker+d1+drizzle app with username and password authentication
 
+Standard sign in, and password reset via email routes are provided.
+
 #### Sign up modes
 
-The app can be configured to run in one of following four modes, by setting the `SIGNUP_MODE`
+The app can be configured to run in one of following four modes, by setting the `SIGN_UP_MODE`
 environment variable:
 
 1. `NO_SIGN_UP` - No sign up allowed
@@ -12,6 +14,12 @@ environment variable:
 
 There are tests for each of these modes (and general functionality) in the `e2e-tests` directory.
 
+#### 404 behavior
+
+This app responds to unknown routes with a rendered 404 page but an HTTP 200 status. End-to-end
+tests intentionally assert a 200 status while checking that the response body contains the 404-page
+content (e.g., "Page Not Found").
+
 #### Setup for development
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
@@ -19,6 +27,47 @@ There are tests for each of these modes (and general functionality) in the `e2e-
 ```txt
 npm run cf-typegen
 ```
+
+#### Development quickstart
+
+- Install dependencies:
+
+  ```bash
+  npm install
+  ```
+  
+- Install the `mailpit` SMTP sink see the [mailpit installation documentation](https://mailpit.axllent.org/docs/install/)
+for instructions for your platform.
+
+- Set up the D1 database:
+
+  ```bash
+  wrangler d1 create <DATABASE_NAME>
+  ```
+  
+- Set up the local D1 database schema:
+
+  ```bash
+  ./build-schema-update.sh
+  ```
+  
+Also see the "Adding initial users via sqlite3" below.
+  
+- Start the dev server in a specific sign-up mode:
+
+  ```bash
+  npm run dev-open-sign-up
+  npm run dev-gated-sign-up
+  npm run dev-interest-sign-up
+  npm run dev-no-sign-up
+  ```
+
+- These scripts call `./run-dev.sh <mode>`, which:
+  - Exports `SIGN_UP_MODE` for Wrangler.
+  - Starts Wrangler dev and Mailpit (SMTP sink) concurrently.
+
+- Mailpit UI (for viewing sent emails) is available at:
+  - http://localhost:8025
 
 #### Database migrations
 
@@ -37,6 +86,21 @@ milliseconds since the epoch.
     insert into user (id, email, emailVerified, createdAt, updatedAt) values ('aaaaa', 'your-email@your-provider.com', true, SELECT strftime('%s', 'now') * 1000, SELECT strftime('%s', 'now') * 1000);
 
 You'll want to use the `wrangler d1` commands to add users to the remote Cloudflare database.
+
+#### Running E2E tests
+
+1. Start the dev server in the desired mode (see Development quickstart above).
+2. Run all tests:
+
+   ```bash
+   npx playwright test
+   ```
+   
+Alternatively, you can run the `ui-tests.sh` script to bring up the UI to run the tests, and
+see the intermediate steps of each test.
+
+3. Mode-specific tests are skipped automatically when not in the matching `SIGN_UP_MODE`.
+4. Tests use helpers from `e2e-tests/support/` for navigation, forms, workflows, and validation.
 
 #### Production
 
@@ -57,6 +121,13 @@ To run in production, set the following environment variables on Cloudflare:
 
     PO_APP_ID='<your pushover app id>'
     PO_USER_ID='<your pushover user id>'
+
+##### Dev-only routes and flags
+
+Several routes and configuration toggles are intended only for development and testing and are marked
+in the code with `// PRODUCTION:REMOVE` or `// PRODUCTION:UNCOMMENT`. Ensure these are not enabled in
+production builds. The `prod_deploy.sh` script runs the `clean-for-production.rb` script, which removes
+all dev-only routes and flags. TODO: Document build-to-production steps.
 
 #### Development
 
