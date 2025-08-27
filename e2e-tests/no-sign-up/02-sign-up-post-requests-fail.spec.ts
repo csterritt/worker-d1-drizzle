@@ -1,13 +1,12 @@
 import { test, expect } from '@playwright/test'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateTo404Route } from '../support/navigation-helpers'
 
 test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
   test.beforeEach(async () => {
     await skipIfNotMode('NO_SIGN_UP')
   })
 
-  test('POST to /auth/sign-up returns 404 page', async ({ page }) => {
+  test('POST to /auth/sign-up returns 404-page', async ({ page }) => {
     // Make a POST request to the sign-up endpoint
     const response = await page.request.post(
       'http://localhost:3000/auth/sign-up',
@@ -19,14 +18,16 @@ test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
       }
     )
 
-    // Should get a 200 status (404 page returns 200 with 404 content)
+    // Should get a 200 status (404-page returns 200 with 404 content)
     expect(response.status()).toBe(200)
 
-    // Navigate to see the 404 page content
-    await navigateTo404Route(page, '/auth/sign-up')
+    // Verify the response body contains the 404-page content
+    const responseText = await response.text()
+    expect(responseText).toContain('Page Not Found')
+    expect(responseText).toContain('That page does not exist.')
   })
 
-  test('POST to /auth/resend-email returns 404 page', async ({ page }) => {
+  test('POST to /auth/resend-email returns 404-page', async ({ page }) => {
     // Make a POST request to the resend-email endpoint
     const response = await page.request.post(
       'http://localhost:3000/auth/resend-email',
@@ -37,10 +38,12 @@ test.describe('No Sign-Up Mode: POST requests to sign-up handlers fail', () => {
       }
     )
 
-    // Should get a 200 status (404 page returns 200 with 404 content)
+    // Should get a 200 status (404-page returns 200 with 404 content)
     expect(response.status()).toBe(200)
 
-    // Navigate to see the 404 page content
-    await navigateTo404Route(page, '/auth/resend-email')
+    // Verify the response body contains the 404-page content
+    const responseText = await response.text()
+    expect(responseText).toContain('Page Not Found')
+    expect(responseText).toContain('That page does not exist.')
   })
 })
