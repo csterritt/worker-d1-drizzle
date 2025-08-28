@@ -24,21 +24,20 @@ import { retrieveCookie } from '../../lib/cookie-support'
  */
 const renderSignIn = (c: Context, emailEntered: string) => {
   return (
-    <div data-testid='sign-in-page-banner' className='flex justify-center'>
-      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold mb-4'>Sign In</h2>
+    <div data-testid='sign-in-page-banner'>
+      <div>
+        <div>
+          <h2>Sign In</h2>
 
           {/* Better-auth sign-in form */}
           <form
             method='post'
             action='/api/auth/sign-in/email'
-            className='flex flex-col gap-4'
             aria-label='Sign in form'
           >
-            <div className='form-control w-full'>
-              <label className='label' htmlFor='email'>
-                <span className='label-text'>Email</span>
+            <div>
+              <label htmlFor='email'>
+                <span>Email</span>
               </label>
               <input
                 id='email'
@@ -46,7 +45,6 @@ const renderSignIn = (c: Context, emailEntered: string) => {
                 type='email'
                 placeholder='Enter your email'
                 required
-                className='input input-bordered w-full'
                 autoFocus
                 value={emailEntered}
                 data-testid='email-input'
@@ -54,9 +52,9 @@ const renderSignIn = (c: Context, emailEntered: string) => {
               />
             </div>
 
-            <div className='form-control w-full'>
-              <label className='label' htmlFor='password'>
-                <span className='label-text'>Password</span>
+            <div>
+              <label htmlFor='password'>
+                <span>Password</span>
               </label>
               <input
                 id='password'
@@ -65,28 +63,22 @@ const renderSignIn = (c: Context, emailEntered: string) => {
                 placeholder='Enter your password'
                 required
                 minLength={8}
-                className='input input-bordered w-full'
                 data-testid='password-input'
                 aria-label='Password'
               />
             </div>
 
-            <div className='card-actions justify-end mt-4'>
-              <button
-                type='submit'
-                className='btn btn-primary'
-                data-testid='submit'
-              >
+            <div>
+              <button type='submit' data-testid='submit'>
                 Sign In
               </button>
             </div>
           </form>
 
           {/* Forgot password link */}
-          <div className='text-center mt-2'>
+          <div>
             <a
               href={PATHS.AUTH.FORGOT_PASSWORD}
-              className='link link-primary text-sm'
               data-testid='forgot-password-link'
             >
               Forgot your password?
@@ -96,15 +88,14 @@ const renderSignIn = (c: Context, emailEntered: string) => {
           {/* Navigation to sign-up page - only show if sign-up is enabled */}
           {process.env.SIGN_UP_MODE !== SIGN_UP_MODES.NO_SIGN_UP && (
             <>
-              <div className='divider'>New user?</div>
-              <div className='card-actions justify-center'>
+              <div>New user?</div>
+              <div>
                 <a
                   href={
                     process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP
                       ? PATHS.AUTH.INTEREST_SIGN_UP
                       : PATHS.AUTH.SIGN_UP
                   }
-                  className='btn btn-outline btn-secondary'
                   data-testid='go-to-sign-up-button'
                 >
                   {process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP

@@ -23,12 +23,12 @@ import { redirectWithMessage } from '../../lib/redirects'
  */
 const renderWaitingForReset = (c: Context, email: string) => {
   return (
-    <div data-testid='waiting-for-reset-page' className='flex justify-center'>
-      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <div className='alert alert-info mb-4'>
+    <div data-testid='waiting-for-reset-page'>
+      <div>
+        <div>
+          <div>
             <div>
-              <h2 className='font-bold text-lg'>Check Your Email</h2>
+              <h2>Check Your Email</h2>
               <p>
                 We've sent a password reset link to <strong>{email}</strong>.
                 Please check your email and click the link to reset your
@@ -37,28 +37,23 @@ const renderWaitingForReset = (c: Context, email: string) => {
             </div>
           </div>
 
-          <div className='text-center text-sm text-gray-600 mb-4'>
+          <div>
             <p>Didn't receive the email? Check your spam folder.</p>
             <p>The reset link will expire in 24 hours.</p>
           </div>
 
-          <div className='card-actions justify-center'>
+          <div>
             <a
               href={PATHS.AUTH.SIGN_IN}
-              className='btn btn-ghost'
               data-testid='back-to-sign-in-from-waiting'
             >
               Back to Sign In
             </a>
           </div>
 
-          <div className='divider'>Need to try again?</div>
-          <div className='card-actions justify-center'>
-            <a
-              href={PATHS.AUTH.FORGOT_PASSWORD}
-              className='btn btn-outline btn-secondary'
-              data-testid='try-again-button'
-            >
+          <div>Need to try again?</div>
+          <div>
+            <a href={PATHS.AUTH.FORGOT_PASSWORD} data-testid='try-again-button'>
               Send Another Reset Link
             </a>
           </div>
@@ -75,21 +70,25 @@ const renderWaitingForReset = (c: Context, email: string) => {
 export const buildWaitingForReset = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.WAITING_FOR_RESET, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    setupNoCacheHeaders(c)
+  app.get(
+    PATHS.AUTH.WAITING_FOR_RESET,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      setupNoCacheHeaders(c)
 
-    const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
-    if (!email) {
-      return redirectWithMessage(
-        c,
-        PATHS.AUTH.FORGOT_PASSWORD,
-        'Please enter your email address to reset your password.'
-      )
+      const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
+      if (!email) {
+        return redirectWithMessage(
+          c,
+          PATHS.AUTH.FORGOT_PASSWORD,
+          'Please enter your email address to reset your password.'
+        )
+      }
+
+      // Clear the email cookie after successful retrieval
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
+
+      return c.render(useLayout(c, renderWaitingForReset(c, email)))
     }
-
-    // Clear the email cookie after successful retrieval
-    removeCookie(c, COOKIES.EMAIL_ENTERED)
-
-    return c.render(useLayout(c, renderWaitingForReset(c, email)))
-  })
+  )
 }

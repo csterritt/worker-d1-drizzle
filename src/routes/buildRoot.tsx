@@ -18,20 +18,13 @@ import { Bindings } from '../local-types'
  */
 const renderRoot = (c: Context) => {
   return (
-    <div
-      data-testid='startup-page-banner'
-      className='flex flex-col items-center'
-    >
-      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
-        <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold'>Welcome!</h2>
+    <div data-testid='startup-page-banner'>
+      <div>
+        <div>
+          <h2>Welcome!</h2>
           <h3 id='heading'>Worker, D1, Drizzle Project</h3>
           <p>
-            <a
-              href={PATHS.PRIVATE}
-              className='btn btn-primary'
-              data-testid='visit-private-link'
-            >
+            <a href={PATHS.PRIVATE} data-testid='visit-private-link'>
               Protected Content
             </a>
           </p>
@@ -64,10 +57,7 @@ const renderRoot = (c: Context) => {
               // Create alert element
               const alertDiv = document.createElement('div');              
               alertDiv.innerHTML = \`
-                <div class="alert alert-success shadow-lg max-w-md mx-auto mt-4" role="alert">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                <div role="alert">
                   <span>\${decodedMessage}</span>
                 </div>
               \`;

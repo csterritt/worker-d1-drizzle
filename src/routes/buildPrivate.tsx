@@ -20,22 +20,15 @@ import { signedInAccess } from '../middleware/signed-in-access'
  */
 const renderPrivate = (c: Context) => {
   return (
-    <div
-      data-testid='private-page-banner'
-      className='flex flex-col items-center'
-    >
-      <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
-        <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold'>Private Area</h2>
-          <p className='py-4'>
+    <div data-testid='private-page-banner'>
+      <div>
+        <div>
+          <h2>Private Area</h2>
+          <p>
             This is a protected area that requires authentication to access.
           </p>
-          <div className='card-actions justify-center'>
-            <a
-              href={PATHS.ROOT}
-              className='btn btn-ghost'
-              data-testid='visit-home-link'
-            >
+          <div>
+            <a href={PATHS.ROOT} data-testid='visit-home-link'>
               Return Home
             </a>
           </div>
@@ -50,7 +43,10 @@ const renderPrivate = (c: Context) => {
  * @param app - Hono app instance
  */
 export const buildPrivate = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.PRIVATE, secureHeaders(STANDARD_SECURE_HEADERS), signedInAccess, (c) =>
-    c.render(useLayout(c, renderPrivate(c)))
+  app.get(
+    PATHS.PRIVATE,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    signedInAccess,
+    (c) => c.render(useLayout(c, renderPrivate(c)))
   )
 }

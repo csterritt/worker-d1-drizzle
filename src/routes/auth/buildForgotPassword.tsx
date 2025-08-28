@@ -20,14 +20,12 @@ import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
  */
 const renderForgotPassword = (c: Context) => {
   return (
-    <div data-testid='forgot-password-page' className='flex justify-center'>
-      <div className='card w-full max-w-md bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold mb-4'>
-            Reset Your Password
-          </h2>
+    <div data-testid='forgot-password-page'>
+      <div>
+        <div>
+          <h2>Reset Your Password</h2>
 
-          <p className='text-sm text-gray-600 mb-4'>
+          <p>
             Enter your email address and we'll send you a link to reset your
             password.
           </p>
@@ -36,13 +34,12 @@ const renderForgotPassword = (c: Context) => {
           <form
             method='post'
             action='/auth/forgot-password'
-            className='flex flex-col gap-4'
             aria-label='Forgot password form'
             noValidate
           >
-            <div className='form-control w-full'>
-              <label className='label' htmlFor='forgot-email'>
-                <span className='label-text'>Email</span>
+            <div>
+              <label htmlFor='forgot-email'>
+                <span>Email</span>
               </label>
               <input
                 id='forgot-email'
@@ -50,32 +47,23 @@ const renderForgotPassword = (c: Context) => {
                 type='email'
                 placeholder='Enter your email address'
                 required
-                className='input input-bordered w-full'
                 autoFocus
                 data-testid='forgot-email-input'
                 aria-label='Email'
               />
             </div>
 
-            <div className='card-actions justify-end mt-4'>
-              <button
-                type='submit'
-                className='btn btn-primary w-full'
-                data-testid='forgot-password-submit'
-              >
+            <div>
+              <button type='submit' data-testid='forgot-password-submit'>
                 Send Reset Link
               </button>
             </div>
           </form>
 
           {/* Navigation back to sign-in */}
-          <div className='divider'>Remember your password?</div>
-          <div className='card-actions justify-center'>
-            <a
-              href={PATHS.AUTH.SIGN_IN}
-              className='btn btn-outline btn-secondary'
-              data-testid='back-to-sign-in-button'
-            >
+          <div>Remember your password?</div>
+          <div>
+            <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-button'>
               Back to Sign In
             </a>
           </div>
@@ -92,8 +80,12 @@ const renderForgotPassword = (c: Context) => {
 export const buildForgotPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.FORGOT_PASSWORD, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderForgotPassword(c)))
-  })
+  app.get(
+    PATHS.AUTH.FORGOT_PASSWORD,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      setupNoCacheHeaders(c)
+      return c.render(useLayout(c, renderForgotPassword(c)))
+    }
+  )
 }

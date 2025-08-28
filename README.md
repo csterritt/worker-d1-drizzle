@@ -28,6 +28,14 @@ content (e.g., "Page Not Found").
 npm run cf-typegen
 ```
 
+#### Styling
+
+The app uses the [Sakura](https://github.com/oxalorg/sakura) CSS theme. It's a class-free system that
+just decorates HTML elements, as a basic start to styling.
+
+There is another git branch for this project named `tailwind-css-and-daisyui` that uses Tailwind
+CSS and DaisyUI. It is functionally identical, just styled differently.
+
 #### Development quickstart
 
 - Install dependencies:
