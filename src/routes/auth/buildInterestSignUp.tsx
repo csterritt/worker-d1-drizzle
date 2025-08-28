@@ -6,7 +6,7 @@
  * Route builder for the interest sign-up page.
  * @module routes/auth/buildInterestSignUp
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -19,10 +19,9 @@ import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
  * Render the JSX for the interest sign-up page.
- * @param c - Hono context
  * @param emailEntered - email entered by user, if any
  */
-const renderInterestSignUp = (c: Context, emailEntered: string) => {
+const renderInterestSignUp = (emailEntered: string) => {
   return (
     <div data-testid='interest-sign-up-page-banner' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -106,6 +105,6 @@ export const buildInterestSignUp = (app: Hono<{ Bindings: Bindings }>): void => 
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderInterestSignUp(c, emailEntered)))
+    return c.render(useLayout(c, renderInterestSignUp(emailEntered)))
   })
 }

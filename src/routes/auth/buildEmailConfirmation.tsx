@@ -6,7 +6,7 @@
  * Route builder for email confirmation page.
  * @module routes/auth/buildEmailConfirmation
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -19,12 +19,10 @@ import { createAuth } from '../../lib/auth'
 
 /**
  * Render the JSX for the email confirmation success page.
- * @param c - Hono context
  * @param message - Success or error message
  * @param isSuccess - Whether the confirmation was successful
  */
 const renderEmailConfirmation = (
-  c: Context,
   message: string,
   isSuccess: boolean
 ) => {
@@ -79,10 +77,9 @@ const renderEmailConfirmation = (
 
 /**
  * Render the JSX for the email sent confirmation page.
- * @param c - Hono context
  * @param email - User's email address
  */
-const renderEmailSent = (c: Context, email: string) => {
+const renderEmailSent = (email: string) => {
   return (
     <div data-testid='email-sent-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -137,7 +134,6 @@ export const buildEmailConfirmation = (
         useLayout(
           c,
           renderEmailConfirmation(
-            c,
             'No verification token provided. Please check your email for the correct link.',
             false
           )
@@ -157,7 +153,6 @@ export const buildEmailConfirmation = (
           useLayout(
             c,
             renderEmailConfirmation(
-              c,
               'Your email has been successfully verified! You can now sign in to your account.',
               true
             )
@@ -168,7 +163,6 @@ export const buildEmailConfirmation = (
           useLayout(
             c,
             renderEmailConfirmation(
-              c,
               'The verification link is invalid or has expired. Please try signing up again.',
               false
             )
@@ -181,7 +175,6 @@ export const buildEmailConfirmation = (
         useLayout(
           c,
           renderEmailConfirmation(
-            c,
             'There was an error verifying your email. Please try again or contact support.',
             false
           )
@@ -206,6 +199,6 @@ export const buildEmailConfirmation = (
     // Clear the email cookie after successful retrieval
     removeCookie(c, COOKIES.EMAIL_ENTERED)
 
-    return c.render(useLayout(c, renderEmailSent(c, email)))
+    return c.render(useLayout(c, renderEmailSent(email)))
   })
 }

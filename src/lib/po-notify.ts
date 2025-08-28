@@ -52,7 +52,7 @@ export const pushoverNotify = async (c: Context, message: string) => {
     }
 
     try {
-      const res = await post(API_URLS.PUSHOVER, msg)
+      await post(API_URLS.PUSHOVER, msg)
     } catch (err) {
       console.log(`pushoverNotify final error:`, err)
     }

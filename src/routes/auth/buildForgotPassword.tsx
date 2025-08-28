@@ -6,7 +6,7 @@
  * Route builder for the forgot password page.
  * @module routes/auth/buildForgotPassword
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -16,9 +16,8 @@ import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 
 /**
  * Render the JSX for the forgot password page.
- * @param c - Hono context
  */
-const renderForgotPassword = (c: Context) => {
+const renderForgotPassword = () => {
   return (
     <div data-testid='forgot-password-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -94,6 +93,6 @@ export const buildForgotPassword = (
 ): void => {
   app.get(PATHS.AUTH.FORGOT_PASSWORD, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderForgotPassword(c)))
+    return c.render(useLayout(c, renderForgotPassword()))
   })
 }

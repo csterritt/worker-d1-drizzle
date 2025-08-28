@@ -6,7 +6,7 @@
  * Route builder for the await verification page.
  * @module routes/auth/buildAwaitVerification
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -17,10 +17,9 @@ import { retrieveCookie, removeCookie } from '../../lib/cookie-support'
 
 /**
  * Render the JSX for the await verification page.
- * @param c - Hono context
  * @param email - User's email address (optional)
  */
-const renderAwaitVerification = (c: Context, email?: string) => {
+const renderAwaitVerification = (email?: string) => {
   return (
     <div data-testid='await-verification-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -122,6 +121,6 @@ export const buildAwaitVerification = (
     // Remove the email cookie after retrieving it
     removeCookie(c, COOKIES.EMAIL_ENTERED)
 
-    return c.render(useLayout(c, renderAwaitVerification(c, email)))
+    return c.render(useLayout(c, renderAwaitVerification(email)))
   })
 }

@@ -6,7 +6,7 @@
  * Route builder for the waiting for password reset page.
  * @module routes/auth/buildWaitingForReset
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -18,10 +18,9 @@ import { redirectWithMessage } from '../../lib/redirects'
 
 /**
  * Render the JSX for the waiting for reset page.
- * @param c - Hono context
  * @param email - User's email address
  */
-const renderWaitingForReset = (c: Context, email: string) => {
+const renderWaitingForReset = (email: string) => {
   return (
     <div data-testid='waiting-for-reset-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -90,6 +89,6 @@ export const buildWaitingForReset = (
     // Clear the email cookie after successful retrieval
     removeCookie(c, COOKIES.EMAIL_ENTERED)
 
-    return c.render(useLayout(c, renderWaitingForReset(c, email)))
+    return c.render(useLayout(c, renderWaitingForReset(email)))
   })
 }

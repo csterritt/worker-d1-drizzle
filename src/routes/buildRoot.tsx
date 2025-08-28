@@ -6,7 +6,7 @@
  * Route builder for the root path.
  * @module routes/buildRoot
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 import { PATHS, COOKIES, ALLOW_SCRIPTS_SECURE_HEADERS } from '../constants'
 import { useLayout } from './buildLayout'
@@ -14,9 +14,8 @@ import { Bindings } from '../local-types'
 
 /**
  * Render the JSX for the root page.
- * @param c - Hono context
  */
-const renderRoot = (c: Context) => {
+const renderRoot = () => {
   return (
     <div
       data-testid='startup-page-banner'
@@ -103,6 +102,6 @@ export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
   }
 
   app.get(PATHS.ROOT, secureHeaders(secureHeadersWithNonce), (c) =>
-    c.render(useLayout(c, renderRoot(c)))
+    c.render(useLayout(c, renderRoot()))
   )
 }

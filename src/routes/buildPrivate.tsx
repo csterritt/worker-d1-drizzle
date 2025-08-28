@@ -6,7 +6,7 @@
  * Route builder for the private path.
  * @module routes/buildPrivate
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../constants'
@@ -16,9 +16,8 @@ import { signedInAccess } from '../middleware/signed-in-access'
 
 /**
  * Render the JSX for the private page.
- * @param c - Hono context
  */
-const renderPrivate = (c: Context) => {
+const renderPrivate = () => {
   return (
     <div
       data-testid='private-page-banner'
@@ -51,6 +50,6 @@ const renderPrivate = (c: Context) => {
  */
 export const buildPrivate = (app: Hono<{ Bindings: Bindings }>): void => {
   app.get(PATHS.PRIVATE, secureHeaders(STANDARD_SECURE_HEADERS), signedInAccess, (c) =>
-    c.render(useLayout(c, renderPrivate(c)))
+    c.render(useLayout(c, renderPrivate()))
   )
 }

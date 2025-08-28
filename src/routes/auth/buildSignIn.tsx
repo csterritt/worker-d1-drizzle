@@ -6,7 +6,7 @@
  * Route builder for the sign-in page.
  * @module routes/auth/buildSignIn
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS, SIGN_UP_MODES } from '../../constants'
@@ -22,7 +22,7 @@ import { retrieveCookie } from '../../lib/cookie-support'
  * @param c - Hono context
  * @param emailEntered - email entered by user, if any
  */
-const renderSignIn = (c: Context, emailEntered: string) => {
+const renderSignIn = (emailEntered: string) => {
   return (
     <div data-testid='sign-in-page-banner' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -155,7 +155,7 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
         retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
       setupNoCacheHeaders(c)
-      return c.render(useLayout(c, renderSignIn(c, emailEntered), extraMessage))
+      return c.render(useLayout(c, renderSignIn(emailEntered), extraMessage))
     }
   )
 }

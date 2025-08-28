@@ -13,6 +13,12 @@
     "types": [
         "./worker-configuration.d.ts",
         "node"
-    ]
+    ],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
+  "exclude": [
+    "tmp",
+    "e2e-tests"
+  ]
 }

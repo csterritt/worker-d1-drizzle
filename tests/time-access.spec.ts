@@ -43,6 +43,7 @@ const makeFakeContext = () => {
       },
     },
     header: (name: string, value: string, options?: any) => {
+      void options
       if (name === 'Set-Cookie') {
         cookieStorage.set('Cookie', value)
       } else {

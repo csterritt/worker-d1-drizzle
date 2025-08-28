@@ -6,7 +6,7 @@
  * Route builder for the 404 (Not Found) page.
  * @module routes/build404
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 
 import { PATHS } from '../constants'
 import { useLayout } from './buildLayout'
@@ -14,9 +14,8 @@ import { Bindings } from '../local-types'
 
 /**
  * Render the JSX for the 404 page.
- * @param c - Hono context
  */
-const renderNotFound = (c: Context) => {
+const renderNotFound = () => {
   return (
     <div data-testid='404-page-banner' className='flex flex-col items-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl mb-6'>
@@ -48,5 +47,5 @@ const renderNotFound = (c: Context) => {
  * @param app - Hono app instance
  */
 export const build404 = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.notFound((c) => c.render(useLayout(c, renderNotFound(c))))
+  app.notFound((c) => c.render(useLayout(c, renderNotFound())))
 }

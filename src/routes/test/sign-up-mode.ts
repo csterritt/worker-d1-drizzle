@@ -18,6 +18,7 @@ testSignUpModeRouter.get(
   '/',
   secureHeaders(STANDARD_SECURE_HEADERS),
   async (c) => {
+    void c
     try {
       const currentMode = process.env.SIGN_UP_MODE || SIGN_UP_MODES.NO_SIGN_UP
       

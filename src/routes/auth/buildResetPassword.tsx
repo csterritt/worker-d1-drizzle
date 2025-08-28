@@ -6,7 +6,7 @@
  * Route builder for the reset password page.
  * @module routes/auth/buildResetPassword
  */
-import { Hono, Context } from 'hono'
+import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
@@ -16,10 +16,9 @@ import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 
 /**
  * Render the JSX for the reset password page.
- * @param c - Hono context
  * @param token - Reset token from URL
  */
-const renderResetPassword = (c: Context, token: string) => {
+const renderResetPassword = (token: string) => {
   return (
     <div data-testid='reset-password-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -109,9 +108,8 @@ const renderResetPassword = (c: Context, token: string) => {
 
 /**
  * Render the JSX for invalid/expired token page.
- * @param c - Hono context
  */
-const renderInvalidToken = (c: Context) => {
+const renderInvalidToken = () => {
   return (
     <div data-testid='invalid-token-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -162,9 +160,9 @@ export const buildResetPassword = (app: Hono<{ Bindings: Bindings }>): void => {
 
     const token = c.req.query('token')
     if (!token) {
-      return c.render(useLayout(c, renderInvalidToken(c)))
+      return c.render(useLayout(c, renderInvalidToken()))
     }
 
-    return c.render(useLayout(c, renderResetPassword(c, token)))
+    return c.render(useLayout(c, renderResetPassword(token)))
   })
 }

@@ -6,10 +6,7 @@
  * Better Auth integration handler for Hono
  * @module routes/auth/better-auth-handler
  */
-import { Hono } from 'hono'
-
-import { createAuth, type Auth } from '../../lib/auth'
-import { Bindings } from '../../local-types'
+import { createAuth } from '../../lib/auth'
 
 // Type definitions for better-auth context variables
 export interface BetterAuthVariables {
@@ -18,11 +15,7 @@ export interface BetterAuthVariables {
   authSession: any | null
 }
 
-// Extended Hono type with better-auth variables
-type BetterAuthHono = Hono<{
-  Bindings: Bindings
-  Variables: BetterAuthVariables
-}>
+// Extended Hono type with better-auth variables (kept for reference)
 
 /**
  * Setup better-auth routes in the Hono app

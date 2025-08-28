@@ -2,10 +2,10 @@
 	"name": "worker-d1-drizzle",
 	"type": "module",
 	"scripts": {
-        "dev-open-sign-up": "./run-dev.sh open-sign-up",
-        "dev-no-sign-up": "./run-dev.sh no-sign-up",
-        "dev-gated-sign-up": "./run-dev.sh gated-sign-up",
-        "dev-interest-sign-up": "./run-dev.sh interest-sign-up",
+		"dev-open-sign-up": "./run-dev.sh open-sign-up",
+		"dev-no-sign-up": "./run-dev.sh no-sign-up",
+		"dev-gated-sign-up": "./run-dev.sh gated-sign-up",
+		"dev-interest-sign-up": "./run-dev.sh interest-sign-up",
 		"build": "wrangler build",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface Bindings"
@@ -33,6 +33,7 @@
 		"drizzle-kit": "^0.31.2",
 		"globby": "^14.1.0",
 		"prettier": "^3.6.0",
+		"typescript": "^5.9.2",
 		"wrangler": "^4.21.1"
 	}
 }
