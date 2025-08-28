@@ -36,7 +36,7 @@ npm run cf-typegen
   npm install
   ```
   
-- Install the `mailpit` SMTP sink see the [mailpit installation documentation](https://mailpit.axllent.org/docs/install/)
+- Install the `mailpit` SMTP sink. See the [mailpit installation documentation](https://mailpit.axllent.org/docs/install/)
 for instructions for your platform.
 
 - Set up the D1 database:
@@ -45,6 +45,9 @@ for instructions for your platform.
   wrangler d1 create <DATABASE_NAME>
   ```
   
+Then set the `CLOUDFLARE_DATABASE_ID` environment variable to the ID of the database. Also set the "database_id"
+in the "d1_databases" section of the `wrangler.jsonc` file to the ID of the database.
+  
 - Set up the local D1 database schema:
 
   ```bash
@@ -52,7 +55,9 @@ for instructions for your platform.
   ```
   
 Also see the "Adding initial users via sqlite3" below.
-  
+
+- Copy the `.dev.vars.all.template` to `.dev.vars.all` and fill in the values for your environment.
+
 - Start the dev server in a specific sign-up mode:
 
   ```bash
@@ -127,19 +132,19 @@ To run in production, set the following environment variables on Cloudflare:
 Several routes and configuration toggles are intended only for development and testing and are marked
 in the code with `// PRODUCTION:REMOVE` or `// PRODUCTION:UNCOMMENT`. Ensure these are not enabled in
 production builds. The `prod_deploy.sh` script runs the `clean-for-production.rb` script, which removes
-all dev-only routes and flags. TODO: Document build-to-production steps.
+all dev-only routes and flags.
 
-#### Development
+#### Development execution
 
-For development, can copy the `.dev.vars.all.template` into `.dev.vars.all` file (which is in `.gitignore`)
-in the root directory of the project. See the script `run-dev.sh` for how to run the development server,
-and how it sets up `.dev.vars` from the `.dev.vars.all` file. For ease of command line usage, you can use
-the `go` script.
+For development, you can use the `go` script with the appropriate single-letter indicator for the
+sign-up mode.
 
 ### Setting up for production
 
 Change the host name in the files that have the domain name as `mini-auth.example.com` (and `mini-auth.workers.dev`
 if needed) to the domain name you want to use for the worker.
+
+**TODO**: Document build-to-production steps.
 
 ### Licensing
 See LICENSE.txt
