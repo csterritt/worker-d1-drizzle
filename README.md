@@ -28,6 +28,11 @@ content (e.g., "Page Not Found").
 npm run cf-typegen
 ```
 
+#### Styling
+
+The app uses Tailwind CSS for styling. The Tailwind config is in `tailwind.config.js`. It also uses the
+daisy-ui library for styling. See the [daisy-ui site](https://daisyui.com/) for more information.
+
 #### Development quickstart
 
 - Install dependencies:
