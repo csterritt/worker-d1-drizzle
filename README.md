@@ -31,7 +31,8 @@ npm run cf-typegen
 #### Styling
 
 The app uses the [Sakura](https://github.com/oxalorg/sakura) CSS theme. It's a class-free system that
-just decorates HTML elements, as a basic start to styling.
+just decorates HTML elements, as a basic start to styling. You can remove it and the `normalize.css`
+file, remove loading them from `renderer.tsx`, and you'll be left with a plain HTML page.
 
 There is another git branch for this project named `tailwind-css-and-daisyui` that uses Tailwind
 CSS and DaisyUI. It is functionally identical, just styled differently.
@@ -52,9 +53,10 @@ for instructions for your platform.
   ```bash
   wrangler d1 create <DATABASE_NAME>
   ```
-  
-Then set the `CLOUDFLARE_DATABASE_ID` environment variable to the ID of the database. Also set the "database_id"
-in the "d1_databases" section of the `wrangler.jsonc` file to the ID of the database.
+
+Then set the `CLOUDFLARE_DATABASE_ID` environment variable to the ID of the database. Also set
+the "database_id" in the "d1_databases" section of the `wrangler.jsonc` file to the ID of the
+database.
   
 - Set up the local D1 database schema:
 
@@ -117,6 +119,16 @@ see the intermediate steps of each test.
 
 #### Production
 
+The only javascript served to clients in this entire project is in the `buildRoot.tsx` file. It
+is used to display a sign-out message if one is present in the cookie. This is done to allow
+the `index.html` file to be built, and then put into the `/public` directory so that it's
+treated as a static file by Cloudflare. The thinking behind this is that people will come to
+the website, see the description of the product or service, and many (alas :-) will decide it's
+not for them. So they leave, without causing a single Cloudflare worker execution. The
+`prod_deploy.sh` (currently untested, and probably broken) builds the `public/index.html`, but
+then removes it. The `index.ts` file would need to be changed to add `// PRODUCTION:REMOVE`
+comments to the import and call to `buildRoot`.
+
 In production, notifications can be made via the [Pushover](https://pushover.net) web service. None are
 currently done, and this service is optional; if you don't want to use Pushover, just don't set the
 `PO_APP_ID` and `PO_USER_ID` environment variables.
@@ -137,10 +149,11 @@ To run in production, set the following environment variables on Cloudflare:
 
 ##### Dev-only routes and flags
 
-Several routes and configuration toggles are intended only for development and testing and are marked
-in the code with `// PRODUCTION:REMOVE` or `// PRODUCTION:UNCOMMENT`. Ensure these are not enabled in
-production builds. The `prod_deploy.sh` script runs the `clean-for-production.rb` script, which removes
-all dev-only routes and flags.
+Several routes and configuration toggles are intended only for development and testing and are
+marked in the code with `// PRODUCTION:REMOVE` or `// PRODUCTION:UNCOMMENT`. Ensure these are
+not enabled in production builds. The `prod_deploy.sh` script runs the
+`clean-for-production.rb` script, which removes all dev-only routes and flags. Note that the
+`prod_deploy.sh` script is currently untested, and probably broken.
 
 #### Development execution
 
@@ -149,8 +162,8 @@ sign-up mode.
 
 ### Setting up for production
 
-Change the host name in the files that have the domain name as `mini-auth.example.com` (and `mini-auth.workers.dev`
-if needed) to the domain name you want to use for the worker.
+Change the host name in the files that have the domain name as `mini-auth.example.com` (and
+`mini-auth.workers.dev` if needed) to the domain name you want to use for the worker.
 
 **TODO**: Document build-to-production steps.
 
