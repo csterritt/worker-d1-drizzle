@@ -9,11 +9,14 @@ import {
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignUp, navigateToSignIn } from '../support/navigation-helpers'
+import {
+  navigateToSignUp,
+  navigateToSignIn,
+} from '../support/navigation-helpers'
 import { submitSignUpForm, submitSignInForm } from '../support/form-helpers'
 
 // Helper function to get the latest email from Mailpit
-async function getLatestEmailFromMailpit() {
+const getLatestEmailFromMailpit = async () => {
   const response = await fetch('http://localhost:8025/api/v1/message/latest')
   if (!response.ok) {
     throw new Error(`Failed to fetch latest email: ${response.status}`)
@@ -22,7 +25,7 @@ async function getLatestEmailFromMailpit() {
 }
 
 // Helper function to extract verification link from email HTML
-function extractVerificationLink(htmlContent: string): string {
+const extractVerificationLink = (htmlContent: string): string => {
   // Look for links that contain 'verify-email' or 'token='
   const linkRegex =
     /<a[^>]+href=["']([^"']*(?:verify-email|token=)[^"']*)["'][^>]*>/gi

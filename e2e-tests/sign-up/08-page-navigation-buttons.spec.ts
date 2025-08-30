@@ -1,16 +1,24 @@
 import { test, expect } from '@playwright/test'
 
 import { clickLink, isElementVisible } from '../support/finders'
-import { verifyOnSignInPage, verifyOnSignUpPage } from '../support/page-verifiers'
+import {
+  verifyOnSignInPage,
+  verifyOnSignUpPage,
+} from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignIn, navigateToSignUp } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateToSignUp,
+} from '../support/navigation-helpers'
 
 test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {
     await skipIfNotMode('OPEN_SIGN_UP')
   })
 
-  test('can navigate between sign-in and sign-up pages using buttons', async ({ page }) => {
+  test('can navigate between sign-in and sign-up pages using buttons', async ({
+    page,
+  }) => {
     // Start on the sign-in page
     await navigateToSignIn(page)
 
@@ -29,7 +37,9 @@ test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
     expect(page.url()).toContain('/auth/sign-in')
   })
 
-  test('sign-up page has correct form elements and navigation', async ({ page }) => {
+  test('sign-up page has correct form elements and navigation', async ({
+    page,
+  }) => {
     // Navigate directly to sign-up page
     await navigateToSignUp(page)
     await verifyOnSignUpPage(page)
@@ -45,7 +55,9 @@ test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
     expect(await page.locator('h2').textContent()).toContain('Create Account')
   })
 
-  test('sign-in page has correct form elements and navigation', async ({ page }) => {
+  test('sign-in page has correct form elements and navigation', async ({
+    page,
+  }) => {
     // Navigate to sign-in page
     await navigateToSignIn(page)
 

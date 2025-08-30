@@ -4,16 +4,22 @@ import { clickLink, verifyAlert, isElementVisible } from '../support/finders'
 import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
-  verifyOnForgotPasswordPage,
   verifyOnWaitingForResetPage,
   verifyOnResetPasswordPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
-import { navigateToForgotPassword, navigateToSignIn } from '../support/navigation-helpers'
-import { submitForgotPasswordForm, submitResetPasswordForm, submitSignInForm } from '../support/form-helpers'
+import {
+  navigateToForgotPassword,
+  navigateToSignIn,
+} from '../support/navigation-helpers'
+import {
+  submitForgotPasswordForm,
+  submitResetPasswordForm,
+  submitSignInForm,
+} from '../support/form-helpers'
 
 // Helper function to get the latest email from Mailpit
-async function getLatestEmailFromMailpit() {
+const getLatestEmailFromMailpit = async () => {
   const response = await fetch('http://localhost:8025/api/v1/message/latest')
   if (!response.ok) {
     throw new Error(`Failed to fetch latest email: ${response.status}`)
@@ -22,7 +28,7 @@ async function getLatestEmailFromMailpit() {
 }
 
 // Helper function to clear all emails from Mailpit
-async function clearAllEmailsFromMailpit() {
+const clearAllEmailsFromMailpit = async () => {
   try {
     const response = await fetch('http://localhost:8025/api/v1/messages', {
       method: 'DELETE',
@@ -37,7 +43,7 @@ async function clearAllEmailsFromMailpit() {
 }
 
 // Helper function to extract password reset link from email HTML
-function extractPasswordResetLink(htmlContent: string): string {
+const extractPasswordResetLink = (htmlContent: string): string => {
   // Look for links that contain 'reset-password' or 'token='
   const linkRegex =
     /<a[^>]+href=["']([^"']*(?:reset-password|token=)[^"']*)["'][^>]*>/gi

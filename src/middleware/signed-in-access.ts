@@ -20,7 +20,7 @@ export const signedInAccess = createMiddleware<{ Bindings: Bindings }>(
     // Check if user is authenticated using better-auth session context
     const user = c.get('user')
     const session = c.get('session')
-    
+
     if (!user || !session) {
       return redirectWithError(
         c,

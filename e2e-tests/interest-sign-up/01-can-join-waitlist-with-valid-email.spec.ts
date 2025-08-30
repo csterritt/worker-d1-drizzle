@@ -2,7 +2,10 @@ import { test } from '@playwright/test'
 
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { completeInterestSignUpFlow, testDuplicateInterestSignUpFlow } from '../support/workflow-helpers'
+import {
+  completeInterestSignUpFlow,
+  testDuplicateInterestSignUpFlow,
+} from '../support/workflow-helpers'
 
 test.describe('Interest Sign-Up Mode: Valid Email Tests', () => {
   test.beforeEach(async ({ page }) => {

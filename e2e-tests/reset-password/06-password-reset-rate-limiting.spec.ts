@@ -33,11 +33,13 @@ test(
     // Verify rate limiting error message is displayed
     const alertElement = page.getByRole('alert')
     await expect(alertElement).toBeVisible()
-    
+
     // Check that the error message mentions waiting and contains "second"
     const alertText = await alertElement.textContent()
     expect(alertText).toMatch(/Please wait \d+ more second/i)
-    expect(alertText).toContain('before requesting another password reset email')
+    expect(alertText).toContain(
+      'before requesting another password reset email'
+    )
   })
 )
 

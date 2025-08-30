@@ -6,7 +6,11 @@ import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
-import { getUserIdByEmail, updateAccountTimestamp, consumeSingleUseCode } from '../../lib/db-access'
+import {
+  getUserIdByEmail,
+  updateAccountTimestamp,
+  consumeSingleUseCode,
+} from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
 
 /**
@@ -59,7 +63,10 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         const codeResult = await consumeSingleUseCode(dbClient, trimmedCode)
 
         if (codeResult.isErr) {
-          console.error('Database error validating sign-up code:', codeResult.error)
+          console.error(
+            'Database error validating sign-up code:',
+            codeResult.error
+          )
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_UP,

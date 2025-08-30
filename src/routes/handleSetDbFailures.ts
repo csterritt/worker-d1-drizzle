@@ -23,19 +23,23 @@ export const handleSetDbFailures = (
 ): void => {
   // } // PRODUCTION:UNCOMMENT
   // PRODUCTION:STOP
-  app.get(`${PATHS.AUTH.SET_DB_FAILURES}/:name/:times`, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
-    const name = c.req.param('name')
-    if (!name || name.trim() === '') {
-      return redirectWithMessage(c, PATHS.ROOT, 'Invalid name parameter')
+  app.get(
+    `${PATHS.AUTH.SET_DB_FAILURES}/:name/:times`,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    async (c) => {
+      const name = c.req.param('name')
+      if (!name || name.trim() === '') {
+        return redirectWithMessage(c, PATHS.ROOT, 'Invalid name parameter')
+      }
+
+      const times = c.req.param('times')
+      if (!times || isNaN(Number(times))) {
+        return redirectWithMessage(c, PATHS.ROOT, 'Invalid times parameter')
+      }
+
+      addCookie(c, name, times)
+
+      return redirectWithMessage(c, PATHS.ROOT, ``)
     }
-
-    const times = c.req.param('times')
-    if (!times || isNaN(Number(times))) {
-      return redirectWithMessage(c, PATHS.ROOT, 'Invalid times parameter')
-    }
-
-    addCookie(c, name, times)
-
-    return redirectWithMessage(c, PATHS.ROOT, ``)
-  })
+  )
 }

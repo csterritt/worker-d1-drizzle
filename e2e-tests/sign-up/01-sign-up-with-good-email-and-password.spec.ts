@@ -9,7 +9,7 @@ test(
   'sign up with good email and password',
   testWithDatabase(async ({ page }) => {
     await skipIfNotMode('OPEN_SIGN_UP')
-    
+
     // Complete the entire sign-up flow with default test user
     await completeSignUpFlow(page)
 

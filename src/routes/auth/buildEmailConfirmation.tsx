@@ -22,10 +22,7 @@ import { createAuth } from '../../lib/auth'
  * @param message - Success or error message
  * @param isSuccess - Whether the confirmation was successful
  */
-const renderEmailConfirmation = (
-  message: string,
-  isSuccess: boolean
-) => {
+const renderEmailConfirmation = (message: string, isSuccess: boolean) => {
   return (
     <div data-testid='email-confirmation-page' className='flex justify-center'>
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
@@ -123,65 +120,69 @@ export const buildEmailConfirmation = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
   // Email confirmation endpoint - handles verification tokens
-  app.get('/auth/verify-email', secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
-    setupNoCacheHeaders(c)
+  app.get(
+    '/auth/verify-email',
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    async (c) => {
+      setupNoCacheHeaders(c)
 
-    const token = c.req.query('token')
-    const callbackUrl = c.req.query('callbackUrl')
+      const token = c.req.query('token')
+      const callbackUrl = c.req.query('callbackUrl')
 
-    if (!token) {
-      return c.render(
-        useLayout(
-          c,
-          renderEmailConfirmation(
-            'No verification token provided. Please check your email for the correct link.',
-            false
-          )
-        )
-      )
-    }
-
-    try {
-      // Use better-auth to verify the email token
-      const auth = createAuth(c.env)
-      const verification = await auth.api.verifyEmail({
-        query: { token, callbackURL: callbackUrl },
-      })
-
-      if (verification && 'status' in verification && verification.status) {
+      if (!token) {
         return c.render(
           useLayout(
             c,
             renderEmailConfirmation(
-              'Your email has been successfully verified! You can now sign in to your account.',
-              true
-            )
-          )
-        )
-      } else {
-        return c.render(
-          useLayout(
-            c,
-            renderEmailConfirmation(
-              'The verification link is invalid or has expired. Please try signing up again.',
+              'No verification token provided. Please check your email for the correct link.',
               false
             )
           )
         )
       }
-    } catch (error) {
-      console.error('Email verification error:', error)
-      return c.render(
-        useLayout(
-          c,
-          renderEmailConfirmation(
-            'There was an error verifying your email. Please try again or contact support.',
-            false
+
+      try {
+        // Use better-auth to verify the email token
+        const auth = createAuth(c.env)
+        const verification = await auth.api.verifyEmail({
+          query: { token, callbackURL: callbackUrl },
+        })
+
+        if (verification && 'status' in verification && verification.status) {
+          return c.render(
+            useLayout(
+              c,
+              renderEmailConfirmation(
+                'Your email has been successfully verified! You can now sign in to your account.',
+                true
+              )
+            )
+          )
+        } else {
+          return c.render(
+            useLayout(
+              c,
+              renderEmailConfirmation(
+                'The verification link is invalid or has expired. Please try signing up again.',
+                false
+              )
+            )
+          )
+        }
+      } catch (error) {
+        console.error('Email verification error:', error)
+        return c.render(
+          useLayout(
+            c,
+            renderEmailConfirmation(
+              'There was an error verifying your email. Please try again or contact support.',
+              false
+            )
           )
         )
-      )
+      }
     }
-  })
+  )
 
   // Email sent confirmation page
   app.get('/auth/email-sent', secureHeaders(STANDARD_SECURE_HEADERS), (c) => {

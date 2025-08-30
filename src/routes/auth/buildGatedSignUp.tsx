@@ -23,7 +23,10 @@ import { retrieveCookie } from '../../lib/cookie-support'
  */
 const renderGatedSignUp = (emailEntered: string) => {
   return (
-    <div data-testid='gated-sign-up-page-banner' className='flex justify-center'>
+    <div
+      data-testid='gated-sign-up-page-banner'
+      className='flex justify-center'
+    >
       <div className='card w-full max-w-md bg-base-100 shadow-xl'>
         <div className='card-body'>
           <h2 className='card-title text-2xl font-bold mb-4'>Create Account</h2>

@@ -3,7 +3,10 @@ import { test, expect } from '@playwright/test'
 import { isElementVisible } from '../support/finders'
 import { verifyOnSignInPage } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignIn, navigateTo404Route } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateTo404Route,
+} from '../support/navigation-helpers'
 
 test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {

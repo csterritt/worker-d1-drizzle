@@ -192,7 +192,7 @@ const consumeSingleUseCodeActual = async (
 
     // In SQLite/D1, the number of rows affected is in result.meta.changes
     const rowsDeleted = result.meta?.changes || 0
-    
+
     // Return true if exactly one row was deleted (code existed and was consumed)
     return Result.ok(rowsDeleted === 1)
   } catch (e) {
@@ -269,7 +269,7 @@ const addInterestedEmailActual = async (
 
     // Insert the new email
     await db.insert(interestedEmails).values({ email })
-    
+
     return Result.ok(true)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))

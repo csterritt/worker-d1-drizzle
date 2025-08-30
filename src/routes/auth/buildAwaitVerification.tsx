@@ -107,20 +107,24 @@ const renderAwaitVerification = (email?: string) => {
 export const buildAwaitVerification = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.AWAIT_VERIFICATION, secureHeaders(STANDARD_SECURE_HEADERS), async (c) => {
-    setupNoCacheHeaders(c)
+  app.get(
+    PATHS.AUTH.AWAIT_VERIFICATION,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    async (c) => {
+      setupNoCacheHeaders(c)
 
-    // Get email from COOKIES.EMAIL_ENTERED cookie
-    const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
-    
-    // If no email cookie is present, redirect to sign-in page
-    if (!email) {
-      return c.redirect(PATHS.AUTH.SIGN_IN)
+      // Get email from COOKIES.EMAIL_ENTERED cookie
+      const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
+
+      // If no email cookie is present, redirect to sign-in page
+      if (!email) {
+        return c.redirect(PATHS.AUTH.SIGN_IN)
+      }
+
+      // Remove the email cookie after retrieving it
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
+
+      return c.render(useLayout(c, renderAwaitVerification(email)))
     }
-
-    // Remove the email cookie after retrieving it
-    removeCookie(c, COOKIES.EMAIL_ENTERED)
-
-    return c.render(useLayout(c, renderAwaitVerification(email)))
-  })
+  )
 }

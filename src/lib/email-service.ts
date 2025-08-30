@@ -152,13 +152,13 @@ export const sendConfirmationEmail = async (
  * @param resetUrl - Password reset URL with token
  * @param token - Reset token
  */
-export async function sendPasswordResetEmail(
+export const sendPasswordResetEmail = async (
   env: any,
   email: string,
   name: string,
   resetUrl: string,
   token: string
-): Promise<void> {
+): Promise<void> => {
   console.log('🔔 sendPasswordResetEmail called:', {
     email,
     name,

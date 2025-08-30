@@ -14,11 +14,11 @@ import { COOKIES, HTML_STATUS } from '../constants'
  * @param message - The message to display
  * @returns Response object with redirect and cookie
  */
-export function redirectWithMessage(
+export const redirectWithMessage = (
   c: Context,
   redirectUrl: string,
   message: string
-): Response {
+): Response => {
   if (message.trim() !== '') {
     addCookie(c, COOKIES.MESSAGE_FOUND, message)
   }
@@ -33,11 +33,11 @@ export function redirectWithMessage(
  * @param errorMessage - The error message to display
  * @returns Response object with redirect and cookie
  */
-export function redirectWithError(
+export const redirectWithError = (
   c: Context,
   redirectUrl: string,
   errorMessage: string
-): Response {
+): Response => {
   addCookie(c, COOKIES.ERROR_FOUND, errorMessage)
   return c.redirect(redirectUrl, HTML_STATUS.SEE_OTHER)
 }

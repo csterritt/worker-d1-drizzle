@@ -2,7 +2,10 @@ import { test } from '@playwright/test'
 
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { completeGatedSignUpFlow, testDuplicateGatedSignUpFlow } from '../support/workflow-helpers'
+import {
+  completeGatedSignUpFlow,
+  testDuplicateGatedSignUpFlow,
+} from '../support/workflow-helpers'
 
 test.describe('Gated Sign-Up Mode: Valid Code Tests', () => {
   test.beforeEach(async ({ page }) => {

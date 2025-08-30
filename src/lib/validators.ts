@@ -39,10 +39,6 @@ export const EmailSchema = pipe(
   custom(validateEmail)
 )
 
-
-
-
-
 /**
  * Increment request schema
  * Note: Currently doesn't require any specific fields

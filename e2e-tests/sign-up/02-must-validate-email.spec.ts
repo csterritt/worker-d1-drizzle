@@ -8,7 +8,10 @@ import {
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignUp, navigateToSignIn } from '../support/navigation-helpers'
+import {
+  navigateToSignUp,
+  navigateToSignIn,
+} from '../support/navigation-helpers'
 import { submitSignUpForm, submitSignInForm } from '../support/form-helpers'
 
 test(

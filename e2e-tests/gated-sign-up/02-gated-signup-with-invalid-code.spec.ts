@@ -4,8 +4,14 @@ import { verifyAlert } from '../support/finders'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 import { navigateToGatedSignUp } from '../support/navigation-helpers'
-import { submitGatedSignUpForm, fillGatedSignUpFormPartial } from '../support/form-helpers'
-import { verifyOnGatedSignUpPage, verifyOnAwaitVerificationPage } from '../support/page-verifiers'
+import {
+  submitGatedSignUpForm,
+  fillGatedSignUpFormPartial,
+} from '../support/form-helpers'
+import {
+  verifyOnGatedSignUpPage,
+  verifyOnAwaitVerificationPage,
+} from '../support/page-verifiers'
 
 test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,7 +27,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
         code: 'INVALID-CODE-999',
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       })
 
       // Should stay on sign-up page with error message
@@ -41,7 +47,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
       await fillGatedSignUpFormPartial(page, {
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
         // code intentionally omitted
       })
       await page.click('[data-testid="gated-signup-submit"]')
@@ -61,7 +67,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
         code: '   ',
         name: 'Test User',
         email: 'test@example.com',
-        password: 'password123'
+        password: 'password123',
       })
 
       // Should stay on sign-up page with error message
@@ -79,7 +85,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
         code: 'TEST-CODE-789',
         name: 'First User',
         email: 'first@example.com',
-        password: 'password123'
+        password: 'password123',
       })
 
       // Should succeed and redirect to await verification
@@ -91,7 +97,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
         code: 'TEST-CODE-789',
         name: 'Second User',
         email: 'second@example.com',
-        password: 'password123'
+        password: 'password123',
       })
 
       // Should fail with invalid code error (code was consumed)

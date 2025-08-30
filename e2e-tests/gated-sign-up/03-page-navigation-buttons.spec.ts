@@ -1,16 +1,24 @@
 import { test, expect } from '@playwright/test'
 
 import { clickLink, isElementVisible } from '../support/finders'
-import { verifyOnSignInPage, verifyOnGatedSignUpPage } from '../support/page-verifiers'
+import {
+  verifyOnSignInPage,
+  verifyOnGatedSignUpPage,
+} from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignIn, navigateToGatedSignUp } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateToGatedSignUp,
+} from '../support/navigation-helpers'
 
 test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {
     await skipIfNotMode('GATED_SIGN_UP')
   })
 
-  test('can navigate between sign-in and gated sign-up pages using buttons', async ({ page }) => {
+  test('can navigate between sign-in and gated sign-up pages using buttons', async ({
+    page,
+  }) => {
     // Start on the sign-in page
     await navigateToSignIn(page)
 
@@ -29,14 +37,18 @@ test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
     expect(page.url()).toContain('/auth/sign-in')
   })
 
-  test('gated sign-up page has correct form elements and navigation', async ({ page }) => {
+  test('gated sign-up page has correct form elements and navigation', async ({
+    page,
+  }) => {
     // Navigate directly to gated sign-up page
     await navigateToGatedSignUp(page)
 
     // Verify form elements are present (gated sign-up specific test IDs)
     expect(await isElementVisible(page, 'gated-signup-name-input')).toBe(true)
     expect(await isElementVisible(page, 'gated-signup-email-input')).toBe(true)
-    expect(await isElementVisible(page, 'gated-signup-password-input')).toBe(true)
+    expect(await isElementVisible(page, 'gated-signup-password-input')).toBe(
+      true
+    )
     expect(await isElementVisible(page, 'gated-signup-code-input')).toBe(true)
     expect(await isElementVisible(page, 'gated-signup-submit')).toBe(true)
     expect(await isElementVisible(page, 'go-to-sign-in-button')).toBe(true)
@@ -45,7 +57,9 @@ test.describe('Gated Sign-Up Mode: Page Navigation Tests', () => {
     expect(await page.locator('h2').textContent()).toContain('Create Account')
   })
 
-  test('sign-in page has correct form elements and navigation', async ({ page }) => {
+  test('sign-in page has correct form elements and navigation', async ({
+    page,
+  }) => {
     // Navigate to sign-in page
     await navigateToSignIn(page)
 

@@ -74,21 +74,25 @@ const renderWaitingForReset = (email: string) => {
 export const buildWaitingForReset = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.WAITING_FOR_RESET, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    setupNoCacheHeaders(c)
+  app.get(
+    PATHS.AUTH.WAITING_FOR_RESET,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      setupNoCacheHeaders(c)
 
-    const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
-    if (!email) {
-      return redirectWithMessage(
-        c,
-        PATHS.AUTH.FORGOT_PASSWORD,
-        'Please enter your email address to reset your password.'
-      )
+      const email = retrieveCookie(c, COOKIES.EMAIL_ENTERED)
+      if (!email) {
+        return redirectWithMessage(
+          c,
+          PATHS.AUTH.FORGOT_PASSWORD,
+          'Please enter your email address to reset your password.'
+        )
+      }
+
+      // Clear the email cookie after successful retrieval
+      removeCookie(c, COOKIES.EMAIL_ENTERED)
+
+      return c.render(useLayout(c, renderWaitingForReset(email)))
     }
-
-    // Clear the email cookie after successful retrieval
-    removeCookie(c, COOKIES.EMAIL_ENTERED)
-
-    return c.render(useLayout(c, renderWaitingForReset(email)))
-  })
+  )
 }

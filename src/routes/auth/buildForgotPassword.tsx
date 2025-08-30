@@ -91,8 +91,12 @@ const renderForgotPassword = () => {
 export const buildForgotPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
-  app.get(PATHS.AUTH.FORGOT_PASSWORD, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderForgotPassword()))
-  })
+  app.get(
+    PATHS.AUTH.FORGOT_PASSWORD,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      setupNoCacheHeaders(c)
+      return c.render(useLayout(c, renderForgotPassword()))
+    }
+  )
 }

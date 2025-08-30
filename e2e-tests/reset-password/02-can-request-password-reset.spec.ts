@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
 
 import { verifyAlert, isElementVisible } from '../support/finders'
-import { verifyOnForgotPasswordPage, verifyOnWaitingForResetPage } from '../support/page-verifiers'
+import {
+  verifyOnForgotPasswordPage,
+  verifyOnWaitingForResetPage,
+} from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { completeForgotPasswordFlow } from '../support/workflow-helpers'
 import { navigateToForgotPassword } from '../support/navigation-helpers'

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import {  } from '../support/finders'
+import {} from '../support/finders'
 import {
   verifyOnSignUpPage,
   verifyOnAwaitVerificationPage,

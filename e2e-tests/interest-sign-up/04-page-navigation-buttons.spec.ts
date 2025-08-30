@@ -6,7 +6,10 @@ import {
   verifyOnInterestSignUpPage,
 } from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
-import { navigateToSignIn, navigateToInterestSignUp } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateToInterestSignUp,
+} from '../support/navigation-helpers'
 
 test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
   test.beforeEach(async ({ page }) => {

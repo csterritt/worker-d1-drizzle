@@ -9,7 +9,11 @@ import {
 import { skipIfNotMode } from '../support/mode-helpers'
 import { signInUser } from '../support/auth-helpers'
 import { testWithDatabase } from '../support/test-helpers'
-import { navigateToSignIn, navigateToInterestSignUp, navigateToHome } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateToInterestSignUp,
+  navigateToHome,
+} from '../support/navigation-helpers'
 
 test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -87,7 +91,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     testWithDatabase(async ({ page }) => {
       // Navigate to startup page first
       await navigateToHome(page)
-      
+
       // Sign in as an existing seeded user
       const knownEmail = 'fredfred@team439980.testinator.com'
       const knownPassword = 'freds-clever-password'

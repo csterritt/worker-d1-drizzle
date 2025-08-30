@@ -1,7 +1,25 @@
 import { Page } from '@playwright/test'
-import { navigateToSignUp, navigateToGatedSignUp, navigateToInterestSignUp, navigateToHome, navigateToForgotPassword } from './navigation-helpers'
-import { submitSignUpForm, submitGatedSignUpForm, submitInterestSignUpForm, submitSignInForm, submitForgotPasswordForm, UserCredentials, GatedSignUpData } from './form-helpers'
-import { verifyOnAwaitVerificationPage, verifyOnSignInPage, verifyOnProtectedPage, verifyOnWaitingForResetPage } from './page-verifiers'
+import {
+  navigateToSignUp,
+  navigateToGatedSignUp,
+  navigateToInterestSignUp,
+  navigateToHome,
+  navigateToForgotPassword,
+} from './navigation-helpers'
+import {
+  submitSignUpForm,
+  submitGatedSignUpForm,
+  submitInterestSignUpForm,
+  submitSignInForm,
+  submitForgotPasswordForm,
+  UserCredentials,
+} from './form-helpers'
+import {
+  verifyOnAwaitVerificationPage,
+  verifyOnSignInPage,
+  verifyOnProtectedPage,
+  verifyOnWaitingForResetPage,
+} from './page-verifiers'
 import { startSignIn } from './auth-helpers'
 import { verifyAlert } from './finders'
 import { TEST_USERS, GATED_CODES, ERROR_MESSAGES } from './test-data'
@@ -14,7 +32,10 @@ import { TEST_USERS, GATED_CODES, ERROR_MESSAGES } from './test-data'
 /**
  * Complete sign-up workflow (navigate → fill → submit → verify redirect)
  */
-export async function completeSignUpFlow(page: Page, user: UserCredentials = TEST_USERS.NEW_USER) {
+export const completeSignUpFlow = async (
+  page: Page,
+  user: UserCredentials = TEST_USERS.NEW_USER
+) => {
   await navigateToSignUp(page)
   await submitSignUpForm(page, user)
   await verifyOnAwaitVerificationPage(page)
@@ -23,7 +44,11 @@ export async function completeSignUpFlow(page: Page, user: UserCredentials = TES
 /**
  * Complete gated sign-up workflow
  */
-export async function completeGatedSignUpFlow(page: Page, code: string = GATED_CODES.WELCOME, user: UserCredentials = TEST_USERS.GATED_USER) {
+export const completeGatedSignUpFlow = async (
+  page: Page,
+  code: string = GATED_CODES.WELCOME,
+  user: UserCredentials = TEST_USERS.GATED_USER
+) => {
   await navigateToGatedSignUp(page)
   await submitGatedSignUpForm(page, { code, ...user })
   await verifyOnAwaitVerificationPage(page)
@@ -32,7 +57,10 @@ export async function completeGatedSignUpFlow(page: Page, code: string = GATED_C
 /**
  * Complete interest sign-up workflow (waitlist)
  */
-export async function completeInterestSignUpFlow(page: Page, email: string = TEST_USERS.INTERESTED_USER.email) {
+export const completeInterestSignUpFlow = async (
+  page: Page,
+  email: string = TEST_USERS.INTERESTED_USER.email
+) => {
   await navigateToInterestSignUp(page)
   await submitInterestSignUpForm(page, email)
   await verifyOnSignInPage(page)
@@ -42,7 +70,10 @@ export async function completeInterestSignUpFlow(page: Page, email: string = TES
 /**
  * Complete sign-in workflow (navigate to home → sign-in → fill → submit → verify)
  */
-export async function completeSignInFlow(page: Page, user = TEST_USERS.KNOWN_USER) {
+export const completeSignInFlow = async (
+  page: Page,
+  user = TEST_USERS.KNOWN_USER
+) => {
   await navigateToHome(page)
   await startSignIn(page)
   await submitSignInForm(page, user)
@@ -53,7 +84,10 @@ export async function completeSignInFlow(page: Page, user = TEST_USERS.KNOWN_USE
 /**
  * Complete forgot password workflow
  */
-export async function completeForgotPasswordFlow(page: Page, email: string = TEST_USERS.KNOWN_USER.email) {
+export const completeForgotPasswordFlow = async (
+  page: Page,
+  email: string = TEST_USERS.KNOWN_USER.email
+) => {
   await navigateToForgotPassword(page)
   await submitForgotPasswordForm(page, email)
   await verifyOnWaitingForResetPage(page)
@@ -63,10 +97,13 @@ export async function completeForgotPasswordFlow(page: Page, email: string = TES
 /**
  * Test duplicate email scenario for sign-up
  */
-export async function testDuplicateSignUpFlow(page: Page, user: UserCredentials = TEST_USERS.DUPLICATE_USER) {
+export const testDuplicateSignUpFlow = async (
+  page: Page,
+  user: UserCredentials = TEST_USERS.DUPLICATE_USER
+) => {
   // First sign-up
   await completeSignUpFlow(page, user)
-  
+
   // Attempt duplicate sign-up
   await navigateToSignUp(page)
   await submitSignUpForm(page, user)
@@ -77,10 +114,15 @@ export async function testDuplicateSignUpFlow(page: Page, user: UserCredentials 
 /**
  * Test duplicate email scenario for gated sign-up
  */
-export async function testDuplicateGatedSignUpFlow(page: Page, firstCode: string = GATED_CODES.WELCOME, secondCode: string = GATED_CODES.BETA, user: UserCredentials = TEST_USERS.DUPLICATE_USER) {
+export const testDuplicateGatedSignUpFlow = async (
+  page: Page,
+  firstCode: string = GATED_CODES.WELCOME,
+  secondCode: string = GATED_CODES.BETA,
+  user: UserCredentials = TEST_USERS.DUPLICATE_USER
+) => {
   // First sign-up with first code
   await completeGatedSignUpFlow(page, firstCode, user)
-  
+
   // Attempt duplicate sign-up with different code
   await navigateToGatedSignUp(page)
   await submitGatedSignUpForm(page, { code: secondCode, ...user })
@@ -91,10 +133,13 @@ export async function testDuplicateGatedSignUpFlow(page: Page, firstCode: string
 /**
  * Test duplicate email scenario for interest sign-up (waitlist)
  */
-export async function testDuplicateInterestSignUpFlow(page: Page, email: string = TEST_USERS.DUPLICATE_USER.email) {
+export const testDuplicateInterestSignUpFlow = async (
+  page: Page,
+  email: string = TEST_USERS.DUPLICATE_USER.email
+) => {
   // First submission
   await completeInterestSignUpFlow(page, email)
-  
+
   // Attempt duplicate submission
   await navigateToInterestSignUp(page)
   await submitInterestSignUpForm(page, email)
@@ -105,10 +150,13 @@ export async function testDuplicateInterestSignUpFlow(page: Page, email: string 
 /**
  * Complete sign-up then attempt unverified sign-in workflow
  */
-export async function signUpThenAttemptUnverifiedSignIn(page: Page, user: UserCredentials = TEST_USERS.NEW_USER) {
+export const signUpThenAttemptUnverifiedSignIn = async (
+  page: Page,
+  user: UserCredentials = TEST_USERS.NEW_USER
+) => {
   // Complete sign-up
   await completeSignUpFlow(page, user)
-  
+
   // Attempt to sign in before verification
   await navigateToHome(page)
   await startSignIn(page)

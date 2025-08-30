@@ -12,7 +12,7 @@ const post = async (url: string, data: any) => {
    * Use await gatherResponse(...) in an async function to get the response body
    * @param {Response} response
    */
-  async function gatherResponse(response: any) {
+  const gatherResponse = async (response: any) => {
     const { headers } = response
     const contentType = headers.get('content-type') || ''
     if (contentType.includes('application/json')) {

@@ -43,5 +43,8 @@ export const isElementVisible = async (
   page: Page,
   testId: string
 ): Promise<boolean> => {
-  return page.locator(`[data-testid="${testId}"]`).isVisible().catch(() => false)
+  return page
+    .locator(`[data-testid="${testId}"]`)
+    .isVisible()
+    .catch(() => false)
 }

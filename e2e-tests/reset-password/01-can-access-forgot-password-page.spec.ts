@@ -5,7 +5,10 @@ import {
   verifyOnForgotPasswordPage,
   verifyOnSignInPage,
 } from '../support/page-verifiers'
-import { navigateToSignIn, navigateToForgotPassword } from '../support/navigation-helpers'
+import {
+  navigateToSignIn,
+  navigateToForgotPassword,
+} from '../support/navigation-helpers'
 
 test('can access forgot password page from sign-in page', async ({ page }) => {
   // Start on the sign-in page

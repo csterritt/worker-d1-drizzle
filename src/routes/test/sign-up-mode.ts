@@ -21,7 +21,7 @@ testSignUpModeRouter.get(
     void c
     try {
       const currentMode = process.env.SIGN_UP_MODE || SIGN_UP_MODES.NO_SIGN_UP
-      
+
       // Return just the mode as plain text for easy parsing
       return new Response(currentMode, {
         headers: { 'Content-Type': 'text/plain' },

@@ -28,7 +28,10 @@ export interface SignInData {
 /**
  * Standard sign-up form (open sign-up mode)
  */
-export async function submitSignUpForm(page: Page, user: UserCredentials = TEST_USERS.NEW_USER) {
+export const submitSignUpForm = async (
+  page: Page,
+  user: UserCredentials = TEST_USERS.NEW_USER
+) => {
   await fillInput(page, 'signup-name-input', user.name)
   await fillInput(page, 'signup-email-input', user.email)
   await fillInput(page, 'signup-password-input', user.password)
@@ -38,7 +41,10 @@ export async function submitSignUpForm(page: Page, user: UserCredentials = TEST_
 /**
  * Gated sign-up form (requires code)
  */
-export async function submitGatedSignUpForm(page: Page, data: GatedSignUpData) {
+export const submitGatedSignUpForm = async (
+  page: Page,
+  data: GatedSignUpData
+) => {
   await fillInput(page, 'gated-signup-code-input', data.code)
   await fillInput(page, 'gated-signup-name-input', data.name)
   await fillInput(page, 'gated-signup-email-input', data.email)
@@ -49,7 +55,10 @@ export async function submitGatedSignUpForm(page: Page, data: GatedSignUpData) {
 /**
  * Sign-in form
  */
-export async function submitSignInForm(page: Page, user: SignInData = TEST_USERS.KNOWN_USER) {
+export const submitSignInForm = async (
+  page: Page,
+  user: SignInData = TEST_USERS.KNOWN_USER
+) => {
   await fillInput(page, 'email-input', user.email)
   await fillInput(page, 'password-input', user.password)
   await clickLink(page, 'submit')
@@ -58,7 +67,10 @@ export async function submitSignInForm(page: Page, user: SignInData = TEST_USERS
 /**
  * Interest sign-up form (waitlist)
  */
-export async function submitInterestSignUpForm(page: Page, email: string = TEST_USERS.INTERESTED_USER.email) {
+export const submitInterestSignUpForm = async (
+  page: Page,
+  email: string = TEST_USERS.INTERESTED_USER.email
+) => {
   await fillInput(page, 'interest-email-input', email)
   await clickLink(page, 'interest-submit')
 }
@@ -66,7 +78,10 @@ export async function submitInterestSignUpForm(page: Page, email: string = TEST_
 /**
  * Forgot password form
  */
-export async function submitForgotPasswordForm(page: Page, email: string = TEST_USERS.KNOWN_USER.email) {
+export const submitForgotPasswordForm = async (
+  page: Page,
+  email: string = TEST_USERS.KNOWN_USER.email
+) => {
   await fillInput(page, 'forgot-email-input', email)
   await clickLink(page, 'forgot-password-submit')
 }
@@ -74,7 +89,10 @@ export async function submitForgotPasswordForm(page: Page, email: string = TEST_
 /**
  * Reset password form
  */
-export async function submitResetPasswordForm(page: Page, newPassword: string = TEST_USERS.RESET_USER.password) {
+export const submitResetPasswordForm = async (
+  page: Page,
+  newPassword: string = TEST_USERS.RESET_USER.password
+) => {
   await fillInput(page, 'new-password-input', newPassword)
   await fillInput(page, 'confirm-password-input', newPassword)
   await clickLink(page, 'reset-password-submit')
@@ -83,39 +101,51 @@ export async function submitResetPasswordForm(page: Page, newPassword: string = 
 /**
  * Partial form fills for validation testing
  */
-export async function fillSignUpFormPartial(page: Page, fields: Partial<UserCredentials>) {
+export const fillSignUpFormPartial = async (
+  page: Page,
+  fields: Partial<UserCredentials>
+) => {
   if (fields.name) await fillInput(page, 'signup-name-input', fields.name)
   if (fields.email) await fillInput(page, 'signup-email-input', fields.email)
-  if (fields.password) await fillInput(page, 'signup-password-input', fields.password)
+  if (fields.password)
+    await fillInput(page, 'signup-password-input', fields.password)
 }
 
-export async function fillSignInFormPartial(page: Page, fields: Partial<SignInData>) {
+export const fillSignInFormPartial = async (
+  page: Page,
+  fields: Partial<SignInData>
+) => {
   if (fields.email) await fillInput(page, 'email-input', fields.email)
   if (fields.password) await fillInput(page, 'password-input', fields.password)
 }
 
-export async function fillGatedSignUpFormPartial(page: Page, fields: Partial<GatedSignUpData>) {
+export const fillGatedSignUpFormPartial = async (
+  page: Page,
+  fields: Partial<GatedSignUpData>
+) => {
   if (fields.code) await fillInput(page, 'gated-signup-code-input', fields.code)
   if (fields.name) await fillInput(page, 'gated-signup-name-input', fields.name)
-  if (fields.email) await fillInput(page, 'gated-signup-email-input', fields.email)
-  if (fields.password) await fillInput(page, 'gated-signup-password-input', fields.password)
+  if (fields.email)
+    await fillInput(page, 'gated-signup-email-input', fields.email)
+  if (fields.password)
+    await fillInput(page, 'gated-signup-password-input', fields.password)
 }
 
 /**
  * Form submission without filling (for testing empty form validation)
  */
-export async function submitEmptySignUpForm(page: Page) {
+export const submitEmptySignUpForm = async (page: Page) => {
   await clickLink(page, 'signup-submit')
 }
 
-export async function submitEmptySignInForm(page: Page) {
+export const submitEmptySignInForm = async (page: Page) => {
   await clickLink(page, 'submit')
 }
 
-export async function submitEmptyGatedSignUpForm(page: Page) {
+export const submitEmptyGatedSignUpForm = async (page: Page) => {
   await clickLink(page, 'gated-signup-submit')
 }
 
-export async function submitEmptyForgotPasswordForm(page: Page) {
+export const submitEmptyForgotPasswordForm = async (page: Page) => {
   await clickLink(page, 'forgot-password-submit')
 }

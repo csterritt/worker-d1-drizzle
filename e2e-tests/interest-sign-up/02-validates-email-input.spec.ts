@@ -1,11 +1,18 @@
 import { test } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
-import { verifyOnInterestSignUpPage, verifyOnSignInPage } from '../support/page-verifiers'
+import {
+  verifyOnInterestSignUpPage,
+  verifyOnSignInPage,
+} from '../support/page-verifiers'
 import { skipIfNotMode } from '../support/mode-helpers'
 import { navigateToInterestSignUp } from '../support/navigation-helpers'
 import { submitInterestSignUpForm } from '../support/form-helpers'
-import { testRequiredEmailField, testEmailValidation, testInterestSignUpFormValidation } from '../support/validation-helpers'
+import {
+  testRequiredEmailField,
+  testEmailValidation,
+  testInterestSignUpFormValidation,
+} from '../support/validation-helpers'
 
 test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
   test.beforeEach(async ({ page }) => {

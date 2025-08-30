@@ -2,7 +2,13 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createDbClient } from '../../db/client'
-import { user, account, session, singleUseCode, interestedEmails } from '../../db/schema'
+import {
+  user,
+  account,
+  session,
+  singleUseCode,
+  interestedEmails,
+} from '../../db/schema'
 import { STANDARD_SECURE_HEADERS } from '../../constants'
 
 /**

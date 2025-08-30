@@ -155,14 +155,18 @@ const renderInvalidToken = () => {
  * @param app - Hono app instance
  */
 export const buildResetPassword = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.AUTH.RESET_PASSWORD, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
-    setupNoCacheHeaders(c)
+  app.get(
+    PATHS.AUTH.RESET_PASSWORD,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    (c) => {
+      setupNoCacheHeaders(c)
 
-    const token = c.req.query('token')
-    if (!token) {
-      return c.render(useLayout(c, renderInvalidToken()))
+      const token = c.req.query('token')
+      if (!token) {
+        return c.render(useLayout(c, renderInvalidToken()))
+      }
+
+      return c.render(useLayout(c, renderResetPassword(token)))
     }
-
-    return c.render(useLayout(c, renderResetPassword(token)))
-  })
+  )
 }

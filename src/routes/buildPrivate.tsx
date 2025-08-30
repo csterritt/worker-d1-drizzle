@@ -49,7 +49,10 @@ const renderPrivate = () => {
  * @param app - Hono app instance
  */
 export const buildPrivate = (app: Hono<{ Bindings: Bindings }>): void => {
-  app.get(PATHS.PRIVATE, secureHeaders(STANDARD_SECURE_HEADERS), signedInAccess, (c) =>
-    c.render(useLayout(c, renderPrivate()))
+  app.get(
+    PATHS.PRIVATE,
+    secureHeaders(STANDARD_SECURE_HEADERS),
+    signedInAccess,
+    (c) => c.render(useLayout(c, renderPrivate()))
   )
 }

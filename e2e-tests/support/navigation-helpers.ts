@@ -10,8 +10,7 @@ import {
   verifyOnAwaitVerificationPage,
   verifyOnForgotPasswordPage,
   verifyOnWaitingForResetPage,
-  verifyOnResetPasswordPage,
-  verifyOn404Page
+  verifyOn404Page,
 } from './page-verifiers'
 
 /**
@@ -19,47 +18,47 @@ import {
  * Eliminates repeated navigation + waitForSelector/verification patterns
  */
 
-export async function navigateToHome(page: Page) {
+export const navigateToHome = async (page: Page) => {
   await page.goto(BASE_URLS.HOME)
   await verifyOnStartupPage(page)
 }
 
-export async function navigateToSignIn(page: Page) {
+export const navigateToSignIn = async (page: Page) => {
   await page.goto(BASE_URLS.SIGN_IN)
   await verifyOnSignInPage(page)
 }
 
-export async function navigateToSignUp(page: Page) {
+export const navigateToSignUp = async (page: Page) => {
   await page.goto(BASE_URLS.SIGN_UP)
   await verifyOnSignUpPage(page)
 }
 
-export async function navigateToInterestSignUp(page: Page) {
+export const navigateToInterestSignUp = async (page: Page) => {
   await page.goto(BASE_URLS.INTEREST_SIGN_UP)
   await verifyOnInterestSignUpPage(page)
 }
 
-export async function navigateToGatedSignUp(page: Page) {
+export const navigateToGatedSignUp = async (page: Page) => {
   await page.goto(BASE_URLS.SIGN_UP)
   await verifyOnGatedSignUpPage(page)
 }
 
-export async function navigateToForgotPassword(page: Page) {
+export const navigateToForgotPassword = async (page: Page) => {
   await page.goto(BASE_URLS.FORGOT_PASSWORD)
   await verifyOnForgotPasswordPage(page)
 }
 
-export async function navigateToAwaitVerification(page: Page) {
+export const navigateToAwaitVerification = async (page: Page) => {
   await page.goto(BASE_URLS.AWAIT_VERIFICATION)
   await verifyOnAwaitVerificationPage(page)
 }
 
-export async function navigateToWaitingForReset(page: Page) {
+export const navigateToWaitingForReset = async (page: Page) => {
   await page.goto(BASE_URLS.WAITING_FOR_RESET)
   await verifyOnWaitingForResetPage(page)
 }
 
-export async function navigateToPrivatePage(page: Page) {
+export const navigateToPrivatePage = async (page: Page) => {
   await page.goto(BASE_URLS.PRIVATE)
   await verifyOnProtectedPage(page)
 }
@@ -67,7 +66,7 @@ export async function navigateToPrivatePage(page: Page) {
 /**
  * Navigation helpers for testing 404 routes
  */
-export async function navigateTo404Route(page: Page, route: string) {
+export const navigateTo404Route = async (page: Page, route: string) => {
   await page.goto(`${BASE_URLS.HOME}${route}`)
   await verifyOn404Page(page)
 }
@@ -75,7 +74,7 @@ export async function navigateTo404Route(page: Page, route: string) {
 /**
  * Helper for navigating to routes that should return 404 in certain modes
  */
-export async function expectRoute404(page: Page, route: string) {
+export const expectRoute404 = async (page: Page, route: string) => {
   await page.goto(`${BASE_URLS.HOME}${route}`)
   await verifyOn404Page(page)
 }

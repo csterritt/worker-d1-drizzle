@@ -17,7 +17,7 @@ import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
  * @param env - Cloudflare environment
  * @returns Configured better-auth instance
  */
-export function createAuth(env: any) {
+export const createAuth = (env: any) => {
   const db: D1Database = env.PROJECT_DB
   const dbClient = createDbClient(db)
 

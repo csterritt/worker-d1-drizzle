@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test'
+import { Page } from '@playwright/test'
 import { clickLink, fillInput } from './finders'
 import {
   verifyOnStartupPage,
@@ -6,23 +6,23 @@ import {
   verifyOnProtectedPage,
 } from './page-verifiers'
 
-export async function signOutAndVerify(page: Page) {
+export const signOutAndVerify = async (page: Page) => {
   await clickLink(page, 'sign-out-link')
   await verifyOnStartupPage(page)
 }
 
-export async function startSignIn(page: Page) {
+export const startSignIn = async (page: Page) => {
   // Click the Sign In link on the home page
   await clickLink(page, 'sign-in-link')
   // Verify we're on the sign-in page
   await verifyOnSignInPage(page)
 }
 
-export async function submitEmailAndPassword(
+export const submitEmailAndPassword = async (
   page: Page,
   email: string,
   password: string
-) {
+) => {
   await fillInput(page, 'email-input', email)
   await fillInput(page, 'password-input', password)
   await clickLink(page, 'submit')
@@ -30,7 +30,11 @@ export async function submitEmailAndPassword(
   await verifyOnProtectedPage(page)
 }
 
-export async function signInUser(page: Page, email: string, password: string) {
+export const signInUser = async (
+  page: Page,
+  email: string,
+  password: string
+) => {
   // Navigate to sign-in page if not already there
   await startSignIn(page)
 
