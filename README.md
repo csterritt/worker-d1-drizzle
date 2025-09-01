@@ -3,8 +3,8 @@
 Standard sign in, and password reset via email routes are provided.
 
 **Note:** This is the "unstyled" version of this project (See Styling section below).
-There is a sibling project that uses Tailwind CSS and DaisyUI. It is functionally
-identical, just styled differently.
+There is a [sibling project](https://github.com/csterritt/daisy-tw-worker-d1-drizzle) that
+uses Tailwind CSS and DaisyUI. It is functionally identical, just styled differently.
 
 #### Sign up modes
 
@@ -36,7 +36,7 @@ npm run cf-typegen
 
 The app uses the [Sakura](https://github.com/oxalorg/sakura) CSS theme. It's a class-free system that
 just decorates HTML elements, as a basic start to styling. You can remove it and the `normalize.css`
-file, remove loading them from `renderer.tsx`, and you'll be left with a plain HTML page.
+file from `/public`, remove loading them from `renderer.tsx`, and you'll be left with a plain HTML page.
 
 #### Development quickstart
 
