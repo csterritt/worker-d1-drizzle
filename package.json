@@ -1,0 +1,36 @@
+{
+	"name": "worker-d1-drizzle",
+	"type": "module",
+	"scripts": {
+		"dev-open-sign-up": "./run-dev.sh open-sign-up",
+		"dev-no-sign-up": "./run-dev.sh no-sign-up",
+		"dev-gated-sign-up": "./run-dev.sh gated-sign-up",
+		"dev-interest-sign-up": "./run-dev.sh interest-sign-up",
+		"build": "wrangler build",
+		"deploy": "wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface Bindings"
+	},
+	"dependencies": {
+		"async-retry": "^1.3.3",
+		"better-auth": "^1.3.4",
+		"drizzle-orm": "^0.44.2",
+		"hono": "^4.8.2",
+		"nodemailer": "^7.0.3",
+		"true-myth": "^9.0.1",
+		"ulid": "^3.0.1",
+		"valibot": "^1.1.0"
+	},
+	"devDependencies": {
+		"@better-auth/cli": "^1.3.4",
+		"@playwright/test": "^1.53.1",
+		"@types/async-retry": "^1.4.9",
+		"@types/node": "^22.15.30",
+		"@types/nodemailer": "^6.4.17",
+		"concurrently": "^9.2.0",
+		"drizzle-kit": "^0.31.2",
+		"globby": "^14.1.0",
+		"prettier": "^3.6.0",
+		"typescript": "^5.9.2",
+		"wrangler": "^4.21.1"
+	}
+}
