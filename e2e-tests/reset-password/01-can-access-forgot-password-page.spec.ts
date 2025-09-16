@@ -15,7 +15,7 @@ test('can access forgot password page from sign-in page', async ({ page }) => {
   await navigateToSignIn(page)
 
   // Click the "Forgot your password?" link
-  await clickLink(page, 'forgot-password-link')
+  await clickLink(page, 'forgot-password-action')
   await verifyOnForgotPasswordPage(page)
 
   // Verify we're on the correct URL
@@ -23,8 +23,8 @@ test('can access forgot password page from sign-in page', async ({ page }) => {
 
   // Verify all form elements are present
   expect(await isElementVisible(page, 'forgot-email-input')).toBe(true)
-  expect(await isElementVisible(page, 'forgot-password-submit')).toBe(true)
-  expect(await isElementVisible(page, 'back-to-sign-in-button')).toBe(true)
+  expect(await isElementVisible(page, 'forgot-password-action')).toBe(true)
+  expect(await isElementVisible(page, 'back-to-sign-in-action')).toBe(true)
 
   // Verify page title
   expect(await page.locator('h2').textContent()).toContain(
@@ -39,7 +39,7 @@ test('can navigate back to sign-in from forgot password page', async ({
   await navigateToForgotPassword(page)
 
   // Click the "Back to Sign In" button
-  await clickLink(page, 'back-to-sign-in-button')
+  await clickLink(page, 'back-to-sign-in-action')
   await verifyOnSignInPage(page)
 
   // Verify we're back on the correct URL

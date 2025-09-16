@@ -32,7 +32,7 @@ test(
     await verifyOnAwaitVerificationPage(page)
 
     // Verify the resend button is available
-    const resendButton = page.getByTestId('resend-email-button')
+    const resendButton = page.getByTestId('resend-email-action')
     await expect(resendButton).toBeVisible()
 
     // Click resend email button for the first time (should now be rate limited since initial email was just sent)

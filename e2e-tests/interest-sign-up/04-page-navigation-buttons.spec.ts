@@ -23,14 +23,14 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     await navigateToSignIn(page)
 
     // Click the "Join Waitlist" button to go to interest sign-up page
-    await clickLink(page, 'go-to-sign-up-button')
+    await clickLink(page, 'go-to-sign-up-action')
     await verifyOnInterestSignUpPage(page)
 
     // Verify we're on the correct URL
     expect(page.url()).toContain('/auth/interest-sign-up')
 
     // Click the "Sign In Instead" button to go back to sign-in page
-    await clickLink(page, 'go-to-sign-in-button')
+    await clickLink(page, 'go-to-sign-in-action')
     await verifyOnSignInPage(page)
 
     // Verify we're back on the correct URL
@@ -45,8 +45,8 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
 
     // Verify form elements are present (interest sign-up specific test IDs)
     expect(await isElementVisible(page, 'interest-email-input')).toBe(true)
-    expect(await isElementVisible(page, 'interest-submit')).toBe(true)
-    expect(await isElementVisible(page, 'go-to-sign-in-button')).toBe(true)
+    expect(await isElementVisible(page, 'interest-action')).toBe(true)
+    expect(await isElementVisible(page, 'go-to-sign-in-action')).toBe(true)
 
     // Verify page banner and content
     expect(await isElementVisible(page, 'interest-sign-up-page-banner')).toBe(
@@ -71,9 +71,9 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     expect(await isElementVisible(page, 'submit')).toBe(true)
 
     // In INTEREST_SIGN_UP mode, the button should say "Join Waitlist"
-    expect(await isElementVisible(page, 'go-to-sign-up-button')).toBe(true)
+    expect(await isElementVisible(page, 'go-to-sign-up-action')).toBe(true)
     const buttonText = await page
-      .locator('[data-testid="go-to-sign-up-button"]')
+      .locator('[data-testid="go-to-sign-up-action"]')
       .textContent()
     expect(buttonText).toContain('Join Waitlist')
 

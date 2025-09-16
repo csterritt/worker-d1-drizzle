@@ -24,7 +24,7 @@ const renderNotFound = () => {
           <h2>Page Not Found</h2>
           <p data-testid='404-message'>That page does not exist.</p>
           <div>
-            <a href={PATHS.ROOT} data-testid='home-link'>
+            <a href={PATHS.ROOT} data-testid='home-action'>
               Return Home
             </a>
           </div>

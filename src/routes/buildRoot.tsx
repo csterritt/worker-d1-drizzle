@@ -23,7 +23,7 @@ const renderRoot = () => {
           <h2>Welcome!</h2>
           <h3 id='heading'>Worker, D1, Drizzle Project</h3>
           <p>
-            <a href={PATHS.PRIVATE} data-testid='visit-private-link'>
+            <a href={PATHS.PRIVATE} data-testid='visit-private-action'>
               Protected Content
             </a>
           </p>

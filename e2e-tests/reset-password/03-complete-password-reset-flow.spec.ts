@@ -101,7 +101,7 @@ test(
     // Verify all form elements are present
     expect(await isElementVisible(page, 'new-password-input')).toBe(true)
     expect(await isElementVisible(page, 'confirm-password-input')).toBe(true)
-    expect(await isElementVisible(page, 'reset-password-submit')).toBe(true)
+    expect(await isElementVisible(page, 'reset-password-action')).toBe(true)
 
     // Fill in the new password
     await submitResetPasswordForm(page, newPassword)
@@ -122,7 +122,7 @@ test(
 
     // Verify that the old password no longer works by signing out and trying
     // Click the sign-out button (which submits a POST form)
-    await clickLink(page, 'sign-out-link')
+    await clickLink(page, 'sign-out-action')
     await page.waitForTimeout(1000)
 
     // Should be redirected to home page after sign-out

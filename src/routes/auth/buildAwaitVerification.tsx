@@ -53,13 +53,13 @@ const renderAwaitVerification = (email?: string) => {
             </div>
 
             <div>
-              <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-link'>
+              <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-action'>
                 Back to Sign In
               </a>
               {email && (
                 <form method='post' action={PATHS.AUTH.RESEND_EMAIL}>
                   <input type='hidden' name='email' value={email} />
-                  <button type='submit' data-testid='resend-email-button'>
+                  <button type='submit' data-testid='resend-email-action'>
                     Resend Email
                   </button>
                 </form>

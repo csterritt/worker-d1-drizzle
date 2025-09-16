@@ -26,7 +26,7 @@ test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
 
     // In NO_SIGN_UP mode, the sign-up button should NOT be visible
     expect(
-      await page.locator('[data-testid="go-to-sign-up-button"]').count()
+      await page.locator('[data-testid="go-to-sign-up-action"]').count()
     ).toBe(0)
 
     // Verify page title
@@ -53,10 +53,10 @@ test.describe('No Sign-Up Mode: Page Navigation Tests', () => {
     await navigateToSignIn(page)
 
     // Verify forgot password link is still present
-    expect(await isElementVisible(page, 'forgot-password-link')).toBe(true)
+    expect(await isElementVisible(page, 'forgot-password-action')).toBe(true)
 
     // Click forgot password link should work
-    await page.click('[data-testid="forgot-password-link"]')
+    await page.click('[data-testid="forgot-password-action"]')
 
     // Should be on forgot password page
     expect(page.url()).toContain('/auth/forgot-password')

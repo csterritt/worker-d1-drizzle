@@ -7,13 +7,13 @@ import {
 } from './page-verifiers'
 
 export const signOutAndVerify = async (page: Page) => {
-  await clickLink(page, 'sign-out-link')
+  await clickLink(page, 'sign-out-action')
   await verifyOnStartupPage(page)
 }
 
 export const startSignIn = async (page: Page) => {
   // Click the Sign In link on the home page
-  await clickLink(page, 'sign-in-link')
+  await clickLink(page, 'sign-in-action')
   // Verify we're on the sign-in page
   await verifyOnSignInPage(page)
 }

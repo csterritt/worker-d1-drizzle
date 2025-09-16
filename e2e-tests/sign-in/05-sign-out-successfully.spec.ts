@@ -31,7 +31,7 @@ test(
     await verifyOnProtectedPage(page)
 
     // Now sign out
-    await clickLink(page, 'sign-out-link')
+    await clickLink(page, 'sign-out-action')
 
     // Verify we get the sign-out success message first
     await verifyAlert(page, 'You have been signed out successfully.')

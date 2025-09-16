@@ -43,7 +43,7 @@ export const useLayout = (c: Context, children: any, extraMessage?: string) => {
         </div>
         <div>
           {!c.get('user') && (
-            <a href={PATHS.AUTH.SIGN_IN} data-testid='sign-in-link'>
+            <a href={PATHS.AUTH.SIGN_IN} data-testid='sign-in-action'>
               Sign in
             </a>
           )}
@@ -55,7 +55,7 @@ export const useLayout = (c: Context, children: any, extraMessage?: string) => {
                 !
               </span>
               <form method='post' action='/auth/sign-out'>
-                <button type='submit' data-testid='sign-out-link'>
+                <button type='submit' data-testid='sign-out-action'>
                   Sign out
                 </button>
               </form>

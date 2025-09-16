@@ -52,7 +52,7 @@ const renderWaitingForReset = (email: string) => {
 
           <div>Need to try again?</div>
           <div>
-            <a href={PATHS.AUTH.FORGOT_PASSWORD} data-testid='try-again-button'>
+            <a href={PATHS.AUTH.FORGOT_PASSWORD} data-testid='try-again-action'>
               Send Another Reset Link
             </a>
           </div>

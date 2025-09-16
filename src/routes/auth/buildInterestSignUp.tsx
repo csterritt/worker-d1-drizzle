@@ -61,7 +61,7 @@ const renderInterestSignUp = (emailEntered: string) => {
             </div>
 
             <div>
-              <button type='submit' data-testid='interest-submit'>
+              <button type='submit' data-testid='interest-action'>
                 Join Waitlist
               </button>
             </div>
@@ -70,7 +70,7 @@ const renderInterestSignUp = (emailEntered: string) => {
           {/* Navigation back to sign-in page */}
           <div>Already have an account?</div>
           <div>
-            <a href={PATHS.AUTH.SIGN_IN} data-testid='go-to-sign-in-button'>
+            <a href={PATHS.AUTH.SIGN_IN} data-testid='go-to-sign-in-action'>
               Sign In Instead
             </a>
           </div>

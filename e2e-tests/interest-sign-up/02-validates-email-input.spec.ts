@@ -21,19 +21,19 @@ test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
 
   test('shows error for empty email submission', async ({ page }) => {
     await navigateToInterestSignUp(page)
-    await testRequiredEmailField(page, 'interest-submit')
+    await testRequiredEmailField(page, 'interest-action')
   })
 
   test('shows error for invalid email format', async ({ page }) => {
     await navigateToInterestSignUp(page)
-    await testEmailValidation(page, 'interest-email-input', 'interest-submit')
+    await testEmailValidation(page, 'interest-email-input', 'interest-action')
   })
 
   test('comprehensive form validation', async ({ page }) => {
     await navigateToInterestSignUp(page)
     await testInterestSignUpFormValidation(page)
     await fillInput(page, 'interest-email-input', 'invalid-email-format')
-    await clickLink(page, 'interest-submit')
+    await clickLink(page, 'interest-action')
 
     // Should stay on the same page with error message
     await verifyOnInterestSignUpPage(page)
@@ -46,7 +46,7 @@ test.describe('Interest Sign-Up Mode: Email Validation Tests', () => {
 
     // Enter malformed email
     await fillInput(page, 'interest-email-input', 'test@')
-    await clickLink(page, 'interest-submit')
+    await clickLink(page, 'interest-action')
 
     // Should stay on the same page with error message
     await verifyOnInterestSignUpPage(page)

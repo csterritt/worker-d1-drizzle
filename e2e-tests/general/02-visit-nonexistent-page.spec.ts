@@ -12,6 +12,6 @@ test('a bad path redirects to a proper 404 page', async ({ page }) => {
 test('return to home from 404 page works', async ({ page }) => {
   // Navigate to nonexistent page and return home
   await navigateTo404Route(page, '/this/path/does/not/exist')
-  await clickLink(page, 'home-link')
+  await clickLink(page, 'home-action')
   await verifyOnStartupPage(page)
 })

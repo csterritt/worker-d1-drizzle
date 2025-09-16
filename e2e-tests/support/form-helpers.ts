@@ -35,7 +35,7 @@ export const submitSignUpForm = async (
   await fillInput(page, 'signup-name-input', user.name)
   await fillInput(page, 'signup-email-input', user.email)
   await fillInput(page, 'signup-password-input', user.password)
-  await clickLink(page, 'signup-submit')
+  await clickLink(page, 'signup-action')
 }
 
 /**
@@ -49,7 +49,7 @@ export const submitGatedSignUpForm = async (
   await fillInput(page, 'gated-signup-name-input', data.name)
   await fillInput(page, 'gated-signup-email-input', data.email)
   await fillInput(page, 'gated-signup-password-input', data.password)
-  await clickLink(page, 'gated-signup-submit')
+  await clickLink(page, 'gated-signup-action')
 }
 
 /**
@@ -72,7 +72,7 @@ export const submitInterestSignUpForm = async (
   email: string = TEST_USERS.INTERESTED_USER.email
 ) => {
   await fillInput(page, 'interest-email-input', email)
-  await clickLink(page, 'interest-submit')
+  await clickLink(page, 'interest-action')
 }
 
 /**
@@ -83,7 +83,7 @@ export const submitForgotPasswordForm = async (
   email: string = TEST_USERS.KNOWN_USER.email
 ) => {
   await fillInput(page, 'forgot-email-input', email)
-  await clickLink(page, 'forgot-password-submit')
+  await clickLink(page, 'forgot-password-action')
 }
 
 /**
@@ -95,7 +95,7 @@ export const submitResetPasswordForm = async (
 ) => {
   await fillInput(page, 'new-password-input', newPassword)
   await fillInput(page, 'confirm-password-input', newPassword)
-  await clickLink(page, 'reset-password-submit')
+  await clickLink(page, 'reset-password-action')
 }
 
 /**
@@ -135,7 +135,7 @@ export const fillGatedSignUpFormPartial = async (
  * Form submission without filling (for testing empty form validation)
  */
 export const submitEmptySignUpForm = async (page: Page) => {
-  await clickLink(page, 'signup-submit')
+  await clickLink(page, 'signup-action')
 }
 
 export const submitEmptySignInForm = async (page: Page) => {
@@ -143,9 +143,9 @@ export const submitEmptySignInForm = async (page: Page) => {
 }
 
 export const submitEmptyGatedSignUpForm = async (page: Page) => {
-  await clickLink(page, 'gated-signup-submit')
+  await clickLink(page, 'gated-signup-action')
 }
 
 export const submitEmptyForgotPasswordForm = async (page: Page) => {
-  await clickLink(page, 'forgot-password-submit')
+  await clickLink(page, 'forgot-password-action')
 }

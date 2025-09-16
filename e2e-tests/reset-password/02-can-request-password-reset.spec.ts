@@ -23,7 +23,7 @@ test(
     expect(await isElementVisible(page, 'back-to-sign-in-from-waiting')).toBe(
       true
     )
-    expect(await isElementVisible(page, 'try-again-button')).toBe(true)
+    expect(await isElementVisible(page, 'try-again-action')).toBe(true)
   })
 )
 
@@ -74,7 +74,7 @@ test('shows error for empty email', async ({ page }) => {
 
   // Submit without entering email
   // Using form-helpers submit without parameter isn't supported for empty, so click submit directly
-  const submit = page.getByTestId('forgot-password-submit')
+  const submit = page.getByTestId('forgot-password-action')
   await submit.click()
 
   // Should stay on forgot password page with error message

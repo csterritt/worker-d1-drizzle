@@ -23,14 +23,14 @@ test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
     await navigateToSignIn(page)
 
     // Click the "Create Account" button to go to sign-up page
-    await clickLink(page, 'go-to-sign-up-button')
+    await clickLink(page, 'go-to-sign-up-action')
     await verifyOnSignUpPage(page)
 
     // Verify we're on the correct URL
     expect(page.url()).toContain('/auth/sign-up')
 
     // Click the "Sign In Instead" button to go back to sign-in page
-    await clickLink(page, 'go-to-sign-in-button')
+    await clickLink(page, 'go-to-sign-in-action')
     await verifyOnSignInPage(page)
 
     // Verify we're back on the correct URL
@@ -48,8 +48,8 @@ test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
     expect(await isElementVisible(page, 'signup-name-input')).toBe(true)
     expect(await isElementVisible(page, 'signup-email-input')).toBe(true)
     expect(await isElementVisible(page, 'signup-password-input')).toBe(true)
-    expect(await isElementVisible(page, 'signup-submit')).toBe(true)
-    expect(await isElementVisible(page, 'go-to-sign-in-button')).toBe(true)
+    expect(await isElementVisible(page, 'signup-action')).toBe(true)
+    expect(await isElementVisible(page, 'go-to-sign-in-action')).toBe(true)
 
     // Verify page title
     expect(await page.locator('h2').textContent()).toContain('Create Account')
@@ -67,7 +67,7 @@ test.describe('Open Sign-Up Mode: Page Navigation Tests', () => {
     expect(await isElementVisible(page, 'submit')).toBe(true)
 
     // In OPEN_SIGN_UP mode, the sign-up button should be visible
-    expect(await isElementVisible(page, 'go-to-sign-up-button')).toBe(true)
+    expect(await isElementVisible(page, 'go-to-sign-up-action')).toBe(true)
 
     // Verify page title
     expect(await page.locator('h2').textContent()).toContain('Sign In')

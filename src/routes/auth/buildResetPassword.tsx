@@ -74,7 +74,7 @@ const renderResetPassword = (token: string) => {
             </div>
 
             <div>
-              <button type='submit' data-testid='reset-password-submit'>
+              <button type='submit' data-testid='reset-password-action'>
                 Update Password
               </button>
             </div>
@@ -117,7 +117,7 @@ const renderInvalidToken = () => {
           <div>
             <a
               href={PATHS.AUTH.FORGOT_PASSWORD}
-              data-testid='request-new-reset-link'
+              data-testid='request-new-reset-action'
             >
               Request New Reset Link
             </a>

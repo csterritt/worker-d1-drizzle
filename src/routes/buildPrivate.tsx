@@ -27,7 +27,7 @@ const renderPrivate = () => {
             This is a protected area that requires authentication to access.
           </p>
           <div>
-            <a href={PATHS.ROOT} data-testid='visit-home-link'>
+            <a href={PATHS.ROOT} data-testid='visit-home-action'>
               Return Home
             </a>
           </div>

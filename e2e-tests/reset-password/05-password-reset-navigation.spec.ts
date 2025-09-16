@@ -58,7 +58,7 @@ test('reset password page shows correct content with token', async ({
   expect(await page.locator('h2').textContent()).toContain('Set New Password')
   expect(await isElementVisible(page, 'new-password-input')).toBe(true)
   expect(await isElementVisible(page, 'confirm-password-input')).toBe(true)
-  expect(await isElementVisible(page, 'reset-password-submit')).toBe(true)
+  expect(await isElementVisible(page, 'reset-password-action')).toBe(true)
 
   // Verify the token is included in the hidden form field
   const tokenInput = page.locator('input[name="token"]')

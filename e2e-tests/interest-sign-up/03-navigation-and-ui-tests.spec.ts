@@ -27,7 +27,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     await navigateToSignIn(page)
 
     // Verify "Join Waitlist" button exists and has correct text
-    const waitlistButton = page.locator('[data-testid="go-to-sign-up-button"]')
+    const waitlistButton = page.locator('[data-testid="go-to-sign-up-action"]')
     await expect(waitlistButton).toBeVisible()
     await expect(waitlistButton).toHaveText('Join Waitlist')
 
@@ -57,17 +57,17 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     await expect(
       page.locator('[data-testid="interest-email-input"]')
     ).toBeVisible()
-    await expect(page.locator('[data-testid="interest-submit"]')).toBeVisible()
+    await expect(page.locator('[data-testid="interest-action"]')).toBeVisible()
     await expect(
-      page.locator('[data-testid="go-to-sign-in-button"]')
+      page.locator('[data-testid="go-to-sign-in-action"]')
     ).toBeVisible()
 
     // Verify button texts
-    await expect(page.locator('[data-testid="interest-submit"]')).toHaveText(
+    await expect(page.locator('[data-testid="interest-action"]')).toHaveText(
       'Join Waitlist'
     )
     await expect(
-      page.locator('[data-testid="go-to-sign-in-button"]')
+      page.locator('[data-testid="go-to-sign-in-action"]')
     ).toHaveText('Sign In Instead')
   })
 
@@ -78,11 +78,11 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     await navigateToSignIn(page)
 
     // Click "Join Waitlist" to go to interest sign-up
-    await clickLink(page, 'go-to-sign-up-button')
+    await clickLink(page, 'go-to-sign-up-action')
     await verifyOnInterestSignUpPage(page)
 
     // Click "Sign In Instead" to go back
-    await clickLink(page, 'go-to-sign-in-button')
+    await clickLink(page, 'go-to-sign-in-action')
     await verifyOnSignInPage(page)
   })
 
@@ -126,7 +126,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     await expect(
       page.locator('[data-testid="interest-email-input"]')
     ).toBeVisible()
-    await expect(page.locator('[data-testid="interest-submit"]')).toBeVisible()
+    await expect(page.locator('[data-testid="interest-action"]')).toBeVisible()
   })
 
   test('preserves email in form when validation fails', async ({ page }) => {
@@ -136,7 +136,7 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     // Enter invalid email
     const invalidEmail = 'invalid-email'
     await fillInput(page, 'interest-email-input', invalidEmail)
-    await clickLink(page, 'interest-submit')
+    await clickLink(page, 'interest-action')
 
     // Should stay on page with error and preserve email
     await verifyOnInterestSignUpPage(page)

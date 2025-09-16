@@ -83,7 +83,7 @@ test(
     expect(currentUrl).toContain('/auth/await-verification')
 
     // Verify that the resend email button is visible
-    const resendButton = page.getByTestId('resend-email-button')
+    const resendButton = page.getByTestId('resend-email-action')
     await expect(resendButton).toBeVisible()
 
     // Verify on await verification page

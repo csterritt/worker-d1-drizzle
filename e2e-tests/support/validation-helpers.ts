@@ -124,7 +124,7 @@ export const testSignUpFormValidation = async (page: Page) => {
     emailInputId: 'signup-email-input',
     passwordInputId: 'signup-password-input',
     nameInputId: 'signup-name-input',
-    submitButtonId: 'signup-submit',
+    submitButtonId: 'signup-action',
   })
 }
 
@@ -142,20 +142,20 @@ export const testGatedSignUpFormValidation = async (page: Page) => {
     passwordInputId: 'gated-signup-password-input',
     nameInputId: 'gated-signup-name-input',
     codeInputId: 'gated-signup-code-input',
-    submitButtonId: 'gated-signup-submit',
+    submitButtonId: 'gated-signup-action',
   })
 }
 
 export const testInterestSignUpFormValidation = async (page: Page) => {
   await testFormValidation(page, {
     emailInputId: 'interest-email-input',
-    submitButtonId: 'interest-submit',
+    submitButtonId: 'interest-action',
   })
 }
 
 export const testForgotPasswordFormValidation = async (page: Page) => {
   await testFormValidation(page, {
     emailInputId: 'forgot-email-input',
-    submitButtonId: 'forgot-password-submit',
+    submitButtonId: 'forgot-password-action',
   })
 }

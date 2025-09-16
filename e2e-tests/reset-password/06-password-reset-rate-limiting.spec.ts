@@ -55,7 +55,7 @@ test(
 
     // First password reset request
     await fillInput(page, 'forgot-email-input', email)
-    await clickLink(page, 'forgot-password-submit')
+    await clickLink(page, 'forgot-password-action')
 
     // Should be redirected to waiting for reset page
     expect(page.url()).toContain('/auth/waiting-for-reset')
@@ -69,7 +69,7 @@ test(
 
     // Second password reset request after waiting - should succeed
     await fillInput(page, 'forgot-email-input', email)
-    await clickLink(page, 'forgot-password-submit')
+    await clickLink(page, 'forgot-password-action')
 
     // Should be redirected to waiting for reset page again
     expect(page.url()).toContain('/auth/waiting-for-reset')
@@ -94,7 +94,7 @@ test(
 
     // First request with non-existent email - should succeed (no enumeration)
     await fillInput(page, 'forgot-email-input', nonExistentEmail)
-    await clickLink(page, 'forgot-password-submit')
+    await clickLink(page, 'forgot-password-action')
 
     // Should be redirected to waiting for reset page (same as valid email)
     expect(page.url()).toContain('/auth/waiting-for-reset')
@@ -105,7 +105,7 @@ test(
 
     // Second request immediately with same non-existent email
     await fillInput(page, 'forgot-email-input', nonExistentEmail)
-    await clickLink(page, 'forgot-password-submit')
+    await clickLink(page, 'forgot-password-action')
 
     // Should still redirect to waiting page (don't reveal that user doesn't exist)
     // Note: For non-existent users, we don't apply rate limiting since we don't have

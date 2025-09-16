@@ -79,7 +79,7 @@ const renderSignIn = (emailEntered: string) => {
           <div>
             <a
               href={PATHS.AUTH.FORGOT_PASSWORD}
-              data-testid='forgot-password-link'
+              data-testid='forgot-password-action'
             >
               Forgot your password?
             </a>
@@ -96,7 +96,7 @@ const renderSignIn = (emailEntered: string) => {
                       ? PATHS.AUTH.INTEREST_SIGN_UP
                       : PATHS.AUTH.SIGN_UP
                   }
-                  data-testid='go-to-sign-up-button'
+                  data-testid='go-to-sign-up-action'
                 >
                   {process.env.SIGN_UP_MODE === SIGN_UP_MODES.INTEREST_SIGN_UP
                     ? 'Join Waitlist'

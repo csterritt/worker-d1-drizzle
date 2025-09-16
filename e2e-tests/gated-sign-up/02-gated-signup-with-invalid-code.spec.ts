@@ -50,7 +50,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
         password: 'password123',
         // code intentionally omitted
       })
-      await page.click('[data-testid="gated-signup-submit"]')
+      await page.click('[data-testid="gated-signup-action"]')
 
       // Should stay on sign-up page with error message
       await verifyOnGatedSignUpPage(page)

@@ -53,7 +53,7 @@ const renderForgotPassword = () => {
             </div>
 
             <div>
-              <button type='submit' data-testid='forgot-password-submit'>
+              <button type='submit' data-testid='forgot-password-action'>
                 Send Reset Link
               </button>
             </div>
@@ -62,7 +62,7 @@ const renderForgotPassword = () => {
           {/* Navigation back to sign-in */}
           <div>Remember your password?</div>
           <div>
-            <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-button'>
+            <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-action'>
               Back to Sign In
             </a>
           </div>

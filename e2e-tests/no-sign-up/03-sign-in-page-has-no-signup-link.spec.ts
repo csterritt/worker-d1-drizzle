@@ -14,8 +14,8 @@ test.describe('No Sign-Up Mode: Sign-in page has no sign-up links', () => {
   }) => {
     await navigateToSignIn(page)
 
-    // Verify the "Create Account" button (go-to-sign-up-button) does not exist
-    const signUpButton = page.getByTestId('go-to-sign-up-button')
+    // Verify the "Create Account" button (go-to-sign-up-action) does not exist
+    const signUpButton = page.getByTestId('go-to-sign-up-action')
     const signUpButtonCount = await signUpButton.count()
     expect(signUpButtonCount).toBe(0)
   })
@@ -48,7 +48,7 @@ test.describe('No Sign-Up Mode: Sign-in page has no sign-up links', () => {
     // Verify that forgot password link still exists (should not be removed)
     const forgotPasswordExists = await verifyElementExists(
       page,
-      'forgot-password-link'
+      'forgot-password-action'
     )
     expect(forgotPasswordExists).toBe(true)
   })

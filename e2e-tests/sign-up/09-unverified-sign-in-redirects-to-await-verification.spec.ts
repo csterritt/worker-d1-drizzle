@@ -27,7 +27,7 @@ test(
     await fillInput(page, 'signup-name-input', newName)
     await fillInput(page, 'signup-email-input', newEmail)
     await fillInput(page, 'signup-password-input', newPassword)
-    await clickLink(page, 'signup-submit')
+    await clickLink(page, 'signup-action')
 
     // Should be redirected to await verification page
     await verifyOnAwaitVerificationPage(page)
