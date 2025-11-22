@@ -23,6 +23,7 @@ import { buildInterestSignUp } from './routes/auth/buildInterestSignUp'
 import { buildForgotPassword } from './routes/auth/buildForgotPassword'
 import { buildWaitingForReset } from './routes/auth/buildWaitingForReset'
 import { buildResetPassword } from './routes/auth/buildResetPassword'
+import { handleSignIn } from './routes/auth/handleSignIn'
 import { handleSignUp } from './routes/auth/handleSignUp'
 import { handleGatedSignUp } from './routes/auth/handleGatedSignUp'
 import { handleInterestSignUp } from './routes/auth/handleInterestSignUp'
@@ -115,6 +116,7 @@ console.log('🔧 setupBetterAuth call completed')
 buildRoot(app) // PRODUCTION:REMOVE
 buildPrivate(app)
 buildSignIn(app)
+handleSignIn(app)
 if (process.env.SIGN_UP_MODE === SIGN_UP_MODES.OPEN_SIGN_UP) {
   buildSignUp(app)
   handleSignUp(app)

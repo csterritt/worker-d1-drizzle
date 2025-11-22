@@ -5,6 +5,7 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
+import { SignInSchema, validateRequest } from '../../lib/validators'
 
 /**
  * Handle sign-in form submission with proper UX flow
@@ -17,34 +18,19 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+        const data = Object.fromEntries(formData)
 
-        // Validate required fields
-        if (!email || !password) {
+        // Validate request data
+        const [isValid, validatedData, validationError] = validateRequest(
+          data,
+          SignInSchema
+        )
+
+        if (!isValid || !validatedData) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
-            'Email and password are required.'
-          )
-        }
-
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Please enter a valid email address.'
-          )
-        }
-
-        // Validate password length
-        if (password.length < 8) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Password must be at least 8 characters long.'
+            validationError || 'Invalid sign-in data.'
           )
         }
 
@@ -57,10 +43,21 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           const authUrl = new URL(c.req.url)
           authUrl.pathname = '/api/auth/sign-in/email'
 
+          // Convert formData to JSON for better-auth
+          // We must create new headers to set Content-Type to application/json
+          const headers = new Headers(c.req.raw.headers)
+          headers.set('Content-Type', 'application/json')
+
+          // Remove Content-Length if present as it will change
+          headers.delete('Content-Length')
+
           const authRequest = new Request(authUrl.toString(), {
             method: 'POST',
-            headers: c.req.raw.headers,
-            body: formData,
+            headers: headers,
+            body: JSON.stringify({
+              email: validatedData.email,
+              password: validatedData.password, // Use validated password
+            }),
           })
 
           // Call better-auth handler to get the actual response with proper cookies
@@ -110,16 +107,19 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           )
 
           // Forward ALL cookies from better-auth response to our redirect response
-          const cookies = authResponse.headers.get('set-cookie')
-          if (cookies) {
-            response.headers.set('Set-Cookie', cookies)
+          // Use getSetCookie to correctly handle multiple cookies
+          if (typeof authResponse.headers.getSetCookie === 'function') {
+            const cookies = authResponse.headers.getSetCookie()
+            cookies.forEach((cookie) => {
+              response.headers.append('Set-Cookie', cookie)
+            })
+          } else {
+            // Fallback for environments without getSetCookie
+            const cookie = authResponse.headers.get('set-cookie')
+            if (cookie) {
+              response.headers.append('Set-Cookie', cookie)
+            }
           }
-
-          // Also check for multiple cookie headers
-          const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
-          allCookieHeaders.forEach((cookie) => {
-            response.headers.append('Set-Cookie', cookie)
-          })
 
           return response
         } catch (apiError: any) {

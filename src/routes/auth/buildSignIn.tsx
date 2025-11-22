@@ -30,11 +30,7 @@ const renderSignIn = (emailEntered: string) => {
           <h2>Sign In</h2>
 
           {/* Better-auth sign-in form */}
-          <form
-            method='post'
-            action='/api/auth/sign-in/email'
-            aria-label='Sign in form'
-          >
+          <form method='post' action='/auth/sign-in' aria-label='Sign in form'>
             <div>
               <label htmlFor='email'>
                 <span>Email</span>

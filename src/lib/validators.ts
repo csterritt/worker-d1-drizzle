@@ -14,6 +14,8 @@ import {
   maxLength,
   pipe,
   custom,
+  forward,
+  check,
   type BaseSchema,
   type BaseIssue,
   type InferOutput,
@@ -36,7 +38,57 @@ export const EmailSchema = pipe(
   string(VALIDATION.REQUIRED),
   minLength(1, VALIDATION.REQUIRED),
   maxLength(254, VALIDATION.EMAIL_INVALID),
-  custom(validateEmail)
+  custom(validateEmail, VALIDATION.EMAIL_INVALID)
+)
+
+/**
+ * Password validation schema
+ * - Must be a string
+ * - At least 8 characters long
+ */
+export const PasswordSchema = pipe(
+  string(VALIDATION.REQUIRED),
+  minLength(8, 'Password must be at least 8 characters long.')
+)
+
+/**
+ * Sign Up validation schema
+ */
+export const SignUpSchema = object({
+  name: pipe(string(VALIDATION.REQUIRED), minLength(1, VALIDATION.REQUIRED)),
+  email: EmailSchema,
+  password: PasswordSchema,
+})
+
+/**
+ * Sign In validation schema
+ */
+export const SignInSchema = object({
+  email: EmailSchema,
+  password: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(1, VALIDATION.REQUIRED)
+  ),
+})
+
+/**
+ * Reset Password validation schema
+ * - Requires password and confirmPassword
+ * - Passwords must match
+ */
+export const ResetPasswordSchema = pipe(
+  object({
+    password: PasswordSchema,
+    confirmPassword: string(VALIDATION.REQUIRED),
+    token: string(VALIDATION.REQUIRED),
+  }),
+  forward(
+    check(
+      (input) => input.password === input.confirmPassword,
+      'Passwords do not match. Please try again.'
+    ),
+    ['confirmPassword']
+  )
 )
 
 /**

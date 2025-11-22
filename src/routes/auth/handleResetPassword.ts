@@ -13,6 +13,7 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
+import { ResetPasswordSchema, validateRequest } from '../../lib/validators'
 
 /**
  * Attach the reset password handler to the app.
@@ -27,41 +28,28 @@ export const handleResetPassword = (
     async (c) => {
       try {
         const formData = await c.req.formData()
+        const data = Object.fromEntries(formData)
+
+        // We need the token for redirecting on error, so extract it first
         const token = formData.get('token') as string
-        const password = formData.get('password') as string
-        const confirmPassword = formData.get('confirmPassword') as string
 
-        if (!token) {
+        // Validate request data
+        const [isValid, validatedData, validationError] = validateRequest(
+          data,
+          ResetPasswordSchema
+        )
+
+        if (!isValid || !validatedData) {
           return redirectWithError(
             c,
-            PATHS.AUTH.FORGOT_PASSWORD,
-            'Invalid reset token. Please request a new password reset link.'
+            token
+              ? `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`
+              : PATHS.AUTH.FORGOT_PASSWORD,
+            validationError || 'Invalid password reset data.'
           )
         }
 
-        if (!password || !confirmPassword) {
-          return redirectWithError(
-            c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
-            'Please fill in all fields.'
-          )
-        }
-
-        if (password !== confirmPassword) {
-          return redirectWithError(
-            c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
-            'Passwords do not match. Please try again.'
-          )
-        }
-
-        if (password.length < 8) {
-          return redirectWithError(
-            c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
-            'Password must be at least 8 characters long.'
-          )
-        }
+        const { password } = validatedData
 
         // Use better-auth to reset the password
         const auth = createAuth(c.env)
