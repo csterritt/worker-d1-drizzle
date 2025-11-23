@@ -5,6 +5,11 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
+import {
+  getFormValue,
+  SignInSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Handle sign-in form submission with proper UX flow
@@ -17,34 +22,20 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            email: getFormValue(formData, 'email'),
+            password: getFormValue(formData, 'password'),
+          },
+          SignInSchema
+        )
 
-        // Validate required fields
-        if (!email || !password) {
+        if (!isValid || !data) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
-            'Email and password are required.'
-          )
-        }
-
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Please enter a valid email address.'
-          )
-        }
-
-        // Validate password length
-        if (password.length < 8) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Password must be at least 8 characters long.'
+            errorMessage ??
+              'Please check your email and password and try again.'
           )
         }
 
@@ -57,10 +48,14 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           const authUrl = new URL(c.req.url)
           authUrl.pathname = '/api/auth/sign-in/email'
 
+          const sanitizedFormData = new FormData()
+          sanitizedFormData.set('email', data.email)
+          sanitizedFormData.set('password', data.password)
+
           const authRequest = new Request(authUrl.toString(), {
             method: 'POST',
             headers: c.req.raw.headers,
-            body: formData,
+            body: sanitizedFormData,
           })
 
           // Call better-auth handler to get the actual response with proper cookies
@@ -117,7 +112,7 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
 
           // Also check for multiple cookie headers
           const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
-          allCookieHeaders.forEach((cookie) => {
+          allCookieHeaders.forEach((cookie: string) => {
             response.headers.append('Set-Cookie', cookie)
           })
 

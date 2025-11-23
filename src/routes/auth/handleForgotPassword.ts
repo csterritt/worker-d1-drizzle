@@ -24,6 +24,11 @@ import {
   getUserWithAccountByEmail,
   updateAccountTimestamp,
 } from '../../lib/db-access'
+import {
+  ForgotPasswordSchema,
+  getFormValue,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Attach the forgot password handler to the app.
@@ -38,25 +43,22 @@ export const handleForgotPassword = (
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const email = formData.get('email') as string
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            email: getFormValue(formData, 'email'),
+          },
+          ForgotPasswordSchema
+        )
 
-        if (!email) {
+        if (!isValid || !data) {
           return redirectWithError(
             c,
             PATHS.AUTH.FORGOT_PASSWORD,
-            'Please enter your email address.'
+            errorMessage ?? 'Please enter your email address.'
           )
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithError(
-            c,
-            PATHS.AUTH.FORGOT_PASSWORD,
-            'Please enter a valid email address.'
-          )
-        }
+        const { email } = data
 
         try {
           // Create database client and auth instance

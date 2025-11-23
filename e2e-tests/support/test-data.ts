@@ -83,7 +83,7 @@ export const ERROR_MESSAGES = {
 
   // Validation errors
   INVALID_EMAIL: 'Please enter a valid email address.',
-  EMAIL_REQUIRED: 'Email address is required.',
+  EMAIL_REQUIRED: 'Please enter your email address.',
   PASSWORD_REQUIRED: 'Please enter your password.',
   NAME_REQUIRED: 'Please enter your name.',
   CODE_REQUIRED: 'Please enter a valid sign-up code.',

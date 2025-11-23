@@ -9,12 +9,17 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS, VALIDATION } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
 import { addInterestedEmail } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
 import { COOKIES } from '../../constants'
+import {
+  getFormValue,
+  InterestSignUpSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Attach the interest sign-up handler to the app.
@@ -40,31 +45,25 @@ export const handleInterestSignUp = (
         )
       }
 
-      // Get form data
-      const body = await c.req.parseBody()
-      const email = body.email as string
+      const formData = await c.req.formData()
+      const [isValid, data, errorMessage] = validateRequest(
+        {
+          email: getFormValue(formData, 'email'),
+        },
+        InterestSignUpSchema
+      )
 
-      // Validate email
-      if (!email) {
-        console.log('No email provided')
+      if (!isValid || !data) {
+        console.log('Invalid interest sign-up submission:', errorMessage)
+        addCookie(c, COOKIES.EMAIL_ENTERED, getFormValue(formData, 'email'))
         return redirectWithError(
           c,
           PATHS.AUTH.INTEREST_SIGN_UP,
-          'Email address is required.'
+          errorMessage ?? 'Email address is required.'
         )
       }
 
-      if (!VALIDATION.EMAIL_PATTERN.test(email.trim())) {
-        console.log('Invalid email format:', email)
-        addCookie(c, COOKIES.EMAIL_ENTERED, email)
-        return redirectWithError(
-          c,
-          PATHS.AUTH.INTEREST_SIGN_UP,
-          'Please enter a valid email address.'
-        )
-      }
-
-      const trimmedEmail = email.trim().toLowerCase()
+      const trimmedEmail = data.email
       console.log('Processing interest sign-up for email:', trimmedEmail)
 
       // Get database instance
@@ -84,7 +83,7 @@ export const handleInterestSignUp = (
             'Database error adding interested email:',
             addResult.error
           )
-          addCookie(c, COOKIES.EMAIL_ENTERED, email)
+          addCookie(c, COOKIES.EMAIL_ENTERED, trimmedEmail)
           return redirectWithError(
             c,
             PATHS.AUTH.INTEREST_SIGN_UP,
@@ -111,7 +110,7 @@ export const handleInterestSignUp = (
         )
       } catch (error) {
         console.error('Unexpected error in handleInterestSignUp:', error)
-        addCookie(c, COOKIES.EMAIL_ENTERED, email)
+        addCookie(c, COOKIES.EMAIL_ENTERED, trimmedEmail)
         return redirectWithError(
           c,
           PATHS.AUTH.INTEREST_SIGN_UP,

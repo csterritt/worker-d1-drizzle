@@ -109,7 +109,7 @@ export const VALIDATION = {
 
   // Messages
   REQUIRED: 'This field is required',
-  EMAIL_INVALID: 'Please enter a valid email address',
+  EMAIL_INVALID: 'Please enter a valid email address.',
 } as const
 
 export const DURATIONS = {

@@ -16,6 +16,11 @@ import {
   consumeSingleUseCode,
 } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
+import {
+  getFormValue,
+  GatedSignUpSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Handle gated sign-up form submission with code validation
@@ -28,43 +33,29 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const code = formData.get('code') as string
-        const name = formData.get('name') as string
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            code: getFormValue(formData, 'code'),
+            name: getFormValue(formData, 'name'),
+            email: getFormValue(formData, 'email'),
+            password: getFormValue(formData, 'password'),
+          },
+          GatedSignUpSchema
+        )
 
-        // Validate required fields (trim whitespace from code)
-        const trimmedCode = code?.trim()
-        if (!trimmedCode || !name || !email || !password) {
+        if (!isValid || !data) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_UP,
-            'All fields are required for sign-up.'
+            errorMessage ?? 'All fields are required for sign-up.'
           )
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_UP,
-            'Please enter a valid email address.'
-          )
-        }
-
-        // Validate password length
-        if (password.length < 8) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_UP,
-            'Password must be at least 8 characters long.'
-          )
-        }
+        const { code, name, email, password } = data
 
         // Validate and consume the sign-up code FIRST
         const dbClient = createDbClient(c.env.PROJECT_DB)
-        const codeResult = await consumeSingleUseCode(dbClient, trimmedCode)
+        const codeResult = await consumeSingleUseCode(dbClient, code)
 
         if (codeResult.isErr) {
           console.error(

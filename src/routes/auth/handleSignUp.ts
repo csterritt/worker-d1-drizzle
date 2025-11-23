@@ -12,6 +12,11 @@ import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import { getUserIdByEmail, updateAccountTimestamp } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
+import {
+  getFormValue,
+  SignUpSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Handle sign-up form submission with proper UX flow
@@ -24,37 +29,24 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const name = formData.get('name') as string
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            name: getFormValue(formData, 'name'),
+            email: getFormValue(formData, 'email'),
+            password: getFormValue(formData, 'password'),
+          },
+          SignUpSchema
+        )
 
-        // Validate required fields
-        if (!name || !email || !password) {
+        if (!isValid || !data) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
-            'All fields are required for sign-up.'
+            errorMessage ?? 'All fields are required for sign-up.'
           )
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Please enter a valid email address.'
-          )
-        }
-
-        // Validate password length
-        if (password.length < 8) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Password must be at least 8 characters long.'
-          )
-        }
+        const { name, email, password } = data
 
         // Create better-auth instance
         const auth = createAuth(c.env)

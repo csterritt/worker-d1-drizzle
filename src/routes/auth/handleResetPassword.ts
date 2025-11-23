@@ -13,6 +13,11 @@ import { createAuth } from '../../lib/auth'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
+import {
+  getFormValue,
+  ResetPasswordSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Attach the reset password handler to the app.
@@ -27,41 +32,49 @@ export const handleResetPassword = (
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const token = formData.get('token') as string
-        const password = formData.get('password') as string
-        const confirmPassword = formData.get('confirmPassword') as string
+        const tokenValue = getFormValue(formData, 'token')
+        const passwordValue = getFormValue(formData, 'password')
+        const confirmPasswordValue = getFormValue(formData, 'confirmPassword')
 
-        if (!token) {
+        const hasMissingFields = [
+          tokenValue,
+          passwordValue,
+          confirmPasswordValue,
+        ].some((value) => value.trim().length === 0)
+
+        if (hasMissingFields) {
+          const redirectPath = tokenValue
+            ? `${PATHS.AUTH.RESET_PASSWORD}?token=${tokenValue}`
+            : PATHS.AUTH.FORGOT_PASSWORD
           return redirectWithError(
             c,
-            PATHS.AUTH.FORGOT_PASSWORD,
-            'Invalid reset token. Please request a new password reset link.'
-          )
-        }
-
-        if (!password || !confirmPassword) {
-          return redirectWithError(
-            c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
+            redirectPath,
             'Please fill in all fields.'
           )
         }
 
-        if (password !== confirmPassword) {
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            token: tokenValue,
+            password: passwordValue,
+            confirmPassword: confirmPasswordValue,
+          },
+          ResetPasswordSchema
+        )
+
+        if (!isValid || !data) {
+          const fallbackToken = getFormValue(formData, 'token')
+          const redirectPath = fallbackToken
+            ? `${PATHS.AUTH.RESET_PASSWORD}?token=${fallbackToken}`
+            : PATHS.AUTH.FORGOT_PASSWORD
           return redirectWithError(
             c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
-            'Passwords do not match. Please try again.'
+            redirectPath,
+            errorMessage ?? 'Please fill in all fields.'
           )
         }
 
-        if (password.length < 8) {
-          return redirectWithError(
-            c,
-            `${PATHS.AUTH.RESET_PASSWORD}?token=${token}`,
-            'Password must be at least 8 characters long.'
-          )
-        }
+        const { token, password } = data
 
         // Use better-auth to reset the password
         const auth = createAuth(c.env)

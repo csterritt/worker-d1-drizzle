@@ -24,6 +24,11 @@ import {
   updateAccountTimestamp,
 } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
+import {
+  getFormValue,
+  ResendEmailSchema,
+  validateRequest,
+} from '../../lib/validators'
 
 /**
  * Handle resend verification email form submission
@@ -37,26 +42,22 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
     async (c) => {
       try {
         const formData = await c.req.formData()
-        const email = formData.get('email') as string
+        const [isValid, data, errorMessage] = validateRequest(
+          {
+            email: getFormValue(formData, 'email'),
+          },
+          ResendEmailSchema
+        )
 
-        // Validate email is provided
-        if (!email) {
+        if (!isValid || !data) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.AWAIT_VERIFICATION,
-            'Email address is required to resend verification.'
+            errorMessage ?? 'Email address is required to resend verification.'
           )
         }
 
-        // Basic email format validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.AWAIT_VERIFICATION,
-            'Please enter a valid email address.'
-          )
-        }
+        const { email } = data
 
         try {
           // Create database client and auth instance

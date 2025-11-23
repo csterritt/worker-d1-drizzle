@@ -54,7 +54,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should stay on sign-up page with error message
       await verifyOnGatedSignUpPage(page)
-      await verifyAlert(page, 'All fields are required for sign-up.')
+      await verifyAlert(page, 'Sign-up code is too short.')
     })
   )
 
@@ -72,7 +72,7 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should stay on sign-up page with error message
       await verifyOnGatedSignUpPage(page)
-      await verifyAlert(page, 'All fields are required for sign-up.')
+      await verifyAlert(page, 'Sign-up code is too short.')
     })
   )
 
