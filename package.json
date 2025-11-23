@@ -28,7 +28,7 @@
     "@types/nodemailer": "^6.4.17",
     "concurrently": "^9.2.0",
     "drizzle-kit": "^0.31.2",
-    "globby": "^14.1.0",
+    "globby": "^16.0.0",
     "prettier": "^3.6.0",
     "typescript": "^5.9.2",
     "wrangler": "^4.50.0"
