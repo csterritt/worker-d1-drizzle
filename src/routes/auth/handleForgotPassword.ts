@@ -16,6 +16,8 @@ import {
   COOKIES,
   STANDARD_SECURE_HEADERS,
   DURATIONS,
+  MESSAGES,
+  MESSAGE_BUILDERS,
 } from '../../constants'
 import { addCookie } from '../../lib/cookie-support'
 import { Bindings } from '../../local-types'
@@ -54,7 +56,7 @@ export const handleForgotPassword = (
           return redirectWithError(
             c,
             PATHS.AUTH.FORGOT_PASSWORD,
-            errorMessage ?? 'Please enter your email address.'
+            errorMessage ?? MESSAGES.EMAIL_REQUIRED
           )
         }
 
@@ -81,7 +83,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              "If an account with that email exists, we've sent you a password reset link."
+              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
             )
           }
 
@@ -94,7 +96,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              "If an account with that email exists, we've sent you a password reset link."
+              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
             )
           }
 
@@ -115,7 +117,7 @@ export const handleForgotPassword = (
             return redirectWithError(
               c,
               PATHS.AUTH.FORGOT_PASSWORD,
-              `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another password reset email.`
+              MESSAGE_BUILDERS.passwordResetRateLimit(remainingSeconds)
             )
           }
 
@@ -152,7 +154,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              "If an account with that email exists, we've sent you a password reset link."
+              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
             )
           } catch (emailError) {
             console.error('Password reset email error:', emailError)
@@ -164,7 +166,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              "If an account with that email exists, we've sent you a password reset link."
+              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
             )
           }
         } catch (error) {
@@ -177,7 +179,7 @@ export const handleForgotPassword = (
           return redirectWithMessage(
             c,
             PATHS.AUTH.WAITING_FOR_RESET,
-            "If an account with that email exists, we've sent you a password reset link."
+            MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
           )
         }
       } catch (error) {

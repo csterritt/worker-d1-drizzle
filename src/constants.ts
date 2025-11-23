@@ -112,6 +112,29 @@ export const VALIDATION = {
   EMAIL_INVALID: 'Please enter a valid email address.',
 } as const
 
+export const MESSAGES = {
+  EMAIL_REQUIRED: 'Please enter your email address.',
+  EMAIL_REQUIRED_FOR_RESET:
+    'Please enter your email address to reset your password.',
+  SIGN_UP_FIELDS_REQUIRED: 'All fields are required for sign-up.',
+  PASSWORD_RESET_FIELDS_REQUIRED: 'Please fill in all fields.',
+  PASSWORD_RESET_GENERIC_SUCCESS:
+    "If an account with that email exists, we've sent you a password reset link.",
+  VERIFICATION_EMAIL_SENT:
+    'A new verification email has been sent. Please check your inbox.',
+} as const
+
+export const MESSAGE_BUILDERS = {
+  passwordResetRateLimit: (remainingSeconds: number): string =>
+    `Please wait ${remainingSeconds} more second${
+      remainingSeconds !== 1 ? 's' : ''
+    } before requesting another password reset email.`,
+  verificationRateLimit: (remainingSeconds: number): string =>
+    `Please wait ${remainingSeconds} more second${
+      remainingSeconds !== 1 ? 's' : ''
+    } before requesting another verification email.`,
+} as const
+
 export const DURATIONS = {
   // EMAIL_RESEND_TIME_IN_MILLISECONDS: 30 * 1000, // PRODUCTION:UNCOMMENT
   EMAIL_RESEND_TIME_IN_MILLISECONDS: 3 * 1000, // PRODUCTION:REMOVE

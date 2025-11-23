@@ -19,7 +19,7 @@ import {
   type BaseIssue,
   type InferOutput,
 } from 'valibot'
-import { VALIDATION } from '../constants'
+import { MESSAGES, VALIDATION } from '../constants'
 
 // Email validation function
 const validateEmail = (value: unknown) => {
@@ -47,9 +47,9 @@ export const RESET_TOKEN_ERROR_MESSAGE =
  * - Must match email regex pattern
  */
 export const EmailSchema = pipe(
-  string('Please enter your email address.'),
+  string(MESSAGES.EMAIL_REQUIRED),
   transform((value) => value.trim().toLowerCase()),
-  minLength(1, 'Please enter your email address.'),
+  minLength(1, MESSAGES.EMAIL_REQUIRED),
   maxLength(254, VALIDATION.EMAIL_INVALID),
   custom(validateEmail, VALIDATION.EMAIL_INVALID)
 )
