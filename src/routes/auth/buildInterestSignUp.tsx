@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS, MESSAGES } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -95,11 +95,7 @@ export const buildInterestSignUp = (
       const user = (c as any).get('user')
       if (user) {
         console.log('Already signed in')
-        return redirectWithMessage(
-          c,
-          PATHS.PRIVATE,
-          'You are already signed in.'
-        )
+        return redirectWithMessage(c, PATHS.PRIVATE, MESSAGES.ALREADY_SIGNED_IN)
       }
 
       const emailEntered: string =

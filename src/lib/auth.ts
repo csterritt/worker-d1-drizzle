@@ -12,6 +12,12 @@ import { createDbClient } from '../db/client'
 import { schema } from '../db/schema'
 import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
 
+let alternateOrigin = 'http://localhost:3000/' // PRODUCTION:REMOVE
+// PRODUCTION:REMOVE-NEXT-LINE
+if (process.env.ALTERNATE_ORIGIN) {
+  alternateOrigin = process.env.ALTERNATE_ORIGIN.replace(/\$/, '') // PRODUCTION:REMOVE
+} // PRODUCTION:REMOVE
+
 /**
  * Create and configure better-auth instance
  * @param env - Cloudflare environment
@@ -97,15 +103,15 @@ export const createAuth = (env: any) => {
     //   },
     // },
     trustedOrigins: [
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      // Add production origins as needed
+      'http://localhost:3000', // PRODUCTION:REMOVE
+      'http://127.0.0.1:3000', // PRODUCTION:REMOVE
+      alternateOrigin, // PRODUCTION:REMOVE
+      // 'https://your-actual-origin.com', 'https://your-url.your-group.workers.dev' // PRODUCTION:UNCOMMENT
     ],
-    baseURL: 'http://localhost:3000',
+    // baseURL: 'https://your-actual-origin.com', // PRODUCTION:UNCOMMENT
+    baseURL: 'http://localhost:3000', // PRODUCTION:REMOVE
     redirectTo: '/private', // Redirect to protected page after successful sign-in
-    secret:
-      process.env.BETTER_AUTH_SECRET ||
-      'your-secret-key-change-this-in-production',
+    secret: process.env.BETTER_AUTH_SECRET,
   })
 }
 

@@ -15,6 +15,8 @@ import {
   DURATIONS,
   COOKIES,
   STANDARD_SECURE_HEADERS,
+  MESSAGES,
+  LOG_MESSAGES,
 } from '../../constants'
 import { createAuth } from '../../lib/auth'
 import type { Bindings } from '../../local-types'
@@ -24,11 +26,7 @@ import {
   updateAccountTimestamp,
 } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
-import {
-  getFormValue,
-  ResendEmailSchema,
-  validateRequest,
-} from '../../lib/validators'
+import { validateRequest, ResendEmailFormSchema } from '../../lib/validators'
 
 /**
  * Handle resend verification email form submission
@@ -41,23 +39,17 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
     secureHeaders(STANDARD_SECURE_HEADERS),
     async (c) => {
       try {
-        const formData = await c.req.formData()
-        const [isValid, data, errorMessage] = validateRequest(
-          {
-            email: getFormValue(formData, 'email'),
-          },
-          ResendEmailSchema
-        )
-
-        if (!isValid || !data) {
+        const body = await c.req.parseBody()
+        const [ok, data, err] = validateRequest(body, ResendEmailFormSchema)
+        if (!ok) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.AWAIT_VERIFICATION,
-            errorMessage ?? 'Email address is required to resend verification.'
+            err || 'Email address is required to resend verification.'
           )
         }
 
-        const { email } = data
+        const email = data!.email as string
 
         try {
           // Create database client and auth instance
@@ -72,14 +64,14 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
 
           if (userWithAccountResult.isErr) {
             console.error(
-              'Database error getting user with account:',
+              LOG_MESSAGES.DB_GET_USER_WITH_ACCOUNT,
               userWithAccountResult.error
             )
             addCookie(c, COOKIES.EMAIL_ENTERED, email)
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'A new verification email has been sent. Please check your inbox.'
+              MESSAGES.NEW_VERIFICATION_EMAIL
             )
           }
 
@@ -91,7 +83,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'A new verification email has been sent. Please check your inbox.'
+              MESSAGES.NEW_VERIFICATION_EMAIL
             )
           }
 
@@ -139,10 +131,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           const updateResult = await updateAccountTimestamp(db, userData.userId)
 
           if (updateResult.isErr) {
-            console.error(
-              'Database error updating account timestamp:',
-              updateResult.error
-            )
+            console.error(LOG_MESSAGES.DB_UPDATE_ACCOUNT_TS, updateResult.error)
             // Don't fail the process if timestamp update fails
           }
 
@@ -151,7 +140,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           return redirectWithMessage(
             c,
             PATHS.AUTH.AWAIT_VERIFICATION,
-            'A new verification email has been sent. Please check your inbox.'
+            MESSAGES.NEW_VERIFICATION_EMAIL
           )
         } catch (emailError) {
           console.error('Error in resend email process:', emailError)
@@ -159,7 +148,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           return redirectWithMessage(
             c,
             PATHS.AUTH.AWAIT_VERIFICATION,
-            'A new verification email has been sent. Please check your inbox.'
+            MESSAGES.NEW_VERIFICATION_EMAIL
           )
         }
       } catch (error) {
@@ -167,7 +156,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         return redirectWithMessage(
           c,
           PATHS.AUTH.AWAIT_VERIFICATION,
-          'Something went wrong. Please try again.'
+          MESSAGES.GENERIC_ERROR_TRY_AGAIN
         )
       }
     }

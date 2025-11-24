@@ -9,7 +9,12 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import {
+  PATHS,
+  STANDARD_SECURE_HEADERS,
+  MESSAGES,
+  UI_TEXT,
+} from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
@@ -29,7 +34,11 @@ const renderSignUp = (emailEntered: string) => {
           <h2>Create Account</h2>
 
           {/* Sign up form */}
-          <form method='post' action='/auth/sign-up' aria-label='Sign up form'>
+          <form
+            method='post'
+            action={PATHS.AUTH.SIGN_UP}
+            aria-label='Sign up form'
+          >
             <div>
               <label htmlFor='signup-name'>
                 <span>Name</span>
@@ -54,7 +63,7 @@ const renderSignUp = (emailEntered: string) => {
                 id='signup-email'
                 name='email'
                 type='email'
-                placeholder='Enter your email'
+                placeholder={UI_TEXT.ENTER_YOUR_EMAIL}
                 required
                 value={emailEntered}
                 data-testid='signup-email-input'
@@ -109,7 +118,7 @@ export const buildSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     const user = (c as any).get('user')
     if (user) {
       console.log('Already signed in')
-      return redirectWithMessage(c, PATHS.PRIVATE, 'You are already signed in.')
+      return redirectWithMessage(c, PATHS.PRIVATE, MESSAGES.ALREADY_SIGNED_IN)
     }
 
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''

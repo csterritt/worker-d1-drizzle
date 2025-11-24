@@ -8,7 +8,7 @@ export const TEST_USERS = {
   KNOWN_USER: {
     email: 'fredfred@team439980.testinator.com',
     password: 'freds-clever-password',
-    name: 'Fred Fred',
+    name: 'FredF',
   },
 
   // Standard new user for sign-up tests
@@ -116,4 +116,5 @@ export const BASE_URLS = {
   AWAIT_VERIFICATION: 'http://localhost:3000/auth/await-verification',
   PRIVATE: 'http://localhost:3000/private',
   WAITING_FOR_RESET: 'http://localhost:3000/auth/waiting-for-reset',
+  PROFILE: 'http://localhost:3000/profile',
 } as const

@@ -18,6 +18,20 @@ export type SignInSession = {
 export type Bindings = {
   PROJECT_DB: D1Database
   Session: Maybe<SignInSession>
+  MAGIC_CODE?: string
+  UPLOAD_URL?: string
+  db?: string
+  signUpType?: string
+  SIGN_UP_MODE?: string
+  EMAIL_SEND_URL?: string
+  EMAIL_SEND_CODE?: string
+  CLOUDFLARE_ACCOUNT_ID?: string
+  CLOUDFLARE_DATABASE_ID?: string
+  CLOUDFLARE_D1_TOKEN?: string
+  PO_APP_ID?: string
+  PO_USER_ID?: string
+  ALTERNATE_ORIGIN?: string
+  BETTER_AUTH_SECRET?: string
 }
 
 export class CountAndDecrement {

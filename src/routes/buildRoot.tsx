@@ -19,7 +19,7 @@ const renderRoot = () => {
   return (
     <div data-testid='startup-page-banner'>
       <div>
-        <div>
+        <div class='container'>
           <h2>Welcome!</h2>
           <h3 id='heading'>Worker, D1, Drizzle Project</h3>
           <p>
@@ -39,7 +39,10 @@ const renderRoot = () => {
             function getCookie(name) {
               const value = \`; \${document.cookie}\`;
               const parts = value.split(\`; \${name}=\`);
-              if (parts.length === 2) return parts.pop().split(';').shift();
+              if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+              }
+              return null;
             }
             
             // Function to delete cookie by name
@@ -87,7 +90,7 @@ export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
     ...ALLOW_SCRIPTS_SECURE_HEADERS,
     contentSecurityPolicy: {
       ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-je2dq3b/WBE98PDRLxXs4N6tC2cAsKOzYQsStnT2de0='"],
+      scriptSrc: ["'sha256-ZXNCd2pGZQ/P0yKye0SdGhvwzepU6qcYgIvceOpTeMQ='"],
     },
   }
 

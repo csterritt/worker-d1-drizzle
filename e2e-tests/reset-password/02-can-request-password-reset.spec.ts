@@ -81,5 +81,5 @@ test('shows error for empty email', async ({ page }) => {
   await verifyOnForgotPasswordPage(page)
 
   // Verify error message
-  await verifyAlert(page, 'Please enter your email address.')
+  await verifyAlert(page, 'Please enter a valid email address.')
 })

@@ -57,15 +57,9 @@ export const addCookie = (
 export const addSimpleCookie = (
   c: Context<{ Bindings: Bindings }>,
   name: string,
-  value: string,
-  extraOptions?: object
+  value: string
 ): void => {
-  let options = {}
-  if (extraOptions) {
-    options = { ...options, ...extraOptions }
-  }
-
-  setCookie(c, name, value, options)
+  setCookie(c, name, value, { path: '/' })
 }
 
 /**
@@ -78,4 +72,16 @@ export const removeCookie = (
   name: string
 ): void => {
   deleteCookie(c, name, COOKIES.STANDARD_COOKIE_OPTIONS)
+}
+
+/**
+ * Removes a cookie without the standard cookie options
+ * @param c - Hono context
+ * @param name - Cookie name
+ */
+export const removeSimpleCookie = (
+  c: Context<{ Bindings: Bindings }>,
+  name: string
+): void => {
+  deleteCookie(c, name, { path: '/' })
 }

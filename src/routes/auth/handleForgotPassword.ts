@@ -16,8 +16,10 @@ import {
   COOKIES,
   STANDARD_SECURE_HEADERS,
   DURATIONS,
+  LOG_MESSAGES,
   MESSAGES,
   MESSAGE_BUILDERS,
+  VALIDATION,
 } from '../../constants'
 import { addCookie } from '../../lib/cookie-support'
 import { Bindings } from '../../local-types'
@@ -26,11 +28,7 @@ import {
   getUserWithAccountByEmail,
   updateAccountTimestamp,
 } from '../../lib/db-access'
-import {
-  ForgotPasswordSchema,
-  getFormValue,
-  validateRequest,
-} from '../../lib/validators'
+import { validateRequest, ForgotPasswordFormSchema } from '../../lib/validators'
 
 /**
  * Attach the forgot password handler to the app.
@@ -40,27 +38,24 @@ export const handleForgotPassword = (
   app: Hono<{ Bindings: Bindings }>
 ): void => {
   app.post(
-    '/auth/forgot-password',
+    PATHS.AUTH.FORGOT_PASSWORD,
     secureHeaders(STANDARD_SECURE_HEADERS),
     async (c) => {
       try {
-        const formData = await c.req.formData()
-        const [isValid, data, errorMessage] = validateRequest(
-          {
-            email: getFormValue(formData, 'email'),
-          },
-          ForgotPasswordSchema
+        const body = await c.req.parseBody()
+        const [ok, data, errorMessage] = validateRequest(
+          body,
+          ForgotPasswordFormSchema
         )
-
-        if (!isValid || !data) {
+        if (!ok) {
           return redirectWithError(
             c,
             PATHS.AUTH.FORGOT_PASSWORD,
-            errorMessage ?? MESSAGES.EMAIL_REQUIRED
+            errorMessage ?? VALIDATION.EMAIL_INVALID
           )
         }
 
-        const { email } = data
+        const email = data!.email as string
 
         try {
           // Create database client and auth instance
@@ -75,7 +70,7 @@ export const handleForgotPassword = (
 
           if (userWithAccountResult.isErr) {
             console.error(
-              'Database error getting user with account:',
+              LOG_MESSAGES.DB_GET_USER_WITH_ACCOUNT,
               userWithAccountResult.error
             )
             // Store email in cookie for the waiting page
@@ -83,7 +78,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
+              MESSAGES.RESET_PASSWORD_MESSAGE
             )
           }
 
@@ -96,7 +91,7 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
+              MESSAGES.RESET_PASSWORD_MESSAGE
             )
           }
 
@@ -140,7 +135,7 @@ export const handleForgotPassword = (
 
             if (updateResult.isErr) {
               console.error(
-                'Database error updating account timestamp:',
+                LOG_MESSAGES.DB_UPDATE_ACCOUNT_TS,
                 updateResult.error
               )
               // Don't fail the process if timestamp update fails
@@ -154,19 +149,34 @@ export const handleForgotPassword = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
+              MESSAGES.RESET_PASSWORD_MESSAGE
             )
           } catch (emailError) {
             console.error('Password reset email error:', emailError)
 
-            // Store email in cookie for the waiting page
-            addCookie(c, COOKIES.EMAIL_ENTERED, email)
+            // Check if this is an email sending error (not a user-not-found error)
+            const errorMessage =
+              emailError instanceof Error
+                ? emailError.message
+                : String(emailError)
+            if (
+              errorMessage.includes('Failed to send') ||
+              errorMessage.includes('email')
+            ) {
+              // Email send failure - show error to user
+              return redirectWithError(
+                c,
+                PATHS.AUTH.FORGOT_PASSWORD,
+                'Unable to send password reset email. Please try again later.'
+              )
+            }
 
-            // Still redirect to waiting page to prevent email enumeration
+            // For other errors, still redirect to waiting page to prevent email enumeration
+            addCookie(c, COOKIES.EMAIL_ENTERED, email)
             return redirectWithMessage(
               c,
               PATHS.AUTH.WAITING_FOR_RESET,
-              MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
+              MESSAGES.RESET_PASSWORD_MESSAGE
             )
           }
         } catch (error) {
@@ -179,7 +189,7 @@ export const handleForgotPassword = (
           return redirectWithMessage(
             c,
             PATHS.AUTH.WAITING_FOR_RESET,
-            MESSAGES.PASSWORD_RESET_GENERIC_SUCCESS
+            MESSAGES.RESET_PASSWORD_MESSAGE
           )
         }
       } catch (error) {
@@ -187,7 +197,7 @@ export const handleForgotPassword = (
         return redirectWithError(
           c,
           PATHS.AUTH.FORGOT_PASSWORD,
-          'An error occurred. Please try again.'
+          MESSAGES.GENERIC_ERROR_TRY_AGAIN
         )
       }
     }

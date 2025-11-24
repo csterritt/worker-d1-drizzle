@@ -44,7 +44,7 @@ test('shows validation errors for password reset form', async ({ page }) => {
 
   // Should stay on reset password page with error
   await verifyOnResetPasswordPage(page)
-  await verifyAlert(page, 'Please fill in all fields.')
+  await verifyAlert(page, 'Password must be at least 8 characters long.')
 
   // Test password too short
   await fillInput(page, 'new-password-input', '1234567') // 7 characters

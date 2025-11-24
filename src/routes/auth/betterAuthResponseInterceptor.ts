@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, COOKIES } from '../../constants'
+import { PATHS, COOKIES, MESSAGES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { addCookie } from '../../lib/cookie-support'
 
@@ -18,7 +18,7 @@ export const setupBetterAuthResponseInterceptor = (
   app: Hono<{ Bindings: Bindings }>
 ) => {
   // Add middleware to capture email from sign-in requests without consuming the body
-  app.use('/api/auth/sign-in/email', async (c: any, next) => {
+  app.use(PATHS.AUTH.SIGN_IN_EMAIL_API, async (c: any, next) => {
     try {
       // Clone the request to avoid consuming the original body
       const clonedRequest = c.req.raw.clone()
@@ -36,7 +36,7 @@ export const setupBetterAuthResponseInterceptor = (
   })
 
   // Intercept sign-in endpoint specifically
-  app.on(['POST'], '/api/auth/sign-in/email', async (c: any, next) => {
+  app.on(['POST'], PATHS.AUTH.SIGN_IN_EMAIL_API, async (c: any, next) => {
     try {
       // Get the captured email from context
       const capturedEmail = c.get('signInEmail') as string | null
@@ -106,7 +106,7 @@ export const setupBetterAuthResponseInterceptor = (
             return redirectWithMessage(
               c,
               PATHS.AUTH.SIGN_IN,
-              'Please verify your email address before signing in. Check your email for a verification link.'
+              MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
             )
           }
         } catch (jsonError) {
@@ -139,7 +139,7 @@ export const setupBetterAuthResponseInterceptor = (
               return redirectWithMessage(
                 c,
                 PATHS.AUTH.AWAIT_VERIFICATION,
-                'Please verify your email address before signing in. Check your email for a verification link.'
+                MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
               )
             }
           }
@@ -151,7 +151,7 @@ export const setupBetterAuthResponseInterceptor = (
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,
-          'Please verify your email address before signing in. Check your email for a verification link.'
+          MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
         )
       }
 
@@ -167,7 +167,7 @@ export const setupBetterAuthResponseInterceptor = (
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,
-          'Something went wrong. Please try again.'
+          MESSAGES.GENERIC_ERROR_TRY_AGAIN
         )
       }
 
@@ -180,7 +180,7 @@ export const setupBetterAuthResponseInterceptor = (
       return redirectWithMessage(
         c,
         PATHS.AUTH.SIGN_IN,
-        'Something went wrong. Please try again.'
+        MESSAGES.GENERIC_ERROR_TRY_AGAIN
       )
     }
   })

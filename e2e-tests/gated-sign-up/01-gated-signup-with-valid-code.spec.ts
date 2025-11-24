@@ -8,7 +8,7 @@ import {
 } from '../support/workflow-helpers'
 
 test.describe('Gated Sign-Up Mode: Valid Code Tests', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     await skipIfNotMode('GATED_SIGN_UP')
   })
 

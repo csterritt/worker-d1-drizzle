@@ -9,6 +9,7 @@
  */
 
 import nodemailer from 'nodemailer'
+import { getTestSmtpConfig } from '../routes/test/smtp-config'
 
 /**
  * Configuration for email service
@@ -19,6 +20,8 @@ interface EmailConfig {
   smtpPort?: number
   smtpUser?: string
   smtpPass?: string
+  emailUrl?: string
+  emailCode?: string
 }
 
 /**
@@ -35,10 +38,12 @@ const getEmailConfig = (env: any): EmailConfig => {
 
   return {
     isTestMode,
-    smtpHost: isTestMode ? '127.0.0.1' : env.SMTP_HOST || '127.0.0.1',
-    smtpPort: isTestMode ? 1025 : parseInt(env.SMTP_PORT || '587'),
-    smtpUser: env.SMTP_USER,
-    smtpPass: env.SMTP_PASS,
+    smtpHost: isTestMode ? '127.0.0.1' : env.SMTP_SERVER_HOST || '127.0.0.1',
+    smtpPort: isTestMode ? 1025 : parseInt(env.SMTP_SERVER_PORT || '587'),
+    smtpUser: env.SMTP_SERVER_USER,
+    smtpPass: env.SMTP_SERVER_PASS,
+    emailUrl: env.EMAIL_SEND_URL,
+    emailCode: env.EMAIL_SEND_CODE,
   }
 }
 
@@ -47,11 +52,18 @@ const getEmailConfig = (env: any): EmailConfig => {
  */
 const createTransporter = (env: any) => {
   const config = getEmailConfig(env)
+
+  // Check if SMTP config has been overridden for testing
+  const testOverride = getTestSmtpConfig()
+  const smtpHost = testOverride?.host || config.smtpHost
+  const smtpPort = testOverride?.port || config.smtpPort
+
   if (config.isTestMode) {
     // Use smtp-tester for testing (assumes server running on port 1025)
+    // But allow override via environment variables for failure testing
     return nodemailer.createTransport({
-      host: '127.0.0.1',
-      port: 1025,
+      host: smtpHost,
+      port: smtpPort,
       secure: false,
       tls: {
         rejectUnauthorized: false,
@@ -59,19 +71,25 @@ const createTransporter = (env: any) => {
     })
   }
 
-  // Production SMTP configuration
-  return nodemailer.createTransport({
-    host: config.smtpHost,
-    port: config.smtpPort,
-    secure: config.smtpPort === 465,
-    auth:
-      config.smtpUser && config.smtpPass
-        ? {
-            user: config.smtpUser,
-            pass: config.smtpPass,
-          }
-        : undefined,
-  })
+  // Production POST configuration
+  return {
+    sendMail: async (mailOptions: any) => {
+      return fetch(env.EMAIL_SEND_URL, {
+        body: JSON.stringify({
+          email_to: mailOptions.to,
+          subject: mailOptions.subject,
+          sending_site: 'cls.cloud',
+          text_content: mailOptions.text,
+          html_content: mailOptions.html,
+        }),
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.EMAIL_SEND_CODE}`,
+          'content-type': 'application/json;charset=UTF-8',
+        },
+      })
+    },
+  }
 }
 
 /**
@@ -101,7 +119,6 @@ export const sendConfirmationEmail = async (
     const transporter = createTransporter(env)
 
     const mailOptions = {
-      from: env.FROM_EMAIL || 'noreply@example.com',
       to: email,
       subject: 'Confirm Your Email Address',
       html: `
@@ -137,7 +154,7 @@ export const sendConfirmationEmail = async (
     }
 
     const result = await transporter.sendMail(mailOptions)
-    console.log('Confirmation email sent successfully:', result.messageId)
+    console.log('Confirmation email sent successfully:', result)
   } catch (error) {
     console.error('Failed to send confirmation email:', error)
     throw new Error('Failed to send confirmation email')
@@ -171,7 +188,6 @@ export const sendPasswordResetEmail = async (
     const transporter = createTransporter(env)
 
     const mailOptions = {
-      from: env.FROM_EMAIL || 'noreply@example.com',
       to: email,
       subject: 'Reset Your Password',
       html: `
@@ -215,7 +231,7 @@ export const sendPasswordResetEmail = async (
     }
 
     const result = await transporter.sendMail(mailOptions)
-    console.log('Password reset email sent successfully:', result.messageId)
+    console.log('Password reset email sent successfully:', result)
   } catch (error) {
     console.error('Failed to send password reset email:', error)
     throw new Error('Failed to send password reset email')

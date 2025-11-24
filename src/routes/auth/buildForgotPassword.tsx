@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { PATHS, STANDARD_SECURE_HEADERS, UI_TEXT } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -32,7 +32,7 @@ const renderForgotPassword = () => {
           {/* Forgot password form */}
           <form
             method='post'
-            action='/auth/forgot-password'
+            action={PATHS.AUTH.FORGOT_PASSWORD}
             aria-label='Forgot password form'
             noValidate
           >
@@ -44,7 +44,7 @@ const renderForgotPassword = () => {
                 id='forgot-email'
                 name='email'
                 type='email'
-                placeholder='Enter your email address'
+                placeholder={UI_TEXT.ENTER_YOUR_EMAIL}
                 required
                 autoFocus
                 data-testid='forgot-email-input'

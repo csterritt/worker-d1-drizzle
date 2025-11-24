@@ -7,38 +7,32 @@
  * @module lib/validators
  */
 import {
-  string,
   object,
+  string,
   safeParse,
   minLength,
   maxLength,
   pipe,
   custom,
-  transform,
+  optional,
   type BaseSchema,
   type BaseIssue,
   type InferOutput,
 } from 'valibot'
-import { MESSAGES, VALIDATION } from '../constants'
+import {
+  VALIDATION,
+  DISPLAY_MODES,
+  PAGE_SIZES,
+  MESSAGES,
+  ITEM_SORT_ORDERS,
+} from '../constants'
 
 // Email validation function
 const validateEmail = (value: unknown) => {
-  if (typeof value !== 'string') {
-    return false
-  }
-  return VALIDATION.EMAIL_PATTERN.test(value)
+  if (typeof value !== 'string') return false
+  const v = value.trim().toLowerCase()
+  return VALIDATION.EMAIL_PATTERN.test(v)
 }
-
-const PASSWORD_MIN_LENGTH = 8
-const PASSWORD_MAX_LENGTH = 128
-const NAME_MIN_LENGTH = 2
-const NAME_MAX_LENGTH = 100
-const CODE_MIN_LENGTH = 4
-const CODE_MAX_LENGTH = 64
-const TOKEN_MIN_LENGTH = 16
-const TOKEN_MAX_LENGTH = 128
-export const RESET_TOKEN_ERROR_MESSAGE =
-  'Invalid reset token. Please request a new password reset link.'
 
 /**
  * Email validation schema
@@ -47,109 +41,158 @@ export const RESET_TOKEN_ERROR_MESSAGE =
  * - Must match email regex pattern
  */
 export const EmailSchema = pipe(
-  string(MESSAGES.EMAIL_REQUIRED),
-  transform((value) => value.trim().toLowerCase()),
-  minLength(1, MESSAGES.EMAIL_REQUIRED),
+  string(VALIDATION.REQUIRED),
+  minLength(1, VALIDATION.EMAIL_INVALID),
   maxLength(254, VALIDATION.EMAIL_INVALID),
-  custom(validateEmail, VALIDATION.EMAIL_INVALID)
+  custom(validateEmail)
 )
 
-export const PasswordSchema = pipe(
-  string('Password is required.'),
-  transform((value) => value.trim()),
-  minLength(
-    PASSWORD_MIN_LENGTH,
-    `Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`
+/**
+ * Interest sign-up form schema
+ */
+export const InterestSignUpFormSchema = object({
+  email: EmailSchema,
+})
+
+/**
+ * Forgot password form schema
+ */
+export const ForgotPasswordFormSchema = object({
+  email: EmailSchema,
+})
+
+/**
+ * Open sign-up form schema
+ */
+export const SignUpFormSchema = object({
+  name: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(1, VALIDATION.NAME_REQUIRED),
+    maxLength(100, 'Name must be 100 characters or fewer'),
+    custom(
+      (v) => typeof v === 'string' && v.trim().length > 0,
+      VALIDATION.NAME_REQUIRED
+    )
   ),
-  maxLength(
-    PASSWORD_MAX_LENGTH,
-    `Password must be at most ${PASSWORD_MAX_LENGTH} characters long.`
+  email: EmailSchema,
+  password: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(8, VALIDATION.PASSWORD_MIN_LENGTH),
+    maxLength(128, 'Password must be at most 128 characters long')
+  ),
+})
+
+/**
+ * Gated sign-up form schema
+ */
+export const GatedSignUpFormSchema = object({
+  code: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(8, 'Sign-up code must be at least 8 characters long.'),
+    maxLength(64, 'Sign-up code is too long.'),
+    custom(
+      (v) => typeof v === 'string' && v.trim().length > 0,
+      'Sign-up code is required'
+    )
+  ),
+  name: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(1, VALIDATION.NAME_REQUIRED),
+    maxLength(100, 'Name must be 100 characters or fewer'),
+    custom(
+      (v) => typeof v === 'string' && v.trim().length > 0,
+      VALIDATION.NAME_REQUIRED
+    )
+  ),
+  email: EmailSchema,
+  password: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(8, VALIDATION.PASSWORD_MIN_LENGTH),
+    maxLength(128, 'Password must be at most 128 characters long')
+  ),
+})
+
+/**
+ * Resend verification email form schema
+ */
+export const ResendEmailFormSchema = object({
+  email: EmailSchema,
+})
+
+/**
+ * Reset password form schema
+ */
+export const ResetPasswordFormSchema = pipe(
+  object({
+    token: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(
+        1,
+        'Invalid reset token. Please request a new password reset link.'
+      )
+    ),
+    password: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(8, VALIDATION.PASSWORD_MIN_LENGTH)
+    ),
+    confirmPassword: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(8, VALIDATION.PASSWORD_MIN_LENGTH)
+    ),
+  }),
+  custom(
+    (data: any) => data && data.password === data.confirmPassword,
+    'Passwords do not match. Please try again.'
   )
 )
 
-export const NameSchema = pipe(
-  string('Name is required.'),
-  transform((value) => value.trim()),
-  minLength(NAME_MIN_LENGTH, 'Name must be at least 2 characters long.'),
-  maxLength(NAME_MAX_LENGTH, 'Name must be at most 100 characters long.')
-)
-
-export const GatedCodeSchema = pipe(
-  string('Sign-up code is required.'),
-  transform((value) => value.trim()),
-  minLength(CODE_MIN_LENGTH, 'Sign-up code is too short.'),
-  maxLength(CODE_MAX_LENGTH, 'Sign-up code is too long.')
-)
-
-export const SignInSchema = object({
-  email: EmailSchema,
-  password: PasswordSchema,
-})
-
-export const SignUpSchema = object({
-  name: NameSchema,
-  email: EmailSchema,
-  password: PasswordSchema,
-})
-
-export const GatedSignUpSchema = object({
-  code: GatedCodeSchema,
-  name: NameSchema,
-  email: EmailSchema,
-  password: PasswordSchema,
-})
-
-export const ForgotPasswordSchema = object({
-  email: EmailSchema,
-})
-
-export const ResendEmailSchema = object({
-  email: EmailSchema,
-})
-
-export const InterestSignUpSchema = object({
-  email: EmailSchema,
-})
-
-export const ResetPasswordSchema = pipe(
+/**
+ * Change password form schema (for profile page)
+ */
+export const ChangePasswordFormSchema = pipe(
   object({
-    token: pipe(
-      string(RESET_TOKEN_ERROR_MESSAGE),
-      transform((value) => value.trim()),
-      minLength(TOKEN_MIN_LENGTH, RESET_TOKEN_ERROR_MESSAGE),
-      maxLength(TOKEN_MAX_LENGTH, RESET_TOKEN_ERROR_MESSAGE)
+    currentPassword: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(1, 'Current password is required.')
     ),
-    password: PasswordSchema,
-    confirmPassword: PasswordSchema,
+    newPassword: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(8, VALIDATION.PASSWORD_MIN_LENGTH)
+    ),
+    confirmPassword: pipe(
+      string(VALIDATION.REQUIRED),
+      minLength(8, VALIDATION.PASSWORD_MIN_LENGTH)
+    ),
+    userInfo: optional(
+      pipe(
+        string(),
+        custom(
+          (v) =>
+            typeof v === 'string' &&
+            (v.trim() === '' ||
+              (/^\s*\d+\s*$/.test(v) && parseInt(v, 10) >= 0)),
+          'User information must be a non-negative number.'
+        )
+      )
+    ),
   }),
-  custom((payload) => {
-    const data = payload as {
-      token: string
-      password: string
-      confirmPassword: string
-    }
-    return data.password === data.confirmPassword
-  }, 'Passwords do not match. Please try again.')
+  custom(
+    (data: any) => data && data.newPassword === data.confirmPassword,
+    'New passwords do not match. Please try again.'
+  )
 )
 
 /**
- * Increment request schema
- * Note: Currently doesn't require any specific fields
- * but could be extended if parameters are added later
+ * Dynamic path parameter validation schemas
  */
-export const IncrementSchema = object({})
-
-/**
- * Safely read a string value from form data
- */
-export const getFormValue = (formData: FormData, field: string): string => {
-  const value = formData.get(field)
-  if (typeof value === 'string') {
-    return value
-  }
-
-  return ''
-}
+export const PathSignInValidationParamSchema = object({
+  validationSuccessful: optional(
+    pipe(
+      string(),
+      custom((v) => v === 'true', 'Invalid validation flag.')
+    )
+  ),
+})
 
 /**
  * Helper function to validate request data against a schema
@@ -166,19 +209,12 @@ export function validateRequest<
     return [true, result.output, null]
   } else {
     // Extract human-readable error message from validation error
-    const messages = result.issues.map(
-      (issue) =>
-        issue.message || `Invalid ${issue.path?.map((p) => p.key).join('.')}`
-    )
-
-    const uniqueMessages: string[] = []
-    messages.forEach((message) => {
-      if (!uniqueMessages.includes(message)) {
-        uniqueMessages.push(message)
-      }
-    })
-
-    let errorMessage = uniqueMessages.join(', ')
+    let errorMessage = result.issues
+      .map(
+        (issue) =>
+          issue.message || `Invalid ${issue.path?.map((p) => p.key).join('.')}`
+      )
+      .join(', ')
     if (errorMessage?.startsWith('Invalid type: Expected unknown')) {
       errorMessage = VALIDATION.EMAIL_INVALID
     }

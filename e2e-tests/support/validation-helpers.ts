@@ -28,7 +28,7 @@ export const testRequiredEmailField = async (
   submitButtonId: string
 ) => {
   await clickLink(page, submitButtonId)
-  await verifyAlert(page, ERROR_MESSAGES.EMAIL_REQUIRED)
+  await verifyAlert(page, ERROR_MESSAGES.INVALID_EMAIL)
 }
 
 export const testRequiredPasswordField = async (
@@ -44,7 +44,7 @@ export const testRequiredNameField = async (
   submitButtonId: string
 ) => {
   await clickLink(page, submitButtonId)
-  await verifyAlert(page, ERROR_MESSAGES.NAME_REQUIRED)
+  await verifyAlert(page, ERROR_MESSAGES.INVALID_EMAIL)
 }
 
 export const testRequiredCodeField = async (

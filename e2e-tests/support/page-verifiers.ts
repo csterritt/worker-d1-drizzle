@@ -55,3 +55,7 @@ export const verifyOnResetPasswordPage = async (page: any) => {
 export const verifyOnInvalidTokenPage = async (page: any) => {
   expect(await verifyElementExists(page, 'invalid-token-page')).toBe(true)
 }
+
+export const verifyOnProfilePage = async (page: Page) => {
+  expect(await verifyElementExists(page, 'profile-page')).toBe(true)
+}

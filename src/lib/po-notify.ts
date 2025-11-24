@@ -40,10 +40,8 @@ const post = async (url: string, data: any) => {
 
 export const pushoverNotify = async (c: Context, message: string) => {
   if (
-    c.env.PO_APP_ID != null &&
-    c.env.PO_APP_ID !== '' &&
-    c.env.PO_USER_ID != null &&
-    c.env.PO_USER_ID !== ''
+    (c.env.PO_APP_ID ?? '').trim() !== '' &&
+    (c.env.PO_USER_ID ?? '').trim() !== ''
   ) {
     const msg = {
       token: c.env.PO_APP_ID,
@@ -52,7 +50,12 @@ export const pushoverNotify = async (c: Context, message: string) => {
     }
 
     try {
-      await post(API_URLS.PUSHOVER, msg)
+      if (c.env.NODE_ENV !== 'development') {
+        await post(API_URLS.PUSHOVER, msg)
+      } else {
+        console.log(`========> Notify would have been sent in production:`)
+        console.log(`========> ${message}`)
+      }
     } catch (err) {
       console.log(`pushoverNotify final error:`, err)
     }

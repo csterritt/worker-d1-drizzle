@@ -7,16 +7,18 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
+import {
+  PATHS,
+  COOKIES,
+  STANDARD_SECURE_HEADERS,
+  MESSAGES,
+  LOG_MESSAGES,
+} from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import { getUserIdByEmail, updateAccountTimestamp } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
-import {
-  getFormValue,
-  SignUpSchema,
-  validateRequest,
-} from '../../lib/validators'
+import { validateRequest, SignUpFormSchema } from '../../lib/validators'
 
 /**
  * Handle sign-up form submission with proper UX flow
@@ -28,25 +30,17 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     secureHeaders(STANDARD_SECURE_HEADERS),
     async (c) => {
       try {
-        const formData = await c.req.formData()
-        const [isValid, data, errorMessage] = validateRequest(
-          {
-            name: getFormValue(formData, 'name'),
-            email: getFormValue(formData, 'email'),
-            password: getFormValue(formData, 'password'),
-          },
-          SignUpSchema
-        )
-
-        if (!isValid || !data) {
+        const body = await c.req.parseBody()
+        const [ok, data, err] = validateRequest(body, SignUpFormSchema)
+        if (!ok) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
-            errorMessage ?? 'All fields are required for sign-up.'
+            err || MESSAGES.INVALID_INPUT
           )
         }
 
-        const { name, email, password } = data
+        const { name, email, password } = data as any
 
         // Create better-auth instance
         const auth = createAuth(c.env)
@@ -66,7 +60,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.SIGN_IN,
-              'Failed to create account. Please try again.'
+              MESSAGES.GENERIC_ERROR_TRY_AGAIN
             )
           }
 
@@ -89,7 +83,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
               return redirectWithMessage(
                 c,
                 PATHS.AUTH.AWAIT_VERIFICATION,
-                'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+                MESSAGES.ACCOUNT_ALREADY_EXISTS
               )
             }
 
@@ -106,7 +100,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.SIGN_IN,
-              'Registration failed. Please try again.'
+              MESSAGES.GENERIC_ERROR_TRY_AGAIN
             )
           }
         } catch (apiError: any) {
@@ -129,7 +123,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+              MESSAGES.ACCOUNT_ALREADY_EXISTS
             )
           }
 
@@ -143,14 +137,14 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+              MESSAGES.ACCOUNT_ALREADY_EXISTS
             )
           }
 
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_IN,
-            'Something went wrong during registration. Please try again.'
+            MESSAGES.REGISTRATION_GENERIC_ERROR
           )
         }
 
@@ -171,7 +165,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
 
             if (updateResult.isErr) {
               console.error(
-                'Database error updating account timestamp:',
+                LOG_MESSAGES.DB_UPDATE_ACCOUNT_TS,
                 updateResult.error
               )
               // Don't fail the sign-up process if this fails
@@ -192,7 +186,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,
-          'Something went wrong during registration. Please try again.'
+          MESSAGES.REGISTRATION_GENERIC_ERROR
         )
       }
     }

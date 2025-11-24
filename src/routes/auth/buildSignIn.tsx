@@ -9,13 +9,23 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { PATHS, STANDARD_SECURE_HEADERS, SIGN_UP_MODES } from '../../constants'
+import {
+  PATHS,
+  STANDARD_SECURE_HEADERS,
+  SIGN_UP_MODES,
+  MESSAGES,
+  UI_TEXT,
+} from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../buildLayout'
 import { COOKIES } from '../../constants'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 import { retrieveCookie } from '../../lib/cookie-support'
+import {
+  validateRequest,
+  PathSignInValidationParamSchema,
+} from '../../lib/validators'
 
 /**
  * Render the JSX for the sign-in page.
@@ -32,7 +42,7 @@ const renderSignIn = (emailEntered: string) => {
           {/* Better-auth sign-in form */}
           <form
             method='post'
-            action='/api/auth/sign-in/email'
+            action={PATHS.AUTH.SIGN_IN_EMAIL_API}
             aria-label='Sign in form'
           >
             <div>
@@ -43,7 +53,7 @@ const renderSignIn = (emailEntered: string) => {
                 id='email'
                 name='email'
                 type='email'
-                placeholder='Enter your email'
+                placeholder={UI_TEXT.ENTER_YOUR_EMAIL}
                 required
                 autoFocus
                 value={emailEntered}
@@ -125,17 +135,16 @@ export const buildSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
       const user = (c as any).get('user')
       if (user) {
         console.log('Already signed in')
-        return redirectWithMessage(
-          c,
-          PATHS.PRIVATE,
-          'You are already signed in.'
-        )
+        return redirectWithMessage(c, PATHS.PRIVATE, MESSAGES.ALREADY_SIGNED_IN)
       }
 
-      // Check if sign-in validation was successful
-      const validationSuccessful = c.req.param('validationSuccessful')
+      // Validate optional path flag :validationSuccessful
+      const [okParams, paramData, _paramErr] = validateRequest(
+        { validationSuccessful: c.req.param('validationSuccessful') },
+        PathSignInValidationParamSchema
+      )
       let extraMessage = ''
-      if (validationSuccessful === 'true') {
+      if (okParams && paramData?.validationSuccessful === 'true') {
         extraMessage =
           'Your email has been verified successfully. You may now sign in.'
       }

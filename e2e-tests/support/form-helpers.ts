@@ -149,3 +149,16 @@ export const submitEmptyGatedSignUpForm = async (page: Page) => {
 export const submitEmptyForgotPasswordForm = async (page: Page) => {
   await clickLink(page, 'forgot-password-action')
 }
+/**
+ * Change password form (profile page)
+ */
+export const submitChangePasswordForm = async (
+  page: Page,
+  currentPassword: string,
+  newPassword: string
+) => {
+  await fillInput(page, 'current-password-input', currentPassword)
+  await fillInput(page, 'new-password-input', newPassword)
+  await fillInput(page, 'confirm-password-input', newPassword)
+  await clickLink(page, 'change-password-action')
+}

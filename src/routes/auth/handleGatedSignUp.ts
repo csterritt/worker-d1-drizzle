@@ -7,7 +7,13 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
+import {
+  PATHS,
+  COOKIES,
+  STANDARD_SECURE_HEADERS,
+  MESSAGES,
+  LOG_MESSAGES,
+} from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
 import {
@@ -16,11 +22,7 @@ import {
   consumeSingleUseCode,
 } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
-import {
-  getFormValue,
-  GatedSignUpSchema,
-  validateRequest,
-} from '../../lib/validators'
+import { validateRequest, GatedSignUpFormSchema } from '../../lib/validators'
 
 /**
  * Handle gated sign-up form submission with code validation
@@ -32,30 +34,22 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     secureHeaders(STANDARD_SECURE_HEADERS),
     async (c) => {
       try {
-        const formData = await c.req.formData()
-        const [isValid, data, errorMessage] = validateRequest(
-          {
-            code: getFormValue(formData, 'code'),
-            name: getFormValue(formData, 'name'),
-            email: getFormValue(formData, 'email'),
-            password: getFormValue(formData, 'password'),
-          },
-          GatedSignUpSchema
-        )
-
-        if (!isValid || !data) {
+        const body = await c.req.parseBody()
+        const [ok, data, err] = validateRequest(body, GatedSignUpFormSchema)
+        if (!ok) {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_UP,
-            errorMessage ?? 'All fields are required for sign-up.'
+            err || MESSAGES.INVALID_INPUT
           )
         }
 
-        const { code, name, email, password } = data
+        const { code, name, email, password } = data as any
+        const trimmedCode = (code as string).trim()
 
         // Validate and consume the sign-up code FIRST
         const dbClient = createDbClient(c.env.PROJECT_DB)
-        const codeResult = await consumeSingleUseCode(dbClient, code)
+        const codeResult = await consumeSingleUseCode(dbClient, trimmedCode)
 
         if (codeResult.isErr) {
           console.error(
@@ -65,7 +59,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_UP,
-            'Something went wrong validating your sign-up code. Please try again.'
+            MESSAGES.GENERIC_ERROR_TRY_AGAIN
           )
         }
 
@@ -120,7 +114,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
               return redirectWithMessage(
                 c,
                 PATHS.AUTH.AWAIT_VERIFICATION,
-                'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+                MESSAGES.ACCOUNT_ALREADY_EXISTS
               )
             }
 
@@ -137,7 +131,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.SIGN_UP,
-              'Registration failed. Please try again.'
+              MESSAGES.GENERIC_ERROR_TRY_AGAIN
             )
           }
         } catch (apiError: any) {
@@ -160,7 +154,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+              MESSAGES.ACCOUNT_ALREADY_EXISTS
             )
           }
 
@@ -174,14 +168,14 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             return redirectWithMessage(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
-              'An account with this email already exists. Please check your email for a verification link or sign in if you have already verified your account.'
+              MESSAGES.ACCOUNT_ALREADY_EXISTS
             )
           }
 
           return redirectWithMessage(
             c,
             PATHS.AUTH.SIGN_UP,
-            'Something went wrong during registration. Please try again.'
+            MESSAGES.REGISTRATION_GENERIC_ERROR
           )
         }
 
@@ -200,7 +194,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
 
             if (updateResult.isErr) {
               console.error(
-                'Database error updating account timestamp:',
+                LOG_MESSAGES.DB_UPDATE_ACCOUNT_TS,
                 updateResult.error
               )
               // Don't fail the sign-up process if this fails
@@ -221,7 +215,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_UP,
-          'Something went wrong during registration. Please try again.'
+          MESSAGES.REGISTRATION_GENERIC_ERROR
         )
       }
     }

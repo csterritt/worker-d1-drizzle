@@ -11,13 +11,9 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { MESSAGES, PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
-import {
-  getFormValue,
-  ResetPasswordSchema,
-  validateRequest,
-} from '../../lib/validators'
+import { validateRequest, ResetPasswordFormSchema } from '../../lib/validators'
 
 /**
  * Attach the reset password handler to the app.
@@ -31,50 +27,22 @@ export const handleResetPassword = (
     secureHeaders(STANDARD_SECURE_HEADERS),
     async (c) => {
       try {
-        const formData = await c.req.formData()
-        const tokenValue = getFormValue(formData, 'token')
-        const passwordValue = getFormValue(formData, 'password')
-        const confirmPasswordValue = getFormValue(formData, 'confirmPassword')
+        const body = await c.req.parseBody()
+        let [ok, data, err] = validateRequest(body, ResetPasswordFormSchema)
+        if (!ok) {
+          const commaSpot = err?.indexOf(',') ?? -1
+          if (commaSpot > -1) {
+            err = err?.substring(0, commaSpot) || 'Invalid input'
+          }
 
-        const hasMissingFields = [
-          tokenValue,
-          passwordValue,
-          confirmPasswordValue,
-        ].some((value) => value.trim().length === 0)
-
-        if (hasMissingFields) {
-          const redirectPath = tokenValue
-            ? `${PATHS.AUTH.RESET_PASSWORD}?token=${tokenValue}`
+          const tokenEntered = (body as any)?.token as string | undefined
+          const target = tokenEntered
+            ? `${PATHS.AUTH.RESET_PASSWORD}?token=${tokenEntered}`
             : PATHS.AUTH.FORGOT_PASSWORD
-          return redirectWithError(
-            c,
-            redirectPath,
-            'Please fill in all fields.'
-          )
+          return redirectWithError(c, target, err || MESSAGES.INVALID_INPUT)
         }
 
-        const [isValid, data, errorMessage] = validateRequest(
-          {
-            token: tokenValue,
-            password: passwordValue,
-            confirmPassword: confirmPasswordValue,
-          },
-          ResetPasswordSchema
-        )
-
-        if (!isValid || !data) {
-          const fallbackToken = getFormValue(formData, 'token')
-          const redirectPath = fallbackToken
-            ? `${PATHS.AUTH.RESET_PASSWORD}?token=${fallbackToken}`
-            : PATHS.AUTH.FORGOT_PASSWORD
-          return redirectWithError(
-            c,
-            redirectPath,
-            errorMessage ?? 'Please fill in all fields.'
-          )
-        }
-
-        const { token, password } = data
+        const { token, password } = data as any
 
         // Use better-auth to reset the password
         const auth = createAuth(c.env)

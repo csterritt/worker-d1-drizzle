@@ -14,7 +14,7 @@ import {
 } from '../support/page-verifiers'
 
 test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     await skipIfNotMode('GATED_SIGN_UP')
   })
 
@@ -54,7 +54,10 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should stay on sign-up page with error message
       await verifyOnGatedSignUpPage(page)
-      await verifyAlert(page, 'Sign-up code is too short.')
+      await verifyAlert(
+        page,
+        'Sign-up code must be at least 8 characters long.'
+      )
     })
   )
 
@@ -72,7 +75,10 @@ test.describe('Gated Sign-Up Mode: Invalid Code Tests', () => {
 
       // Should stay on sign-up page with error message
       await verifyOnGatedSignUpPage(page)
-      await verifyAlert(page, 'Sign-up code is too short.')
+      await verifyAlert(
+        page,
+        'Sign-up code must be at least 8 characters long.'
+      )
     })
   )
 

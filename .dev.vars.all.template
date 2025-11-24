@@ -1,7 +1,5 @@
-SMTP_SERVER_HOST='<your server host>'
-SMTP_SERVER_PORT='<your hosts port>'
-SMTP_SERVER_USER='<your user name>'
-SMTP_SERVER_PASSWORD='<your server password>'
+EMAIL_SEND_URL='https://your-email-sender/url'
+EMAIL_SEND_CODE='set-your-email-site-secret-here'
 
 CLOUDFLARE_ACCOUNT_ID='<your account id>'
 CLOUDFLARE_DATABASE_ID='<your d1 database id>'
@@ -12,3 +10,4 @@ PO_USER_ID='<your pushover user id - optional>'
 
 ALTERNATE_ORIGIN='<an alternate URL to your app, e.g. via tailscale>'
 NODE_ENV=development
+BETTER_AUTH_SECRET='set-your-per-site-secret-here'

@@ -3,8 +3,9 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
-import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { COOKIES, PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
+import { addSimpleCookie } from '../../lib/cookie-support'
 
 /**
  * Handle sign-out with proper UX flow
@@ -35,11 +36,12 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
 
           if (authResponse && authResponse.status === 200) {
             // Create redirect response with success message
-            const redirectResponse = redirectWithMessage(
+            addSimpleCookie(
               c,
-              PATHS.ROOT,
+              COOKIES.SIGN_OUT_MESSAGE,
               'You have been signed out successfully.'
             )
+            const redirectResponse = redirectWithMessage(c, PATHS.ROOT, '')
 
             // Handle multiple cookie headers if they exist
             const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
