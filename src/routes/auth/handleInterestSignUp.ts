@@ -42,7 +42,10 @@ export const handleInterestSignUp = (
       const [ok, data, err] = validateRequest(body, InterestSignUpFormSchema)
       if (!ok) {
         const emailEntered = (body as any)?.email as string
-        if (emailEntered) addCookie(c, COOKIES.EMAIL_ENTERED, emailEntered)
+        if (emailEntered) {
+          addCookie(c, COOKIES.EMAIL_ENTERED, emailEntered)
+        }
+
         return redirectWithError(
           c,
           PATHS.AUTH.INTEREST_SIGN_UP,

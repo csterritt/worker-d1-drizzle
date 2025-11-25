@@ -19,17 +19,13 @@ import {
   type BaseIssue,
   type InferOutput,
 } from 'valibot'
-import {
-  VALIDATION,
-  DISPLAY_MODES,
-  PAGE_SIZES,
-  MESSAGES,
-  ITEM_SORT_ORDERS,
-} from '../constants'
+import { VALIDATION } from '../constants'
 
 // Email validation function
 const validateEmail = (value: unknown) => {
-  if (typeof value !== 'string') return false
+  if (typeof value !== 'string') {
+    return false
+  }
   const v = value.trim().toLowerCase()
   return VALIDATION.EMAIL_PATTERN.test(v)
 }
