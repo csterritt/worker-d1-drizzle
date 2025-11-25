@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { Hono } from 'hono'
+import { Hono, Context, Next } from 'hono'
 
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage } from '../../lib/redirects'
@@ -11,177 +11,213 @@ import type { Bindings } from '../../local-types'
 import { addCookie } from '../../lib/cookie-support'
 
 /**
+ * Response data from better-auth sign-in/sign-up
+ */
+interface AuthResponseData {
+  user?: {
+    id: string
+    email: string
+    emailVerified: boolean
+  }
+}
+
+/**
+ * Error response from better-auth
+ */
+interface AuthErrorData {
+  code?: string
+  message?: string
+}
+
+/**
+ * Variables stored in context during interceptor
+ */
+interface InterceptorVariables {
+  signInEmail?: string
+}
+
+type InterceptorEnv = { Bindings: Bindings; Variables: InterceptorVariables }
+type InterceptorContext = Context<InterceptorEnv>
+
+/**
  * Better-auth response interceptor to convert JSON responses to user-friendly redirects
  * This middleware intercepts successful better-auth API responses and redirects appropriately
  */
 export const setupBetterAuthResponseInterceptor = (
   app: Hono<{ Bindings: Bindings }>
-) => {
+): void => {
   // Add middleware to capture email from sign-in requests without consuming the body
-  app.use(PATHS.AUTH.SIGN_IN_EMAIL_API, async (c: any, next) => {
-    try {
-      // Clone the request to avoid consuming the original body
-      const clonedRequest = c.req.raw.clone()
-      const formData = await clonedRequest.formData()
-      const email = formData.get('email') as string | null
+  app.use(
+    PATHS.AUTH.SIGN_IN_EMAIL_API,
+    async (c: InterceptorContext, next: Next) => {
+      try {
+        // Clone the request to avoid consuming the original body
+        const clonedRequest = c.req.raw.clone()
+        const formData = await clonedRequest.formData()
+        const email = formData.get('email') as string | null
 
-      if (email) {
-        c.set('signInEmail', email)
+        if (email) {
+          c.set('signInEmail', email)
+        }
+      } catch (e) {
+        // Silently continue if email capture fails
       }
-    } catch (e) {
-      // Silently continue if email capture fails
-    }
 
-    await next()
-  })
+      await next()
+    }
+  )
 
   // Intercept sign-in endpoint specifically
-  app.on(['POST'], PATHS.AUTH.SIGN_IN_EMAIL_API, async (c: any, next) => {
-    try {
-      // Get the captured email from context
-      const capturedEmail = c.get('signInEmail') as string | null
+  app.on(
+    ['POST'],
+    PATHS.AUTH.SIGN_IN_EMAIL_API,
+    async (c: InterceptorContext, next: Next) => {
+      try {
+        // Get the captured email from context
+        const capturedEmail = c.get('signInEmail')
 
-      // Create better-auth instance and handle the request normally
-      const auth = createAuth(c.env)
-      const response = await auth.handler(c.req.raw)
+        // Create better-auth instance and handle the request normally
+        const auth = createAuth(c.env)
+        const response = await auth.handler(c.req.raw)
 
-      if (!response) {
-        return next()
-      }
-
-      // Handle better-auth response based on status
-
-      // Check if this was a successful auth response (status 200)
-      if (response.status === 200) {
-        try {
-          const responseData = (await response.json()) as any
-
-          // Handle successful sign-up that requires email verification
-          if (
-            responseData &&
-            responseData.user &&
-            !responseData.user.emailVerified &&
-            c.req.url.includes('/sign-up')
-          ) {
-            // User signed up but needs to verify email
-            const email = responseData.user.email
-            addCookie(c, COOKIES.EMAIL_ENTERED, email)
-            return redirectWithMessage(
-              c,
-              `${PATHS.AUTH.EMAIL_SENT}`,
-              'Account created! Please check your email to verify your account.'
-            )
-          }
-
-          // If the response contains user data and user is verified, it was a successful sign-in
-          if (
-            responseData &&
-            responseData.user &&
-            responseData.user.id &&
-            responseData.user.emailVerified
-          ) {
-            // Create a new response with the same cookies but redirect instead of JSON
-            const redirectResponse = redirectWithMessage(
-              c,
-              PATHS.PRIVATE,
-              'Welcome! You have been signed in successfully.'
-            )
-
-            // Handle multiple cookie headers if they exist
-            const allCookieHeaders = response.headers.getSetCookie?.() || []
-            allCookieHeaders.forEach((cookie) => {
-              redirectResponse.headers.append('Set-Cookie', cookie)
-            })
-
-            return redirectResponse
-          }
-
-          // If the response contains user data but email is not verified
-          if (
-            responseData &&
-            responseData.user &&
-            responseData.user.id &&
-            !responseData.user.emailVerified
-          ) {
-            return redirectWithMessage(
-              c,
-              PATHS.AUTH.SIGN_IN,
-              MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
-            )
-          }
-        } catch (jsonError) {
-          console.log(
-            'Response was not JSON, continuing with original response'
-          )
+        if (!response) {
+          return next()
         }
-      }
 
-      // For non-200 responses or responses without user data, handle errors gracefully
-      if (response.status === 401) {
-        return redirectWithMessage(
-          c,
-          PATHS.AUTH.SIGN_IN,
-          'Invalid email or password. Please check your credentials and try again.'
-        )
-      }
+        // Handle better-auth response based on status
 
-      if (response.status === 403) {
-        // For 403 responses, check if it's specifically for unverified email
-        try {
-          const responseClone = response.clone()
-          const errorData: any = await responseClone.json()
+        // Check if this was a successful auth response (status 200)
+        if (response.status === 200) {
+          try {
+            const responseData = (await response.json()) as AuthResponseData
 
-          // Check if this is specifically an EMAIL_NOT_VERIFIED error
-          if (errorData && errorData.code === 'EMAIL_NOT_VERIFIED') {
-            // Use the captured email from context
-            if (capturedEmail) {
-              addCookie(c, COOKIES.EMAIL_ENTERED, capturedEmail)
+            // Handle successful sign-up that requires email verification
+            if (
+              responseData &&
+              responseData.user &&
+              !responseData.user.emailVerified &&
+              c.req.url.includes('/sign-up')
+            ) {
+              // User signed up but needs to verify email
+              const email = responseData.user.email
+              addCookie(c, COOKIES.EMAIL_ENTERED, email)
               return redirectWithMessage(
                 c,
-                PATHS.AUTH.AWAIT_VERIFICATION,
+                `${PATHS.AUTH.EMAIL_SENT}`,
+                'Account created! Please check your email to verify your account.'
+              )
+            }
+
+            // If the response contains user data and user is verified, it was a successful sign-in
+            if (
+              responseData &&
+              responseData.user &&
+              responseData.user.id &&
+              responseData.user.emailVerified
+            ) {
+              // Create a new response with the same cookies but redirect instead of JSON
+              const redirectResponse = redirectWithMessage(
+                c,
+                PATHS.PRIVATE,
+                'Welcome! You have been signed in successfully.'
+              )
+
+              // Handle multiple cookie headers if they exist
+              const allCookieHeaders = response.headers.getSetCookie?.() || []
+              allCookieHeaders.forEach((cookie) => {
+                redirectResponse.headers.append('Set-Cookie', cookie)
+              })
+
+              return redirectResponse
+            }
+
+            // If the response contains user data but email is not verified
+            if (
+              responseData &&
+              responseData.user &&
+              responseData.user.id &&
+              !responseData.user.emailVerified
+            ) {
+              return redirectWithMessage(
+                c,
+                PATHS.AUTH.SIGN_IN,
                 MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
               )
             }
+          } catch (jsonError) {
+            console.log(
+              'Response was not JSON, continuing with original response'
+            )
           }
-        } catch (e) {
-          // Could not parse 403 response, continue with fallback
         }
 
-        // Fallback to original behavior for other 403 cases or if no email captured
-        return redirectWithMessage(
-          c,
-          PATHS.AUTH.SIGN_IN,
-          MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
-        )
-      }
+        // For non-200 responses or responses without user data, handle errors gracefully
+        if (response.status === 401) {
+          return redirectWithMessage(
+            c,
+            PATHS.AUTH.SIGN_IN,
+            'Invalid email or password. Please check your credentials and try again.'
+          )
+        }
 
-      if (response.status === 400) {
-        return redirectWithMessage(
-          c,
-          PATHS.AUTH.SIGN_IN,
-          'Please check your email and password and try again.'
-        )
-      }
+        if (response.status === 403) {
+          // For 403 responses, check if it's specifically for unverified email
+          try {
+            const responseClone = response.clone()
+            const errorData = (await responseClone.json()) as AuthErrorData
 
-      if (response.status >= 500) {
+            // Check if this is specifically an EMAIL_NOT_VERIFIED error
+            if (errorData && errorData.code === 'EMAIL_NOT_VERIFIED') {
+              // Use the captured email from context
+              if (capturedEmail) {
+                addCookie(c, COOKIES.EMAIL_ENTERED, capturedEmail)
+                return redirectWithMessage(
+                  c,
+                  PATHS.AUTH.AWAIT_VERIFICATION,
+                  MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
+                )
+              }
+            }
+          } catch (e) {
+            // Could not parse 403 response, continue with fallback
+          }
+
+          // Fallback to original behavior for other 403 cases or if no email captured
+          return redirectWithMessage(
+            c,
+            PATHS.AUTH.SIGN_IN,
+            MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
+          )
+        }
+
+        if (response.status === 400) {
+          return redirectWithMessage(
+            c,
+            PATHS.AUTH.SIGN_IN,
+            'Please check your email and password and try again.'
+          )
+        }
+
+        if (response.status >= 500) {
+          return redirectWithMessage(
+            c,
+            PATHS.AUTH.SIGN_IN,
+            MESSAGES.GENERIC_ERROR_TRY_AGAIN
+          )
+        }
+
+        // Return the original response for any other cases
+        return response
+      } catch (error) {
+        console.error('Better-auth response interceptor error:', error)
+
+        // Graceful fallback - redirect to sign-in page with error message
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,
           MESSAGES.GENERIC_ERROR_TRY_AGAIN
         )
       }
-
-      // Return the original response for any other cases
-      return response
-    } catch (error) {
-      console.error('Better-auth response interceptor error:', error)
-
-      // Graceful fallback - redirect to sign-in page with error message
-      return redirectWithMessage(
-        c,
-        PATHS.AUTH.SIGN_IN,
-        MESSAGES.GENERIC_ERROR_TRY_AGAIN
-      )
     }
-  })
+  )
 }

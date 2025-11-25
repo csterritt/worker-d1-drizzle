@@ -10,7 +10,6 @@ import { Context } from 'hono'
 import { setCookie, deleteCookie, getCookie } from 'hono/cookie'
 
 import { COOKIES } from '../constants'
-import { Bindings } from '../local-types'
 
 /**
  * Retrieves a cookie value
@@ -19,7 +18,7 @@ import { Bindings } from '../local-types'
  * @returns Cookie value or undefined if not found
  */
 export const retrieveCookie = (
-  c: Context<{ Bindings: Bindings }>,
+  c: Context,
   name: string
 ): string | undefined => {
   return getCookie(c, name)
@@ -33,10 +32,10 @@ export const retrieveCookie = (
  * @param extraOptions - Additional cookie options
  */
 export const addCookie = (
-  c: Context<{ Bindings: Bindings }>,
+  c: Context,
   name: string,
   value: string,
-  extraOptions?: object
+  extraOptions?: Record<string, unknown>
 ): void => {
   let options = COOKIES.STANDARD_COOKIE_OPTIONS
   if (extraOptions) {
@@ -55,7 +54,7 @@ export const addCookie = (
  * @param extraOptions - Additional cookie options
  */
 export const addSimpleCookie = (
-  c: Context<{ Bindings: Bindings }>,
+  c: Context,
   name: string,
   value: string
 ): void => {
@@ -67,10 +66,7 @@ export const addSimpleCookie = (
  * @param c - Hono context
  * @param name - Cookie name
  */
-export const removeCookie = (
-  c: Context<{ Bindings: Bindings }>,
-  name: string
-): void => {
+export const removeCookie = (c: Context, name: string): void => {
   deleteCookie(c, name, COOKIES.STANDARD_COOKIE_OPTIONS)
 }
 
@@ -79,9 +75,6 @@ export const removeCookie = (
  * @param c - Hono context
  * @param name - Cookie name
  */
-export const removeSimpleCookie = (
-  c: Context<{ Bindings: Bindings }>,
-  name: string
-): void => {
+export const removeSimpleCookie = (c: Context, name: string): void => {
   deleteCookie(c, name, { path: '/' })
 }

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+import { Context } from 'hono'
+
 import { addCookie, removeCookie, retrieveCookie } from './cookie-support'
 
 /**
@@ -10,7 +12,10 @@ import { addCookie, removeCookie, retrieveCookie } from './cookie-support'
  * @module lib/time-access
  */
 
-export const getCurrentTime = (c: any, ...args: any[]): Date => {
+export const getCurrentTime = (
+  c: Context,
+  ...args: (string | number | Date)[]
+): Date => {
   // if (args.length === 0) { // PRODUCTION:UNCOMMENT
   //   return new Date() // PRODUCTION:UNCOMMENT
   // } // PRODUCTION:UNCOMMENT
@@ -30,10 +35,10 @@ export const getCurrentTime = (c: any, ...args: any[]): Date => {
   return new Date(new Date(...args).getTime() + delta)
 }
 
-export const setCurrentDelta = (c: any, delta: number) => {
+export const setCurrentDelta = (c: Context, delta: number): void => {
   addCookie(c, 'delta', String(delta))
 }
 
-export const clearCurrentDelta = (c: any) => {
+export const clearCurrentDelta = (c: Context): void => {
   removeCookie(c, 'delta')
 }

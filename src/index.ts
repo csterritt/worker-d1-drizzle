@@ -94,7 +94,7 @@ if (!validateEnvironmentVariables()) {
   console.log('==============> Environment variables are not valid!')
 }
 
-const app: Hono<{ Bindings: Bindings }> = new Hono<{ Bindings: Bindings }>()
+const app = new Hono<{ Bindings: Bindings }>()
 
 const signUpMode = process.env.SIGN_UP_MODE
 console.log(`🔧 SIGN_UP_MODE: ${signUpMode}`)

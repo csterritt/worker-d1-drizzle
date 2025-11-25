@@ -10,6 +10,7 @@
 
 import nodemailer from 'nodemailer'
 import { getTestSmtpConfig } from '../routes/test/smtp-config'
+import type { Bindings } from '../local-types'
 
 /**
  * Configuration for email service
@@ -27,7 +28,7 @@ interface EmailConfig {
 /**
  * Get email configuration based on environment
  */
-const getEmailConfig = (env: any): EmailConfig => {
+const getEmailConfig = (env: Bindings): EmailConfig => {
   // More robust test environment detection
   const isTestMode =
     env.NODE_ENV === 'test' ||
@@ -48,9 +49,26 @@ const getEmailConfig = (env: any): EmailConfig => {
 }
 
 /**
+ * Mail options for sending emails
+ */
+interface MailOptions {
+  to: string
+  subject: string
+  html: string
+  text: string
+}
+
+/**
+ * Email transporter interface
+ */
+interface EmailTransporter {
+  sendMail: (options: MailOptions) => Promise<unknown>
+}
+
+/**
  * Create email transporter based on configuration
  */
-const createTransporter = (env: any) => {
+const createTransporter = (env: Bindings): EmailTransporter => {
   const config = getEmailConfig(env)
 
   // Check if SMTP config has been overridden for testing
@@ -73,7 +91,11 @@ const createTransporter = (env: any) => {
 
   // Production POST configuration
   return {
-    sendMail: async (mailOptions: any) => {
+    sendMail: async (mailOptions: MailOptions) => {
+      if (!env.EMAIL_SEND_URL) {
+        throw new Error('EMAIL_SEND_URL is not configured')
+      }
+
       return fetch(env.EMAIL_SEND_URL, {
         body: JSON.stringify({
           email_to: mailOptions.to,
@@ -101,7 +123,7 @@ const createTransporter = (env: any) => {
  * @param token - Confirmation token
  */
 export const sendConfirmationEmail = async (
-  env: any,
+  env: Bindings,
   email: string,
   name: string,
   confirmationUrl: string,
@@ -170,7 +192,7 @@ export const sendConfirmationEmail = async (
  * @param token - Reset token
  */
 export const sendPasswordResetEmail = async (
-  env: any,
+  env: Bindings,
   email: string,
   name: string,
   resetUrl: string,

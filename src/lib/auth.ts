@@ -11,6 +11,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { createDbClient } from '../db/client'
 import { schema } from '../db/schema'
 import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
+import type { Bindings } from '../local-types'
 
 let alternateOrigin = 'http://localhost:3000/' // PRODUCTION:REMOVE
 // PRODUCTION:REMOVE-NEXT-LINE
@@ -23,7 +24,7 @@ if (process.env.ALTERNATE_ORIGIN) {
  * @param env - Cloudflare environment
  * @returns Configured better-auth instance
  */
-export const createAuth = (env: any) => {
+export const createAuth = (env: Bindings) => {
   const db: D1Database = env.PROJECT_DB
   const dbClient = createDbClient(db)
 

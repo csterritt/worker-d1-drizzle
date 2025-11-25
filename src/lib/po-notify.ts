@@ -5,14 +5,16 @@
 import { Context } from 'hono'
 
 import { API_URLS } from '../constants'
+import type { Bindings, PushoverMessage } from '../local-types'
 
-const post = async (url: string, data: any) => {
+type AppContext = Context<{ Bindings: Bindings }>
+
+const post = async (url: string, data: PushoverMessage): Promise<Response> => {
   /**
    * gatherResponse awaits and returns a response body as a string.
    * Use await gatherResponse(...) in an async function to get the response body
-   * @param {Response} response
    */
-  const gatherResponse = async (response: any) => {
+  const gatherResponse = async (response: Response): Promise<string> => {
     const { headers } = response
     const contentType = headers.get('content-type') || ''
     if (contentType.includes('application/json')) {
@@ -38,14 +40,17 @@ const post = async (url: string, data: any) => {
   return new Response(results, init)
 }
 
-export const pushoverNotify = async (c: Context, message: string) => {
-  if (
-    (c.env.PO_APP_ID ?? '').trim() !== '' &&
-    (c.env.PO_USER_ID ?? '').trim() !== ''
-  ) {
-    const msg = {
-      token: c.env.PO_APP_ID,
-      user: c.env.PO_USER_ID,
+export const pushoverNotify = async (
+  c: AppContext,
+  message: string
+): Promise<void> => {
+  const appId = c.env.PO_APP_ID?.trim()
+  const userId = c.env.PO_USER_ID?.trim()
+
+  if (appId && userId) {
+    const msg: PushoverMessage = {
+      token: appId,
+      user: userId,
       message,
     }
 

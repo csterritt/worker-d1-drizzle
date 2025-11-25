@@ -103,11 +103,12 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
               MESSAGES.GENERIC_ERROR_TRY_AGAIN
             )
           }
-        } catch (apiError: any) {
+        } catch (apiError: unknown) {
           console.error('Better-auth sign-up API error:', apiError)
 
           // Check if it's a duplicate email error from database or API
-          const errorMessage = apiError?.message || String(apiError)
+          const errorMessage =
+            apiError instanceof Error ? apiError.message : String(apiError)
           const errorString = errorMessage.toLowerCase()
 
           if (

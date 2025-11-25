@@ -10,7 +10,7 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS, MESSAGES } from '../../constants'
-import { Bindings } from '../../local-types'
+import { Bindings, DrizzleClient } from '../../local-types'
 import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
 import { addInterestedEmail } from '../../lib/db-access'
 import { addCookie } from '../../lib/cookie-support'
@@ -58,7 +58,7 @@ export const handleInterestSignUp = (
       console.log('Processing interest sign-up for email:', trimmedEmail)
 
       // Get database instance
-      const db = c.get('db')
+      const db = c.get('db') as DrizzleClient
 
       try {
         console.log('🔧 About to call addInterestedEmail for:', trimmedEmail)

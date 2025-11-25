@@ -117,11 +117,12 @@ export const handleSignIn = (app: Hono<{ Bindings: Bindings }>): void => {
           })
 
           return response
-        } catch (apiError: any) {
+        } catch (apiError: unknown) {
           console.error('Better-auth sign-in API error:', apiError)
 
           // Check if it's an authentication error
-          const errorMessage = apiError?.message || String(apiError)
+          const errorMessage =
+            apiError instanceof Error ? apiError.message : String(apiError)
           const errorString = errorMessage.toLowerCase()
 
           if (

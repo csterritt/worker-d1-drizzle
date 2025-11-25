@@ -58,6 +58,17 @@ export const ForgotPasswordFormSchema = object({
 })
 
 /**
+ * Sign-in form schema
+ */
+export const SignInSchema = object({
+  email: EmailSchema,
+  password: pipe(
+    string(VALIDATION.REQUIRED),
+    minLength(1, 'Password is required.')
+  ),
+})
+
+/**
  * Open sign-up form schema
  */
 export const SignUpFormSchema = object({
@@ -136,10 +147,10 @@ export const ResetPasswordFormSchema = pipe(
       minLength(8, VALIDATION.PASSWORD_MIN_LENGTH)
     ),
   }),
-  custom(
-    (data: any) => data && data.password === data.confirmPassword,
-    'Passwords do not match. Please try again.'
-  )
+  custom((data) => {
+    const d = data as { password: string; confirmPassword: string }
+    return d && d.password === d.confirmPassword
+  }, 'Passwords do not match. Please try again.')
 )
 
 /**
@@ -172,10 +183,10 @@ export const ChangePasswordFormSchema = pipe(
       )
     ),
   }),
-  custom(
-    (data: any) => data && data.newPassword === data.confirmPassword,
-    'New passwords do not match. Please try again.'
-  )
+  custom((data) => {
+    const d = data as { newPassword: string; confirmPassword: string }
+    return d && d.newPassword === d.confirmPassword
+  }, 'New passwords do not match. Please try again.')
 )
 
 /**
@@ -217,4 +228,24 @@ export function validateRequest<
 
     return [false, null, errorMessage]
   }
+}
+
+/**
+ * Helper function to extract a string value from FormData
+ * @param formData - The FormData object
+ * @param key - The key to extract
+ * @returns The string value or empty string if not found
+ */
+export const getFormValue = (formData: FormData, key: string): string => {
+  const value = formData.get(key)
+  if (value === null || value === undefined) {
+    return ''
+  }
+
+  if (typeof value === 'string') {
+    return value
+  }
+
+  // Handle File objects (shouldn't happen for text fields, but be safe)
+  return ''
 }

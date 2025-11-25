@@ -6,14 +6,25 @@
  * Better Auth integration handler for Hono
  * @module routes/auth/better-auth-handler
  */
+import { Hono, Context, Next } from 'hono'
+
 import { createAuth } from '../../lib/auth'
+import type {
+  Bindings,
+  AuthUser,
+  AuthSession,
+  AuthSessionResponse,
+} from '../../local-types'
 
 // Type definitions for better-auth context variables
 export interface BetterAuthVariables {
-  user: any | null
-  session: any | null
-  authSession: any | null
+  user: AuthUser | null
+  session: AuthSession | null
+  authSession: AuthSessionResponse | null
 }
+
+type AppEnv = { Bindings: Bindings; Variables: BetterAuthVariables }
+type AppContext = Context<AppEnv>
 
 // Extended Hono type with better-auth variables (kept for reference)
 
@@ -21,11 +32,11 @@ export interface BetterAuthVariables {
  * Setup better-auth routes in the Hono app
  * @param app - Hono app instance
  */
-export const setupBetterAuth = (app: any) => {
+export const setupBetterAuth = (app: Hono<{ Bindings: Bindings }>): void => {
   console.log('🔧 Setting up better-auth routes...')
 
   // Better-auth handler with enhanced debugging
-  app.all('/api/auth/*', async (c: any) => {
+  app.all('/api/auth/*', async (c: AppContext) => {
     console.log('🔔 Better-auth route hit:', c.req.method, c.req.url)
     console.log('🔧 Environment check:', {
       PROJECT_DB: !!c.env.PROJECT_DB,
@@ -63,7 +74,7 @@ export const setupBetterAuth = (app: any) => {
   })
 
   // Add a simple test route for debugging (after wildcard)
-  app.get('/api/auth/test', async (c: any) => {
+  app.get('/api/auth/test', async (c: AppContext) => {
     return c.json({ message: 'Test route working', url: c.req.url })
   })
 
@@ -74,8 +85,10 @@ export const setupBetterAuth = (app: any) => {
  * Better Auth middleware to provide session and user context
  * @param app - Hono app instance
  */
-export const setupBetterAuthMiddleware = (app: any) => {
-  app.use('*', async (c: any, next: any) => {
+export const setupBetterAuthMiddleware = (
+  app: Hono<{ Bindings: Bindings }>
+): void => {
+  app.use('*', async (c: AppContext, next: Next) => {
     try {
       const auth = createAuth(c.env)
       const session = await auth.api.getSession({

@@ -7,6 +7,7 @@
  * @module routes/buildLayout
  */
 import { Context } from 'hono'
+import type { HtmlEscapedString } from 'hono/utils/html'
 
 import { removeCookie, retrieveCookie } from '../lib/cookie-support'
 import { PATHS, COOKIES } from '../constants'
@@ -18,7 +19,11 @@ import { version } from '../version'
  * @param c - Hono context
  * @param children - TSX children
  */
-export const useLayout = (c: Context, children: any, extraMessage?: string) => {
+export const useLayout = (
+  c: Context,
+  children: HtmlEscapedString | Promise<HtmlEscapedString>,
+  extraMessage?: string
+) => {
   // Get message and error cookies
   const message = retrieveCookie(c, COOKIES.MESSAGE_FOUND) || extraMessage
   if (message) {

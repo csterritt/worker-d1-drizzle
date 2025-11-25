@@ -177,8 +177,17 @@ export const API_URLS = {
   PUSHOVER: 'https://api.pushover.net/1/messages.json',
 }
 
+/**
+ * Security headers configuration for secureHeaders middleware
+ */
+interface SecureHeadersConfig {
+  referrerPolicy: string
+  contentSecurityPolicy: Record<string, string | string[]>
+  permissionsPolicy: Record<string, string[]>
+}
+
 // Security headers
-export const STANDARD_SECURE_HEADERS: any = {
+export const STANDARD_SECURE_HEADERS: SecureHeadersConfig = {
   referrerPolicy: 'strict-origin-when-cross-origin',
   contentSecurityPolicy: {
     // defaultSrc: ["'self'", 'https://mini-auth.example.com', 'https://mini-auth.workers.dev'], // PRODUCTION:UNCOMMENT
@@ -219,7 +228,7 @@ export const STANDARD_SECURE_HEADERS: any = {
   },
 }
 
-export const ALLOW_SCRIPTS_SECURE_HEADERS: any = {
+export const ALLOW_SCRIPTS_SECURE_HEADERS: SecureHeadersConfig = {
   ...STANDARD_SECURE_HEADERS,
   contentSecurityPolicy: {
     ...STANDARD_SECURE_HEADERS.contentSecurityPolicy,

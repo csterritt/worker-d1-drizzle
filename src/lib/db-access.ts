@@ -11,6 +11,7 @@ import Result from 'true-myth/result'
 import { eq } from 'drizzle-orm'
 import { user, account, singleUseCode, interestedEmails } from '../db/schema'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
+import type { DrizzleClient } from '../local-types'
 
 /**
  * Type definitions for database operations
@@ -34,7 +35,7 @@ export interface UserIdData {
  * @returns Promise<Result<UserWithAccountData[], Error>>
  */
 export const getUserWithAccountByEmail = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<UserWithAccountData[], Error>> => {
   let res: Result<UserWithAccountData[], Error>
@@ -52,7 +53,7 @@ export const getUserWithAccountByEmail = async (
 }
 
 const getUserWithAccountByEmailActual = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<UserWithAccountData[], Error>> => {
   try {
@@ -82,7 +83,7 @@ const getUserWithAccountByEmailActual = async (
  * @returns Promise<Result<UserIdData[], Error>>
  */
 export const getUserIdByEmail = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<UserIdData[], Error>> => {
   let res: Result<UserIdData[], Error>
@@ -100,7 +101,7 @@ export const getUserIdByEmail = async (
 }
 
 const getUserIdByEmailActual = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<UserIdData[], Error>> => {
   try {
@@ -123,7 +124,7 @@ const getUserIdByEmailActual = async (
  * @returns Promise<Result<boolean, Error>>
  */
 export const updateAccountTimestamp = async (
-  db: any,
+  db: DrizzleClient,
   userId: string
 ): Promise<Result<boolean, Error>> => {
   let res: Result<boolean, Error>
@@ -141,7 +142,7 @@ export const updateAccountTimestamp = async (
 }
 
 const updateAccountTimestampActual = async (
-  db: any,
+  db: DrizzleClient,
   userId: string
 ): Promise<Result<boolean, Error>> => {
   try {
@@ -163,7 +164,7 @@ const updateAccountTimestampActual = async (
  * @returns Promise<Result<boolean, Error>> - true if code existed and was consumed, false if code didn't exist
  */
 export const consumeSingleUseCode = async (
-  db: any,
+  db: DrizzleClient,
   code: string
 ): Promise<Result<boolean, Error>> => {
   let res: Result<boolean, Error>
@@ -181,7 +182,7 @@ export const consumeSingleUseCode = async (
 }
 
 const consumeSingleUseCodeActual = async (
-  db: any,
+  db: DrizzleClient,
   code: string
 ): Promise<Result<boolean, Error>> => {
   try {
@@ -207,7 +208,7 @@ const consumeSingleUseCodeActual = async (
  * @returns Promise<Result<boolean, Error>> - true if added successfully, false if already exists
  */
 export const addInterestedEmail = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   let res: Result<boolean, Error>
@@ -231,7 +232,7 @@ export const addInterestedEmail = async (
  * @returns Promise<Result<boolean, Error>> - true if email exists, false otherwise
  */
 export const checkInterestedEmailExists = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   let res: Result<boolean, Error>
@@ -252,7 +253,7 @@ export const checkInterestedEmailExists = async (
  * Private function: Add an email to the interested emails list (actual implementation)
  */
 const addInterestedEmailActual = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   try {
@@ -280,7 +281,7 @@ const addInterestedEmailActual = async (
  * Private function: Check if an email exists in interested emails list (actual implementation)
  */
 const checkInterestedEmailExistsActual = async (
-  db: any,
+  db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   try {
