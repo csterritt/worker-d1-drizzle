@@ -12,6 +12,7 @@ import { createDbClient } from '../db/client'
 import { schema } from '../db/schema'
 import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
 import type { Bindings } from '../local-types'
+import { DURATIONS } from '../constants'
 
 let alternateOrigin = 'http://localhost:3000/' // PRODUCTION:REMOVE
 // PRODUCTION:REMOVE-NEXT-LINE
@@ -90,11 +91,11 @@ export const createAuth = (env: Bindings) => {
       },
     },
     session: {
-      expiresIn: 60 * 60 * 24 * 30, // 30 days
-      updateAge: 60 * 60 * 24, // 1 day
+      expiresIn: DURATIONS.THIRTY_DAYS_IN_SECONDS, // 30 days
+      updateAge: DURATIONS.ONE_DAY_IN_SECONDS, // 1 day
       cookieCache: {
         enabled: true,
-        maxAge: 60 * 5, // 5 minutes
+        maxAge: DURATIONS.FIVE_MINUTES_IN_SECONDS, // 5 minutes
       },
     },
     // Using better-auth's default ID generation

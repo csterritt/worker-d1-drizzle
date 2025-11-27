@@ -9,6 +9,7 @@
 import retry from 'async-retry'
 import Result from 'true-myth/result'
 import { eq } from 'drizzle-orm'
+
 import { user, account, singleUseCode, interestedEmails } from '../db/schema'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
 import type { DrizzleClient } from '../local-types'
@@ -29,35 +30,56 @@ export interface UserIdData {
 }
 
 /**
+ * Wrap a database operation with retry logic and Result type handling
+ * @param operationName - Name of the operation for logging
+ * @param operation - The async operation to execute
+ * @returns Promise<Result<T, Error>>
+ */
+const withRetry = async <T>(
+  operationName: string,
+  operation: () => Promise<Result<T, Error>>
+): Promise<Result<T, Error>> => {
+  try {
+    return await retry(operation, STANDARD_RETRY_OPTIONS)
+  } catch (err) {
+    console.log(`${operationName} final error:`, err)
+    return Result.err(err instanceof Error ? err : new Error(String(err)))
+  }
+}
+
+/**
+ * Wrap a value in Result.ok, or wrap an error in Result.err
+ * @param fn - The async function to execute
+ * @returns Promise<Result<T, Error>>
+ */
+const toResult = async <T>(fn: () => Promise<T>): Promise<Result<T, Error>> => {
+  try {
+    return Result.ok(await fn())
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}
+
+/**
  * Get user with account data for rate limiting checks
  * @param db - Database instance
  * @param email - User email to look up
  * @returns Promise<Result<UserWithAccountData[], Error>>
  */
-export const getUserWithAccountByEmail = async (
+export const getUserWithAccountByEmail = (
   db: DrizzleClient,
   email: string
-): Promise<Result<UserWithAccountData[], Error>> => {
-  let res: Result<UserWithAccountData[], Error>
-  try {
-    res = await retry(
-      () => getUserWithAccountByEmailActual(db, email),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`getUserWithAccountByEmail final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
+): Promise<Result<UserWithAccountData[], Error>> =>
+  withRetry('getUserWithAccountByEmail', () =>
+    getUserWithAccountByEmailActual(db, email)
+  )
 
-  return res
-}
-
-const getUserWithAccountByEmailActual = async (
+const getUserWithAccountByEmailActual = (
   db: DrizzleClient,
   email: string
-): Promise<Result<UserWithAccountData[], Error>> => {
-  try {
-    const userWithAccount = await db
+): Promise<Result<UserWithAccountData[], Error>> =>
+  toResult(() =>
+    db
       .select({
         userId: user.id,
         userName: user.name,
@@ -69,12 +91,7 @@ const getUserWithAccountByEmailActual = async (
       .leftJoin(account, eq(account.userId, user.id))
       .where(eq(user.email, email))
       .limit(1)
-
-    return Result.ok(userWithAccount)
-  } catch (e) {
-    return Result.err(e instanceof Error ? e : new Error(String(e)))
-  }
-}
+  )
 
 /**
  * Find user by email and return user ID
@@ -82,40 +99,19 @@ const getUserWithAccountByEmailActual = async (
  * @param email - User email to look up
  * @returns Promise<Result<UserIdData[], Error>>
  */
-export const getUserIdByEmail = async (
+export const getUserIdByEmail = (
   db: DrizzleClient,
   email: string
-): Promise<Result<UserIdData[], Error>> => {
-  let res: Result<UserIdData[], Error>
-  try {
-    res = await retry(
-      () => getUserIdByEmailActual(db, email),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`getUserIdByEmail final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
+): Promise<Result<UserIdData[], Error>> =>
+  withRetry('getUserIdByEmail', () => getUserIdByEmailActual(db, email))
 
-  return res
-}
-
-const getUserIdByEmailActual = async (
+const getUserIdByEmailActual = (
   db: DrizzleClient,
   email: string
-): Promise<Result<UserIdData[], Error>> => {
-  try {
-    const userData = await db
-      .select({ id: user.id })
-      .from(user)
-      .where(eq(user.email, email))
-      .limit(1)
-
-    return Result.ok(userData)
-  } catch (e) {
-    return Result.err(e instanceof Error ? e : new Error(String(e)))
-  }
-}
+): Promise<Result<UserIdData[], Error>> =>
+  toResult(() =>
+    db.select({ id: user.id }).from(user).where(eq(user.email, email)).limit(1)
+  )
 
 /**
  * Update account timestamp for rate limiting
@@ -123,23 +119,13 @@ const getUserIdByEmailActual = async (
  * @param userId - User ID whose account to update
  * @returns Promise<Result<boolean, Error>>
  */
-export const updateAccountTimestamp = async (
+export const updateAccountTimestamp = (
   db: DrizzleClient,
   userId: string
-): Promise<Result<boolean, Error>> => {
-  let res: Result<boolean, Error>
-  try {
-    res = await retry(
-      () => updateAccountTimestampActual(db, userId),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`updateAccountTimestamp final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
-
-  return res
-}
+): Promise<Result<boolean, Error>> =>
+  withRetry('updateAccountTimestamp', () =>
+    updateAccountTimestampActual(db, userId)
+  )
 
 const updateAccountTimestampActual = async (
   db: DrizzleClient,
@@ -150,7 +136,6 @@ const updateAccountTimestampActual = async (
       .update(account)
       .set({ updatedAt: new Date() })
       .where(eq(account.userId, userId))
-
     return Result.ok(true)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
@@ -163,38 +148,21 @@ const updateAccountTimestampActual = async (
  * @param code - The code to consume
  * @returns Promise<Result<boolean, Error>> - true if code existed and was consumed, false if code didn't exist
  */
-export const consumeSingleUseCode = async (
+export const consumeSingleUseCode = (
   db: DrizzleClient,
   code: string
-): Promise<Result<boolean, Error>> => {
-  let res: Result<boolean, Error>
-  try {
-    res = await retry(
-      () => consumeSingleUseCodeActual(db, code),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`consumeSingleUseCode final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
-
-  return res
-}
+): Promise<Result<boolean, Error>> =>
+  withRetry('consumeSingleUseCode', () => consumeSingleUseCodeActual(db, code))
 
 const consumeSingleUseCodeActual = async (
   db: DrizzleClient,
   code: string
 ): Promise<Result<boolean, Error>> => {
   try {
-    // Delete the code and return the number of rows affected
     const result = await db
       .delete(singleUseCode)
       .where(eq(singleUseCode.code, code))
-
-    // In SQLite/D1, the number of rows affected is in result.meta.changes
     const rowsDeleted = result.meta?.changes || 0
-
-    // Return true if exactly one row was deleted (code existed and was consumed)
     return Result.ok(rowsDeleted === 1)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
@@ -207,23 +175,11 @@ const consumeSingleUseCodeActual = async (
  * @param email - Email address to add
  * @returns Promise<Result<boolean, Error>> - true if added successfully, false if already exists
  */
-export const addInterestedEmail = async (
+export const addInterestedEmail = (
   db: DrizzleClient,
   email: string
-): Promise<Result<boolean, Error>> => {
-  let res: Result<boolean, Error>
-  try {
-    res = await retry(
-      () => addInterestedEmailActual(db, email),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`addInterestedEmail final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
-
-  return res
-}
+): Promise<Result<boolean, Error>> =>
+  withRetry('addInterestedEmail', () => addInterestedEmailActual(db, email))
 
 /**
  * Check if an email is already in the interested emails list
@@ -231,55 +187,35 @@ export const addInterestedEmail = async (
  * @param email - Email address to check
  * @returns Promise<Result<boolean, Error>> - true if email exists, false otherwise
  */
-export const checkInterestedEmailExists = async (
+export const checkInterestedEmailExists = (
   db: DrizzleClient,
   email: string
-): Promise<Result<boolean, Error>> => {
-  let res: Result<boolean, Error>
-  try {
-    res = await retry(
-      () => checkInterestedEmailExistsActual(db, email),
-      STANDARD_RETRY_OPTIONS
-    )
-  } catch (err) {
-    console.log(`checkInterestedEmailExists final error:`, err)
-    res = Result.err(err instanceof Error ? err : new Error(String(err)))
-  }
+): Promise<Result<boolean, Error>> =>
+  withRetry('checkInterestedEmailExists', () =>
+    checkInterestedEmailExistsActual(db, email)
+  )
 
-  return res
-}
-
-/**
- * Private function: Add an email to the interested emails list (actual implementation)
- */
 const addInterestedEmailActual = async (
   db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   try {
-    // First check if email already exists
     const existingEmails = await db
       .select()
       .from(interestedEmails)
       .where(eq(interestedEmails.email, email))
 
     if (existingEmails.length > 0) {
-      // Email already exists
       return Result.ok(false)
     }
 
-    // Insert the new email
     await db.insert(interestedEmails).values({ email })
-
     return Result.ok(true)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
   }
 }
 
-/**
- * Private function: Check if an email exists in interested emails list (actual implementation)
- */
 const checkInterestedEmailExistsActual = async (
   db: DrizzleClient,
   email: string
@@ -289,7 +225,6 @@ const checkInterestedEmailExistsActual = async (
       .select()
       .from(interestedEmails)
       .where(eq(interestedEmails.email, email))
-
     return Result.ok(existingEmails.length > 0)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))
