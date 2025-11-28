@@ -7,7 +7,10 @@ set -euo pipefail
 
 source .env.sh
 
-if [[ "x${1-}" = "xgated-sign-up" ]] ; then
+if [[ "x${1-}" = "xboth-sign-up" ]] ; then
+  echo "====> Both sign-up (gated + interest)"
+  export SIGN_UP_MODE='BOTH_SIGN_UP'
+elif [[ "x${1-}" = "xgated-sign-up" ]] ; then
   echo "====> Gated mode"
   export SIGN_UP_MODE='GATED_SIGN_UP'
 elif [ "x${1-}" = "xno-sign-up" ]; then

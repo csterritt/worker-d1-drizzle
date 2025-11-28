@@ -100,6 +100,7 @@ export const COOKIES = {
  * Sign up modes
  */
 export const SIGN_UP_MODES = {
+  BOTH_SIGN_UP: 'BOTH_SIGN_UP' as const,
   GATED_SIGN_UP: 'GATED_SIGN_UP' as const,
   INTEREST_SIGN_UP: 'INTEREST_SIGN_UP' as const,
   NO_SIGN_UP: 'NO_SIGN_UP' as const,

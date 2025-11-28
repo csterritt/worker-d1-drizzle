@@ -14,15 +14,35 @@ export const verifyOnSignUpPage = async (page: Page) => {
 }
 
 export const verifyOnInterestSignUpPage = async (page: Page) => {
-  expect(await verifyElementExists(page, 'interest-sign-up-page-banner')).toBe(
-    true
+  // Accept either dedicated interest page or combined gated+interest page
+  const hasInterestBanner = await verifyElementExists(
+    page,
+    'interest-sign-up-page-banner'
   )
+  const hasCombinedBanner = await verifyElementExists(
+    page,
+    'gated-interest-sign-up-page-banner'
+  )
+  expect(hasInterestBanner || hasCombinedBanner).toBe(true)
 }
 
 export const verifyOnGatedSignUpPage = async (page: Page) => {
-  expect(await verifyElementExists(page, 'gated-sign-up-page-banner')).toBe(
-    true
+  // Accept either dedicated gated page or combined gated+interest page
+  const hasGatedBanner = await verifyElementExists(
+    page,
+    'gated-sign-up-page-banner'
   )
+  const hasCombinedBanner = await verifyElementExists(
+    page,
+    'gated-interest-sign-up-page-banner'
+  )
+  expect(hasGatedBanner || hasCombinedBanner).toBe(true)
+}
+
+export const verifyOnGatedInterestSignUpPage = async (page: Page) => {
+  expect(
+    await verifyElementExists(page, 'gated-interest-sign-up-page-banner')
+  ).toBe(true)
 }
 
 export const verifyOnProtectedPage = async (page: Page) => {

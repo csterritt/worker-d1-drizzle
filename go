@@ -12,8 +12,9 @@ elif [ "x${1-}" = "xo" ]; then
   npm run dev-open-sign-up
 elif [ "x${1-}" = "xi" ]; then
   npm run dev-interest-sign-up
+elif [ "x${1-}" = "xb" ]; then
+  npm run dev-both-sign-up
 else
-  echo "Usage: go <g|n|o|i>"
+  echo "Usage: go <b|g|i|n|o>"
   exit 1
 fi
-

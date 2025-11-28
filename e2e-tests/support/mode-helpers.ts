@@ -1,11 +1,16 @@
 import { test } from '@playwright/test'
 
+export type SignUpMode =
+  | 'OPEN_SIGN_UP'
+  | 'NO_SIGN_UP'
+  | 'GATED_SIGN_UP'
+  | 'INTEREST_SIGN_UP'
+  | 'BOTH_SIGN_UP'
+
 /**
  * Detects the current sign-up mode by calling the test endpoint
  */
-export const detectSignUpMode = async (): Promise<
-  'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP' | 'INTEREST_SIGN_UP'
-> => {
+export const detectSignUpMode = async (): Promise<SignUpMode> => {
   try {
     const response = await fetch('http://localhost:3000/test/sign-up-mode')
 
@@ -30,6 +35,8 @@ export const detectSignUpMode = async (): Promise<
       return 'GATED_SIGN_UP'
     } else if (mode === 'INTEREST_SIGN_UP') {
       return 'INTEREST_SIGN_UP'
+    } else if (mode === 'BOTH_SIGN_UP') {
+      return 'BOTH_SIGN_UP'
     } else {
       console.warn(
         'Unknown sign-up mode returned:',
@@ -47,14 +54,9 @@ export const detectSignUpMode = async (): Promise<
 
 /**
  * Skip test if not running in the expected mode
+ * Tests must match their exact mode - BOTH_SIGN_UP mode has its own tests
  */
-export const skipIfNotMode = async (
-  expectedMode:
-    | 'OPEN_SIGN_UP'
-    | 'NO_SIGN_UP'
-    | 'GATED_SIGN_UP'
-    | 'INTEREST_SIGN_UP'
-) => {
+export const skipIfNotMode = async (expectedMode: SignUpMode) => {
   const currentMode = await detectSignUpMode()
 
   if (currentMode !== expectedMode) {
@@ -68,15 +70,27 @@ export const skipIfNotMode = async (
 /**
  * Skip test if running in the specified mode
  */
-export const skipIfMode = async (
-  skipMode: 'OPEN_SIGN_UP' | 'NO_SIGN_UP' | 'GATED_SIGN_UP' | 'INTEREST_SIGN_UP'
-) => {
+export const skipIfMode = async (skipMode: SignUpMode) => {
   const currentMode = await detectSignUpMode()
 
   if (currentMode === skipMode) {
     test.skip(
       currentMode === skipMode,
       `Skipping test - not applicable in ${currentMode} mode`
+    )
+  }
+}
+
+/**
+ * Skip test unless running in BOTH_SIGN_UP mode
+ */
+export const skipIfNotBothMode = async () => {
+  const currentMode = await detectSignUpMode()
+
+  if (currentMode !== 'BOTH_SIGN_UP') {
+    test.skip(
+      currentMode !== 'BOTH_SIGN_UP',
+      `Skipping test - requires BOTH_SIGN_UP mode, currently in ${currentMode} mode`
     )
   }
 }
