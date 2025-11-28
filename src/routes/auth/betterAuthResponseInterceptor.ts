@@ -10,9 +10,6 @@ import { PATHS, COOKIES, MESSAGES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { addCookie } from '../../lib/cookie-support'
 
-/**
- * Response data from better-auth sign-in/sign-up
- */
 interface AuthResponseData {
   user?: {
     id: string
@@ -21,17 +18,11 @@ interface AuthResponseData {
   }
 }
 
-/**
- * Error response from better-auth
- */
 interface AuthErrorData {
   code?: string
   message?: string
 }
 
-/**
- * Variables stored in context during interceptor
- */
 interface InterceptorVariables {
   signInEmail?: string
 }
@@ -39,185 +30,242 @@ interface InterceptorVariables {
 type InterceptorEnv = { Bindings: Bindings; Variables: InterceptorVariables }
 type InterceptorContext = Context<InterceptorEnv>
 
+const ERROR_MESSAGES = {
+  INVALID_CREDENTIALS:
+    'Invalid email or password. Please check your credentials and try again.',
+  CHECK_CREDENTIALS: 'Please check your email and password and try again.',
+  ACCOUNT_CREATED:
+    'Account created! Please check your email to verify your account.',
+  WELCOME: 'Welcome! You have been signed in successfully.',
+} as const
+
 /**
- * Better-auth response interceptor to convert JSON responses to user-friendly redirects
- * This middleware intercepts successful better-auth API responses and redirects appropriately
+ * Handle successful sign-up requiring email verification
  */
-export const setupBetterAuthResponseInterceptor = (
-  app: Hono<{ Bindings: Bindings }>
-): void => {
-  // Add middleware to capture email from sign-in requests without consuming the body
-  app.use(
-    PATHS.AUTH.SIGN_IN_EMAIL_API,
-    async (c: InterceptorContext, next: Next) => {
-      try {
-        // Clone the request to avoid consuming the original body
-        const clonedRequest = c.req.raw.clone()
-        const formData = await clonedRequest.formData()
-        const email = formData.get('email') as string | null
+const handleUnverifiedSignUp = (
+  c: InterceptorContext,
+  email: string,
+  isSignUp: boolean
+): Response | null => {
+  if (!isSignUp) {
+    return null
+  }
 
-        if (email) {
-          c.set('signInEmail', email)
-        }
-      } catch (e) {
-        // Silently continue if email capture fails
-      }
+  addCookie(c, COOKIES.EMAIL_ENTERED, email)
+  return redirectWithMessage(
+    c,
+    PATHS.AUTH.EMAIL_SENT,
+    ERROR_MESSAGES.ACCOUNT_CREATED
+  )
+}
 
-      await next()
-    }
+/**
+ * Handle successful sign-in with verified email
+ */
+const handleVerifiedSignIn = (
+  c: InterceptorContext,
+  response: Response
+): Response => {
+  const redirectResponse = redirectWithMessage(
+    c,
+    PATHS.PRIVATE,
+    ERROR_MESSAGES.WELCOME
   )
 
-  // Intercept sign-in endpoint specifically
-  app.on(
-    ['POST'],
-    PATHS.AUTH.SIGN_IN_EMAIL_API,
-    async (c: InterceptorContext, next: Next) => {
-      try {
-        // Get the captured email from context
-        const capturedEmail = c.get('signInEmail')
+  const allCookieHeaders = response.headers.getSetCookie?.() || []
+  allCookieHeaders.forEach((cookie) => {
+    redirectResponse.headers.append('Set-Cookie', cookie)
+  })
 
-        // Create better-auth instance and handle the request normally
-        const auth = createAuth(c.env)
-        const response = await auth.handler(c.req.raw)
+  return redirectResponse
+}
 
-        if (!response) {
-          return next()
-        }
+/**
+ * Handle unverified user attempting to sign in
+ */
+const handleUnverifiedSignIn = (c: InterceptorContext): Response =>
+  redirectWithMessage(
+    c,
+    PATHS.AUTH.SIGN_IN,
+    MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
+  )
 
-        // Handle better-auth response based on status
+/**
+ * Process successful (200) auth response
+ */
+const handleSuccessResponse = async (
+  c: InterceptorContext,
+  response: Response
+): Promise<Response | null> => {
+  let responseData: AuthResponseData
 
-        // Check if this was a successful auth response (status 200)
-        if (response.status === 200) {
-          try {
-            const responseData = (await response.json()) as AuthResponseData
+  try {
+    responseData = (await response.json()) as AuthResponseData
+  } catch {
+    console.log('Response was not JSON, continuing with original response')
+    return null
+  }
 
-            // Handle successful sign-up that requires email verification
-            if (
-              responseData &&
-              responseData.user &&
-              !responseData.user.emailVerified &&
-              c.req.url.includes('/sign-up')
-            ) {
-              // User signed up but needs to verify email
-              const email = responseData.user.email
-              addCookie(c, COOKIES.EMAIL_ENTERED, email)
-              return redirectWithMessage(
-                c,
-                `${PATHS.AUTH.EMAIL_SENT}`,
-                'Account created! Please check your email to verify your account.'
-              )
-            }
+  const user = responseData?.user
+  if (!user) {
+    return null
+  }
 
-            // If the response contains user data and user is verified, it was a successful sign-in
-            if (
-              responseData &&
-              responseData.user &&
-              responseData.user.id &&
-              responseData.user.emailVerified
-            ) {
-              // Create a new response with the same cookies but redirect instead of JSON
-              const redirectResponse = redirectWithMessage(
-                c,
-                PATHS.PRIVATE,
-                'Welcome! You have been signed in successfully.'
-              )
+  const isSignUp = c.req.url.includes('/sign-up')
 
-              // Handle multiple cookie headers if they exist
-              const allCookieHeaders = response.headers.getSetCookie?.() || []
-              allCookieHeaders.forEach((cookie) => {
-                redirectResponse.headers.append('Set-Cookie', cookie)
-              })
+  if (!user.emailVerified) {
+    const signUpRedirect = handleUnverifiedSignUp(c, user.email, isSignUp)
+    if (signUpRedirect) {
+      return signUpRedirect
+    }
 
-              return redirectResponse
-            }
+    return handleUnverifiedSignIn(c)
+  }
 
-            // If the response contains user data but email is not verified
-            if (
-              responseData &&
-              responseData.user &&
-              responseData.user.id &&
-              !responseData.user.emailVerified
-            ) {
-              return redirectWithMessage(
-                c,
-                PATHS.AUTH.SIGN_IN,
-                MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
-              )
-            }
-          } catch (jsonError) {
-            console.log(
-              'Response was not JSON, continuing with original response'
-            )
-          }
-        }
+  if (user.id && user.emailVerified) {
+    return handleVerifiedSignIn(c, response)
+  }
 
-        // For non-200 responses or responses without user data, handle errors gracefully
-        if (response.status === 401) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Invalid email or password. Please check your credentials and try again.'
-          )
-        }
+  return null
+}
 
-        if (response.status === 403) {
-          // For 403 responses, check if it's specifically for unverified email
-          try {
-            const responseClone = response.clone()
-            const errorData = (await responseClone.json()) as AuthErrorData
+/**
+ * Handle 403 forbidden response (typically email not verified)
+ */
+const handleForbiddenResponse = async (
+  c: InterceptorContext,
+  response: Response,
+  capturedEmail: string | undefined
+): Promise<Response> => {
+  try {
+    const responseClone = response.clone()
+    const errorData = (await responseClone.json()) as AuthErrorData
 
-            // Check if this is specifically an EMAIL_NOT_VERIFIED error
-            if (errorData && errorData.code === 'EMAIL_NOT_VERIFIED') {
-              // Use the captured email from context
-              if (capturedEmail) {
-                addCookie(c, COOKIES.EMAIL_ENTERED, capturedEmail)
-                return redirectWithMessage(
-                  c,
-                  PATHS.AUTH.AWAIT_VERIFICATION,
-                  MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
-                )
-              }
-            }
-          } catch (e) {
-            // Could not parse 403 response, continue with fallback
-          }
+    if (errorData?.code === 'EMAIL_NOT_VERIFIED' && capturedEmail) {
+      addCookie(c, COOKIES.EMAIL_ENTERED, capturedEmail)
+      return redirectWithMessage(
+        c,
+        PATHS.AUTH.AWAIT_VERIFICATION,
+        MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
+      )
+    }
+  } catch {
+    // Could not parse 403 response, continue with fallback
+  }
 
-          // Fallback to original behavior for other 403 cases or if no email captured
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
-          )
-        }
+  return redirectWithMessage(
+    c,
+    PATHS.AUTH.SIGN_IN,
+    MESSAGES.VERIFY_EMAIL_BEFORE_SIGN_IN
+  )
+}
 
-        if (response.status === 400) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            'Please check your email and password and try again.'
-          )
-        }
+/**
+ * Handle error responses by status code
+ */
+const handleErrorResponse = async (
+  c: InterceptorContext,
+  response: Response,
+  capturedEmail: string | undefined
+): Promise<Response | null> => {
+  switch (response.status) {
+    case 401:
+      return redirectWithMessage(
+        c,
+        PATHS.AUTH.SIGN_IN,
+        ERROR_MESSAGES.INVALID_CREDENTIALS
+      )
 
-        if (response.status >= 500) {
-          return redirectWithMessage(
-            c,
-            PATHS.AUTH.SIGN_IN,
-            MESSAGES.GENERIC_ERROR_TRY_AGAIN
-          )
-        }
+    case 403:
+      return handleForbiddenResponse(c, response, capturedEmail)
 
-        // Return the original response for any other cases
-        return response
-      } catch (error) {
-        console.error('Better-auth response interceptor error:', error)
+    case 400:
+      return redirectWithMessage(
+        c,
+        PATHS.AUTH.SIGN_IN,
+        ERROR_MESSAGES.CHECK_CREDENTIALS
+      )
 
-        // Graceful fallback - redirect to sign-in page with error message
+    default:
+      if (response.status >= 500) {
         return redirectWithMessage(
           c,
           PATHS.AUTH.SIGN_IN,
           MESSAGES.GENERIC_ERROR_TRY_AGAIN
         )
       }
+
+      return null
+  }
+}
+
+/**
+ * Middleware to capture email from sign-in requests
+ */
+const captureEmailMiddleware = async (
+  c: InterceptorContext,
+  next: Next
+): Promise<void> => {
+  try {
+    const clonedRequest = c.req.raw.clone()
+    const formData = await clonedRequest.formData()
+    const email = formData.get('email') as string | null
+
+    if (email) {
+      c.set('signInEmail', email)
     }
-  )
+  } catch {
+    // Silently continue if email capture fails
+  }
+
+  await next()
+}
+
+/**
+ * Main sign-in handler that intercepts better-auth responses
+ */
+const signInHandler = async (
+  c: InterceptorContext,
+  next: Next
+): Promise<Response | void> => {
+  try {
+    const capturedEmail = c.get('signInEmail')
+    const auth = createAuth(c.env)
+    const response = await auth.handler(c.req.raw)
+
+    if (!response) {
+      return next()
+    }
+
+    if (response.status === 200) {
+      const successResult = await handleSuccessResponse(c, response)
+      if (successResult) {
+        return successResult
+      }
+    }
+
+    const errorResult = await handleErrorResponse(c, response, capturedEmail)
+    if (errorResult) {
+      return errorResult
+    }
+
+    return response
+  } catch (error) {
+    console.error('Better-auth response interceptor error:', error)
+    return redirectWithMessage(
+      c,
+      PATHS.AUTH.SIGN_IN,
+      MESSAGES.GENERIC_ERROR_TRY_AGAIN
+    )
+  }
+}
+
+/**
+ * Better-auth response interceptor to convert JSON responses to user-friendly redirects
+ */
+export const setupBetterAuthResponseInterceptor = (
+  app: Hono<{ Bindings: Bindings }>
+): void => {
+  app.use(PATHS.AUTH.SIGN_IN_EMAIL_API, captureEmailMiddleware)
+  app.on(['POST'], PATHS.AUTH.SIGN_IN_EMAIL_API, signInHandler)
 }
