@@ -46,9 +46,9 @@ const renderAwaitVerification = (email?: string) => {
             <div>
               <h3>Don't see the email?</h3>
               <ul>
-                <li>• Check your spam or junk folder</li>
-                <li>• Make sure you entered the correct email address</li>
-                <li>• The email may take a few minutes to arrive</li>
+                <li>Check your spam or junk folder</li>
+                <li>Make sure you entered the correct email address</li>
+                <li>The email may take a few minutes to arrive</li>
               </ul>
             </div>
 
