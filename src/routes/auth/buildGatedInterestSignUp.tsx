@@ -28,7 +28,7 @@ import { retrieveCookie } from '../../lib/cookie-support'
  */
 const renderGatedInterestSignUp = (emailEntered: string) => {
   return (
-    <div data-testid='gated-interest-sign-up-page-banner'>
+    <div data-testid='sign-up-page-banner'>
       <div>
         <div>
           <h2>Create Account</h2>

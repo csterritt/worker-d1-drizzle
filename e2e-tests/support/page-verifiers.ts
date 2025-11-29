@@ -9,41 +9,16 @@ export const verifyOnSignInPage = async (page: Page) => {
   expect(await verifyElementExists(page, 'sign-in-page-banner')).toBe(true)
 }
 
+/**
+ * Unified sign-up page verifier - works for gated, interest, and both modes
+ */
 export const verifyOnSignUpPage = async (page: Page) => {
   expect(await verifyElementExists(page, 'sign-up-page-banner')).toBe(true)
 }
 
-export const verifyOnInterestSignUpPage = async (page: Page) => {
-  // Accept either dedicated interest page or combined gated+interest page
-  const hasInterestBanner = await verifyElementExists(
-    page,
-    'interest-sign-up-page-banner'
-  )
-  const hasCombinedBanner = await verifyElementExists(
-    page,
-    'gated-interest-sign-up-page-banner'
-  )
-  expect(hasInterestBanner || hasCombinedBanner).toBe(true)
-}
-
-export const verifyOnGatedSignUpPage = async (page: Page) => {
-  // Accept either dedicated gated page or combined gated+interest page
-  const hasGatedBanner = await verifyElementExists(
-    page,
-    'gated-sign-up-page-banner'
-  )
-  const hasCombinedBanner = await verifyElementExists(
-    page,
-    'gated-interest-sign-up-page-banner'
-  )
-  expect(hasGatedBanner || hasCombinedBanner).toBe(true)
-}
-
-export const verifyOnGatedInterestSignUpPage = async (page: Page) => {
-  expect(
-    await verifyElementExists(page, 'gated-interest-sign-up-page-banner')
-  ).toBe(true)
-}
+// Aliases for backward compatibility - all use the same unified banner
+export const verifyOnInterestSignUpPage = verifyOnSignUpPage
+export const verifyOnGatedSignUpPage = verifyOnSignUpPage
 
 export const verifyOnProtectedPage = async (page: Page) => {
   expect(await verifyElementExists(page, 'private-page-banner')).toBe(true)

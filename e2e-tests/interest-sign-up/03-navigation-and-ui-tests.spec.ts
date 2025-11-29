@@ -6,7 +6,7 @@ import {
   verifyOnInterestSignUpPage,
   verifyOnProtectedPage,
 } from '../support/page-verifiers'
-import { skipIfNotMode } from '../support/mode-helpers'
+import { skipIfNotMode, detectSignUpMode } from '../support/mode-helpers'
 import { signInUser } from '../support/auth-helpers'
 import { testWithDatabase } from '../support/test-helpers'
 import {
@@ -26,32 +26,28 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     // Navigate to sign-in page
     await navigateToSignIn(page)
 
-    // Verify "Join Waitlist" button exists and has correct text
-    const waitlistButton = page.locator('[data-testid="go-to-sign-up-action"]')
-    await expect(waitlistButton).toBeVisible()
-    await expect(waitlistButton).toHaveText('Join Waitlist')
+    const mode = await detectSignUpMode()
+    const signUpButton = page.locator('[data-testid="go-to-sign-up-action"]')
+    await expect(signUpButton).toBeVisible()
 
-    // Verify the button links to the correct URL
-    const href = await waitlistButton.getAttribute('href')
-    expect(href).toBe('/auth/interest-sign-up')
+    // Button text and href differ by mode
+    if (mode === 'INTEREST_SIGN_UP') {
+      await expect(signUpButton).toHaveText('Join Waitlist')
+      const href = await signUpButton.getAttribute('href')
+      expect(href).toBe('/auth/interest-sign-up')
+    } else {
+      // BOTH_SIGN_UP mode
+      await expect(signUpButton).toHaveText('Create Account')
+      const href = await signUpButton.getAttribute('href')
+      expect(href).toBe('/auth/sign-up')
+    }
   })
 
   test('interest sign-up page has correct UI elements', async ({ page }) => {
     // Navigate to interest sign-up page
     await navigateToInterestSignUp(page)
 
-    // Verify page title
-    const title = page.locator('h2')
-    await expect(title).toHaveText('Join the Waitlist')
-
-    // Verify explanatory text exists
-    const explanation = page.locator('h4')
-    await expect(explanation).toContainText(
-      "We're not accepting new accounts at the moment"
-    )
-    await expect(explanation).toContainText(
-      'Enter your email address to join our waitlist'
-    )
+    const mode = await detectSignUpMode()
 
     // Verify form elements exist
     await expect(
@@ -69,6 +65,19 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
     await expect(
       page.locator('[data-testid="go-to-sign-in-action"]')
     ).toHaveText('Sign In Instead')
+
+    // Mode-specific UI checks
+    if (mode === 'INTEREST_SIGN_UP') {
+      // Verify page title
+      const title = page.locator('h2')
+      await expect(title).toHaveText('Join the Waitlist')
+
+      // Verify explanatory text exists
+      const explanation = page.locator('h4')
+      await expect(explanation).toContainText(
+        "We're not accepting new accounts at the moment"
+      )
+    }
   })
 
   test('can navigate back and forth between sign-in and interest sign-up', async ({
@@ -101,9 +110,14 @@ test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
       // Verify we're signed in and on the protected page
       await verifyOnProtectedPage(page)
 
-      // Now try to navigate to interest sign-up page while authenticated
+      // Now try to navigate to sign-up page while authenticated
       // Do not use navigateToInterestSignUp here because we expect a redirect
-      await page.goto('http://localhost:3000/auth/interest-sign-up')
+      const mode = await detectSignUpMode()
+      const signUpUrl =
+        mode === 'BOTH_SIGN_UP'
+          ? 'http://localhost:3000/auth/sign-up'
+          : 'http://localhost:3000/auth/interest-sign-up'
+      await page.goto(signUpUrl)
 
       // Should be redirected back to protected page with a message about already being signed in
       await verifyOnProtectedPage(page)

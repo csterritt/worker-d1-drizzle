@@ -54,14 +54,24 @@ export const detectSignUpMode = async (): Promise<SignUpMode> => {
 
 /**
  * Skip test if not running in the expected mode
- * Tests must match their exact mode - BOTH_SIGN_UP mode has its own tests
+ * BOTH_SIGN_UP mode supports both GATED_SIGN_UP and INTEREST_SIGN_UP tests
  */
 export const skipIfNotMode = async (expectedMode: SignUpMode) => {
   const currentMode = await detectSignUpMode()
 
+  // BOTH_SIGN_UP mode supports gated and interest sign-up tests
+  if (currentMode === 'BOTH_SIGN_UP') {
+    if (
+      expectedMode === 'GATED_SIGN_UP' ||
+      expectedMode === 'INTEREST_SIGN_UP'
+    ) {
+      return // Don't skip - BOTH mode supports these tests
+    }
+  }
+
   if (currentMode !== expectedMode) {
     test.skip(
-      currentMode !== expectedMode,
+      true,
       `Skipping test - requires ${expectedMode} mode, currently in ${currentMode} mode`
     )
   }
@@ -74,23 +84,6 @@ export const skipIfMode = async (skipMode: SignUpMode) => {
   const currentMode = await detectSignUpMode()
 
   if (currentMode === skipMode) {
-    test.skip(
-      currentMode === skipMode,
-      `Skipping test - not applicable in ${currentMode} mode`
-    )
-  }
-}
-
-/**
- * Skip test unless running in BOTH_SIGN_UP mode
- */
-export const skipIfNotBothMode = async () => {
-  const currentMode = await detectSignUpMode()
-
-  if (currentMode !== 'BOTH_SIGN_UP') {
-    test.skip(
-      currentMode !== 'BOTH_SIGN_UP',
-      `Skipping test - requires BOTH_SIGN_UP mode, currently in ${currentMode} mode`
-    )
+    test.skip(true, `Skipping test - not applicable in ${currentMode} mode`)
   }
 }

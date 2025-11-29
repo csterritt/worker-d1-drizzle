@@ -23,7 +23,7 @@ import { retrieveCookie } from '../../lib/cookie-support'
  */
 const renderInterestSignUp = (emailEntered: string) => {
   return (
-    <div data-testid='interest-sign-up-page-banner'>
+    <div data-testid='sign-up-page-banner'>
       <div>
         <div>
           <h2>Join the Waitlist</h2>

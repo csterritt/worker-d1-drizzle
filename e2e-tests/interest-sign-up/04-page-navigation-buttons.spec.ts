@@ -5,7 +5,7 @@ import {
   verifyOnSignInPage,
   verifyOnInterestSignUpPage,
 } from '../support/page-verifiers'
-import { skipIfNotMode } from '../support/mode-helpers'
+import { skipIfNotMode, detectSignUpMode } from '../support/mode-helpers'
 import {
   navigateToSignIn,
   navigateToInterestSignUp,
@@ -26,8 +26,13 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     await clickLink(page, 'go-to-sign-up-action')
     await verifyOnInterestSignUpPage(page)
 
-    // Verify we're on the correct URL
-    expect(page.url()).toContain('/auth/interest-sign-up')
+    // Verify we're on a sign-up URL (varies by mode)
+    const mode = await detectSignUpMode()
+    if (mode === 'INTEREST_SIGN_UP') {
+      expect(page.url()).toContain('/auth/interest-sign-up')
+    } else {
+      expect(page.url()).toContain('/auth/sign-up')
+    }
 
     // Click the "Sign In Instead" button to go back to sign-in page
     await clickLink(page, 'go-to-sign-in-action')
@@ -49,14 +54,17 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     expect(await isElementVisible(page, 'go-to-sign-in-action')).toBe(true)
 
     // Verify page banner and content
-    expect(await isElementVisible(page, 'interest-sign-up-page-banner')).toBe(
-      true
-    )
+    expect(await isElementVisible(page, 'sign-up-page-banner')).toBe(true)
 
-    // Verify page title/heading
-    expect(await page.locator('h2').textContent()).toContain(
-      'Join the Waitlist'
-    )
+    // Verify page title/heading (varies by mode)
+    const mode = await detectSignUpMode()
+    if (mode === 'INTEREST_SIGN_UP') {
+      expect(await page.locator('h2').textContent()).toContain(
+        'Join the Waitlist'
+      )
+    } else {
+      expect(await page.locator('h2').textContent()).toContain('Create Account')
+    }
   })
 
   test('sign-in page has correct form elements and navigation for waitlist mode', async ({
@@ -70,12 +78,17 @@ test.describe('Interest Sign-Up Mode: Page Navigation Tests', () => {
     expect(await isElementVisible(page, 'password-input')).toBe(true)
     expect(await isElementVisible(page, 'submit')).toBe(true)
 
-    // In INTEREST_SIGN_UP mode, the button should say "Join Waitlist"
+    // Sign-up button should be visible
     expect(await isElementVisible(page, 'go-to-sign-up-action')).toBe(true)
     const buttonText = await page
       .locator('[data-testid="go-to-sign-up-action"]')
       .textContent()
-    expect(buttonText).toContain('Join Waitlist')
+    const mode = await detectSignUpMode()
+    if (mode === 'INTEREST_SIGN_UP') {
+      expect(buttonText).toContain('Join Waitlist')
+    } else {
+      expect(buttonText).toContain('Create Account')
+    }
 
     // Verify page title
     expect(await page.locator('h2').textContent()).toContain('Sign In')

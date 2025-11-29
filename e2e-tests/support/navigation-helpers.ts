@@ -4,8 +4,6 @@ import {
   verifyOnStartupPage,
   verifyOnSignInPage,
   verifyOnSignUpPage,
-  verifyOnInterestSignUpPage,
-  verifyOnGatedSignUpPage,
   verifyOnProfilePage,
   verifyOnProtectedPage,
   verifyOnAwaitVerificationPage,
@@ -13,6 +11,7 @@ import {
   verifyOnWaitingForResetPage,
   verifyOn404Page,
 } from './page-verifiers'
+import { detectSignUpMode } from './mode-helpers'
 
 /**
  * Navigation helpers that combine page.goto() with verification
@@ -34,14 +33,28 @@ export const navigateToSignUp = async (page: Page) => {
   await verifyOnSignUpPage(page)
 }
 
+/**
+ * Navigate to interest sign-up page
+ * In BOTH_SIGN_UP mode, navigates to /auth/sign-up (combined page)
+ * In INTEREST_SIGN_UP mode, navigates to /auth/interest-sign-up
+ */
 export const navigateToInterestSignUp = async (page: Page) => {
-  await page.goto(BASE_URLS.INTEREST_SIGN_UP)
-  await verifyOnInterestSignUpPage(page)
+  const mode = await detectSignUpMode()
+  if (mode === 'BOTH_SIGN_UP') {
+    await page.goto(BASE_URLS.SIGN_UP)
+  } else {
+    await page.goto(BASE_URLS.INTEREST_SIGN_UP)
+  }
+  await verifyOnSignUpPage(page)
 }
 
+/**
+ * Navigate to gated sign-up page
+ * Works for both GATED_SIGN_UP and BOTH_SIGN_UP modes
+ */
 export const navigateToGatedSignUp = async (page: Page) => {
   await page.goto(BASE_URLS.SIGN_UP)
-  await verifyOnGatedSignUpPage(page)
+  await verifyOnSignUpPage(page)
 }
 
 export const navigateToForgotPassword = async (page: Page) => {

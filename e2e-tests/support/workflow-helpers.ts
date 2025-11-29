@@ -19,11 +19,10 @@ import {
   verifyOnSignInPage,
   verifyOnProtectedPage,
   verifyOnWaitingForResetPage,
-  verifyOnGatedInterestSignUpPage,
 } from './page-verifiers'
 import { startSignIn } from './auth-helpers'
 import { verifyAlert } from './finders'
-import { TEST_USERS, GATED_CODES, ERROR_MESSAGES, BASE_URLS } from './test-data'
+import { TEST_USERS, GATED_CODES, ERROR_MESSAGES } from './test-data'
 
 /**
  * Workflow helpers for complete multi-step processes
@@ -163,78 +162,4 @@ export const signUpThenAttemptUnverifiedSignIn = async (
   await startSignIn(page)
   await submitSignInForm(page, { email: user.email, password: user.password })
   await verifyAlert(page, ERROR_MESSAGES.EMAIL_NOT_VERIFIED)
-}
-
-// ============================================
-// BOTH_SIGN_UP mode workflow helpers
-// ============================================
-
-/**
- * Navigate to combined gated+interest sign-up page
- */
-const navigateToGatedInterestSignUp = async (page: Page) => {
-  await page.goto(BASE_URLS.SIGN_UP)
-  await verifyOnGatedInterestSignUpPage(page)
-}
-
-/**
- * Complete gated sign-up workflow in BOTH_SIGN_UP mode
- */
-export const completeGatedSignUpFlowBothMode = async (
-  page: Page,
-  code: string = GATED_CODES.WELCOME,
-  user: UserCredentials = TEST_USERS.GATED_USER
-) => {
-  await navigateToGatedInterestSignUp(page)
-  await submitGatedSignUpForm(page, { code, ...user })
-  await verifyOnAwaitVerificationPage(page)
-}
-
-/**
- * Complete interest sign-up workflow in BOTH_SIGN_UP mode
- */
-export const completeInterestSignUpFlowBothMode = async (
-  page: Page,
-  email: string = TEST_USERS.INTERESTED_USER.email
-) => {
-  await navigateToGatedInterestSignUp(page)
-  await submitInterestSignUpForm(page, email)
-  await verifyOnSignInPage(page)
-  await verifyAlert(page, ERROR_MESSAGES.WAITLIST_SUCCESS)
-}
-
-/**
- * Test duplicate email scenario for gated sign-up in BOTH_SIGN_UP mode
- */
-export const testDuplicateGatedSignUpFlowBothMode = async (
-  page: Page,
-  firstCode: string = GATED_CODES.WELCOME,
-  secondCode: string = GATED_CODES.BETA,
-  user: UserCredentials = TEST_USERS.DUPLICATE_USER
-) => {
-  // First sign-up with first code
-  await completeGatedSignUpFlowBothMode(page, firstCode, user)
-
-  // Attempt duplicate sign-up with different code
-  await navigateToGatedInterestSignUp(page)
-  await submitGatedSignUpForm(page, { code: secondCode, ...user })
-  await verifyOnAwaitVerificationPage(page)
-  await verifyAlert(page, ERROR_MESSAGES.DUPLICATE_EMAIL)
-}
-
-/**
- * Test duplicate email scenario for interest sign-up in BOTH_SIGN_UP mode
- */
-export const testDuplicateInterestSignUpFlowBothMode = async (
-  page: Page,
-  email: string = TEST_USERS.DUPLICATE_USER.email
-) => {
-  // First submission
-  await completeInterestSignUpFlowBothMode(page, email)
-
-  // Attempt duplicate submission
-  await navigateToGatedInterestSignUp(page)
-  await submitInterestSignUpForm(page, email)
-  await verifyOnSignInPage(page)
-  await verifyAlert(page, ERROR_MESSAGES.ALREADY_ON_WAITLIST)
 }
