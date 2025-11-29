@@ -6,6 +6,7 @@ import { verifyOnSignInPage } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { navigateToHome } from '../support/navigation-helpers'
 import { submitSignInForm } from '../support/form-helpers'
+import { TEST_USERS, ERROR_MESSAGES } from '../support/test-data'
 
 test(
   'cannot sign in with wrong password',
@@ -17,18 +18,15 @@ test(
     await startSignIn(page)
 
     // Try to sign in with a known email but wrong password
-    const knownEmail = 'fredfred@team439980.testinator.com'
-    const wrongPassword = 'this-is-definitely-wrong-password'
-
-    await submitSignInForm(page, { email: knownEmail, password: wrongPassword })
+    await submitSignInForm(page, {
+      email: TEST_USERS.KNOWN_USER.email,
+      password: 'this-is-definitely-wrong-password',
+    })
 
     // Should remain on sign-in page (not redirect to protected page)
     await verifyOnSignInPage(page)
 
     // Should show an error message indicating invalid credentials
-    await verifyAlert(
-      page,
-      'Invalid email or password. Please check your credentials and try again.'
-    )
+    await verifyAlert(page, ERROR_MESSAGES.INVALID_CREDENTIALS)
   })
 )

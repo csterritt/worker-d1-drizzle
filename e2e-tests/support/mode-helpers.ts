@@ -87,3 +87,18 @@ export const skipIfMode = async (skipMode: SignUpMode) => {
     test.skip(true, `Skipping test - not applicable in ${currentMode} mode`)
   }
 }
+
+/**
+ * Skip test if not running in the exact expected mode (strict check)
+ * Unlike skipIfNotMode, this does NOT allow BOTH_SIGN_UP to run GATED/INTEREST tests
+ */
+export const skipIfNotExactMode = async (expectedMode: SignUpMode) => {
+  const currentMode = await detectSignUpMode()
+
+  if (currentMode !== expectedMode) {
+    test.skip(
+      true,
+      `Skipping test - requires exactly ${expectedMode} mode, currently in ${currentMode} mode`
+    )
+  }
+}

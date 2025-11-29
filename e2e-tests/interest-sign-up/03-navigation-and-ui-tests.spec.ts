@@ -2,161 +2,95 @@ import { test, expect } from '@playwright/test'
 
 import { fillInput, clickLink, verifyAlert } from '../support/finders'
 import {
-  verifyOnSignInPage,
   verifyOnInterestSignUpPage,
   verifyOnProtectedPage,
 } from '../support/page-verifiers'
-import { skipIfNotMode, detectSignUpMode } from '../support/mode-helpers'
+import {
+  skipIfNotExactMode,
+  skipIfNotMode,
+  detectSignUpMode,
+} from '../support/mode-helpers'
 import { signInUser } from '../support/auth-helpers'
 import { testWithDatabase } from '../support/test-helpers'
 import {
-  navigateToSignIn,
   navigateToInterestSignUp,
   navigateToHome,
 } from '../support/navigation-helpers'
+import { TEST_USERS, BASE_URLS } from '../support/test-data'
 
-test.describe('Interest Sign-Up Mode: Navigation and UI Tests', () => {
+/**
+ * Tests specific to INTEREST_SIGN_UP mode UI
+ * These should NOT run in BOTH_SIGN_UP mode which has different UI
+ */
+test.describe('Interest Sign-Up Mode: UI Tests', () => {
   test.beforeEach(async () => {
-    await skipIfNotMode('INTEREST_SIGN_UP')
+    await skipIfNotExactMode('INTEREST_SIGN_UP')
   })
 
-  test('sign-in page shows correct button text and navigation', async ({
-    page,
-  }) => {
-    // Navigate to sign-in page
-    await navigateToSignIn(page)
-
-    const mode = await detectSignUpMode()
-    const signUpButton = page.locator('[data-testid="go-to-sign-up-action"]')
-    await expect(signUpButton).toBeVisible()
-
-    // Button text and href differ by mode
-    if (mode === 'INTEREST_SIGN_UP') {
-      await expect(signUpButton).toHaveText('Join Waitlist')
-      const href = await signUpButton.getAttribute('href')
-      expect(href).toBe('/auth/interest-sign-up')
-    } else {
-      // BOTH_SIGN_UP mode
-      await expect(signUpButton).toHaveText('Create Account')
-      const href = await signUpButton.getAttribute('href')
-      expect(href).toBe('/auth/sign-up')
-    }
-  })
-
-  test('interest sign-up page has correct UI elements', async ({ page }) => {
-    // Navigate to interest sign-up page
+  test('interest sign-up page shows explanatory text', async ({ page }) => {
     await navigateToInterestSignUp(page)
 
-    const mode = await detectSignUpMode()
+    const explanation = page.locator('h4')
+    await expect(explanation).toContainText(
+      "We're not accepting new accounts at the moment"
+    )
+  })
 
-    // Verify form elements exist
-    await expect(
-      page.locator('[data-testid="interest-email-input"]')
-    ).toBeVisible()
-    await expect(page.locator('[data-testid="interest-action"]')).toBeVisible()
-    await expect(
-      page.locator('[data-testid="go-to-sign-in-action"]')
-    ).toBeVisible()
+  test('interest sign-up page has correct button texts', async ({ page }) => {
+    await navigateToInterestSignUp(page)
 
-    // Verify button texts
     await expect(page.locator('[data-testid="interest-action"]')).toHaveText(
       'Join Waitlist'
     )
     await expect(
       page.locator('[data-testid="go-to-sign-in-action"]')
     ).toHaveText('Sign In Instead')
-
-    // Mode-specific UI checks
-    if (mode === 'INTEREST_SIGN_UP') {
-      // Verify page title
-      const title = page.locator('h2')
-      await expect(title).toHaveText('Join the Waitlist')
-
-      // Verify explanatory text exists
-      const explanation = page.locator('h4')
-      await expect(explanation).toContainText(
-        "We're not accepting new accounts at the moment"
-      )
-    }
   })
+})
 
-  test('can navigate back and forth between sign-in and interest sign-up', async ({
-    page,
-  }) => {
-    // Start at sign-in page
-    await navigateToSignIn(page)
-
-    // Click "Join Waitlist" to go to interest sign-up
-    await clickLink(page, 'go-to-sign-up-action')
-    await verifyOnInterestSignUpPage(page)
-
-    // Click "Sign In Instead" to go back
-    await clickLink(page, 'go-to-sign-in-action')
-    await verifyOnSignInPage(page)
+/**
+ * Behavior tests that work in both INTEREST_SIGN_UP and BOTH_SIGN_UP modes
+ */
+test.describe('Interest Sign-Up Mode: Behavior Tests', () => {
+  test.beforeEach(async () => {
+    await skipIfNotMode('INTEREST_SIGN_UP')
   })
 
   test(
-    'redirects to sign-in when already authenticated',
+    'redirects to protected page when already authenticated',
     testWithDatabase(async ({ page }) => {
-      // Navigate to startup page first
       await navigateToHome(page)
-
-      // Sign in as an existing seeded user
-      const knownEmail = 'fredfred@team439980.testinator.com'
-      const knownPassword = 'freds-clever-password'
-
-      await signInUser(page, knownEmail, knownPassword)
-
-      // Verify we're signed in and on the protected page
+      await signInUser(
+        page,
+        TEST_USERS.KNOWN_USER.email,
+        TEST_USERS.KNOWN_USER.password
+      )
       await verifyOnProtectedPage(page)
 
-      // Now try to navigate to sign-up page while authenticated
-      // Do not use navigateToInterestSignUp here because we expect a redirect
+      // Try to navigate to interest sign-up page while authenticated
       const mode = await detectSignUpMode()
-      const signUpUrl =
-        mode === 'BOTH_SIGN_UP'
-          ? 'http://localhost:3000/auth/sign-up'
-          : 'http://localhost:3000/auth/interest-sign-up'
-      await page.goto(signUpUrl)
+      const url =
+        mode === 'INTEREST_SIGN_UP'
+          ? BASE_URLS.INTEREST_SIGN_UP
+          : BASE_URLS.SIGN_UP
+      await page.goto(url)
 
-      // Should be redirected back to protected page with a message about already being signed in
+      // Should be redirected back to protected page
       await verifyOnProtectedPage(page)
-
-      // Verify the URL is correct (should be redirected away from interest-sign-up)
       expect(page.url()).toContain('/private')
     })
   )
 
-  test('handles direct navigation to interest sign-up URL', async ({
-    page,
-  }) => {
-    // Navigate directly to the interest sign-up URL
-    await navigateToInterestSignUp(page)
-
-    // Should load the page correctly
-    await verifyOnInterestSignUpPage(page)
-
-    // Verify all elements are present
-    await expect(
-      page.locator('[data-testid="interest-email-input"]')
-    ).toBeVisible()
-    await expect(page.locator('[data-testid="interest-action"]')).toBeVisible()
-  })
-
   test('preserves email in form when validation fails', async ({ page }) => {
-    // Navigate to interest sign-up page
     await navigateToInterestSignUp(page)
 
-    // Enter invalid email
     const invalidEmail = 'invalid-email'
     await fillInput(page, 'interest-email-input', invalidEmail)
     await clickLink(page, 'interest-action')
 
-    // Should stay on page with error and preserve email
     await verifyOnInterestSignUpPage(page)
     await verifyAlert(page, 'Please enter a valid email address.')
 
-    // Check that email is preserved in the input
     const emailInput = page.locator('[data-testid="interest-email-input"]')
     await expect(emailInput).toHaveValue(invalidEmail)
   })

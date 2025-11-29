@@ -5,6 +5,7 @@ import { testWithDatabase } from '../support/test-helpers'
 import { verifyOnForgotPasswordPage } from '../support/page-verifiers'
 import { navigateToForgotPassword } from '../support/navigation-helpers'
 import { submitForgotPasswordForm } from '../support/form-helpers'
+import { TEST_USERS, ERROR_MESSAGES, BASE_URLS } from '../support/test-data'
 
 test(
   'enforces rate limiting for password reset requests',
@@ -12,11 +13,8 @@ test(
     // Navigate to forgot password page
     await navigateToForgotPassword(page)
 
-    // Use a known email from the test database
-    const email = 'fredfred@team439980.testinator.com'
-
     // First password reset request - should succeed
-    await submitForgotPasswordForm(page, email)
+    await submitForgotPasswordForm(page, TEST_USERS.KNOWN_USER.email)
 
     // Should be redirected to waiting for reset page
     expect(page.url()).toContain('/auth/waiting-for-reset')
@@ -25,7 +23,7 @@ test(
     await navigateToForgotPassword(page)
 
     // Second password reset request immediately - should be rate limited
-    await submitForgotPasswordForm(page, email)
+    await submitForgotPasswordForm(page, TEST_USERS.KNOWN_USER.email)
 
     // Should stay on forgot password page with rate limiting error
     await verifyOnForgotPasswordPage(page)
@@ -47,14 +45,11 @@ test(
   'allows password reset after rate limit period expires',
   testWithDatabase(async ({ page }) => {
     // Navigate to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
+    await page.goto(BASE_URLS.FORGOT_PASSWORD)
     await verifyOnForgotPasswordPage(page)
 
-    // Use a known email from the test database
-    const email = 'fredfred@team439980.testinator.com'
-
     // First password reset request
-    await fillInput(page, 'forgot-email-input', email)
+    await fillInput(page, 'forgot-email-input', TEST_USERS.KNOWN_USER.email)
     await clickLink(page, 'forgot-password-action')
 
     // Should be redirected to waiting for reset page
@@ -64,21 +59,18 @@ test(
     await page.waitForTimeout(4000)
 
     // Navigate back to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
+    await page.goto(BASE_URLS.FORGOT_PASSWORD)
     await verifyOnForgotPasswordPage(page)
 
     // Second password reset request after waiting - should succeed
-    await fillInput(page, 'forgot-email-input', email)
+    await fillInput(page, 'forgot-email-input', TEST_USERS.KNOWN_USER.email)
     await clickLink(page, 'forgot-password-action')
 
     // Should be redirected to waiting for reset page again
     expect(page.url()).toContain('/auth/waiting-for-reset')
 
     // Verify success message is displayed
-    await verifyAlert(
-      page,
-      "If an account with that email exists, we've sent you a password reset link."
-    )
+    await verifyAlert(page, ERROR_MESSAGES.RESET_LINK_SENT)
   })
 )
 
@@ -86,7 +78,7 @@ test(
   'rate limiting works for non-existent emails without revealing user existence',
   testWithDatabase(async ({ page }) => {
     // Navigate to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
+    await page.goto(BASE_URLS.FORGOT_PASSWORD)
     await verifyOnForgotPasswordPage(page)
 
     // Use a non-existent email
@@ -100,7 +92,7 @@ test(
     expect(page.url()).toContain('/auth/waiting-for-reset')
 
     // Navigate back to forgot password page
-    await page.goto('http://localhost:3000/auth/forgot-password')
+    await page.goto(BASE_URLS.FORGOT_PASSWORD)
     await verifyOnForgotPasswordPage(page)
 
     // Second request immediately with same non-existent email

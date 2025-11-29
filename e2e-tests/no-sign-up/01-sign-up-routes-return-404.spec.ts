@@ -7,19 +7,19 @@ test.describe('No Sign-Up Mode: Sign-up routes return 404', () => {
     await skipIfNotMode('NO_SIGN_UP')
   })
 
-  test('visiting /auth/sign-up returns 404 page with proper banner', async ({
-    page,
-  }) => {
+  test('visiting /auth/sign-up returns 404', async ({ page }) => {
     await navigateTo404Route(page, '/auth/sign-up')
   })
 
-  test('visiting /auth/await-verification returns 404 page', async ({
-    page,
-  }) => {
+  test('visiting /auth/interest-sign-up returns 404', async ({ page }) => {
+    await navigateTo404Route(page, '/auth/interest-sign-up')
+  })
+
+  test('visiting /auth/await-verification returns 404', async ({ page }) => {
     await navigateTo404Route(page, '/auth/await-verification')
   })
 
-  test('visiting /auth/resend-email returns 404 page', async ({ page }) => {
+  test('visiting /auth/resend-email returns 404', async ({ page }) => {
     await navigateTo404Route(page, '/auth/resend-email')
   })
 })

@@ -99,26 +99,8 @@ export const submitResetPasswordForm = async (
 }
 
 /**
- * Partial form fills for validation testing
+ * Partial form fill for gated sign-up validation testing
  */
-export const fillSignUpFormPartial = async (
-  page: Page,
-  fields: Partial<UserCredentials>
-) => {
-  if (fields.name) await fillInput(page, 'signup-name-input', fields.name)
-  if (fields.email) await fillInput(page, 'signup-email-input', fields.email)
-  if (fields.password)
-    await fillInput(page, 'signup-password-input', fields.password)
-}
-
-export const fillSignInFormPartial = async (
-  page: Page,
-  fields: Partial<SignInData>
-) => {
-  if (fields.email) await fillInput(page, 'email-input', fields.email)
-  if (fields.password) await fillInput(page, 'password-input', fields.password)
-}
-
 export const fillGatedSignUpFormPartial = async (
   page: Page,
   fields: Partial<GatedSignUpData>
@@ -131,24 +113,6 @@ export const fillGatedSignUpFormPartial = async (
     await fillInput(page, 'gated-signup-password-input', fields.password)
 }
 
-/**
- * Form submission without filling (for testing empty form validation)
- */
-export const submitEmptySignUpForm = async (page: Page) => {
-  await clickLink(page, 'signup-action')
-}
-
-export const submitEmptySignInForm = async (page: Page) => {
-  await clickLink(page, 'submit')
-}
-
-export const submitEmptyGatedSignUpForm = async (page: Page) => {
-  await clickLink(page, 'gated-signup-action')
-}
-
-export const submitEmptyForgotPasswordForm = async (page: Page) => {
-  await clickLink(page, 'forgot-password-action')
-}
 /**
  * Change password form (profile page)
  */

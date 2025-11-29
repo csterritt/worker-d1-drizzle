@@ -77,7 +77,7 @@ export const ERROR_MESSAGES = {
     'Invalid email or password. Please check your credentials and try again.',
   EMAIL_NOT_VERIFIED:
     'Please verify your email address before signing in. Check your email for a verification link.',
-  MUST_SIGN_IN: 'You must sign in to visit that page.',
+  MUST_SIGN_IN: 'You must sign in to visit that page',
   SIGN_OUT_SUCCESS: 'You have been signed out successfully.',
   SIGN_IN_SUCCESS: 'Welcome! You have been signed in successfully.',
 
@@ -104,7 +104,7 @@ export const ERROR_MESSAGES = {
   RESET_LINK_SENT:
     "If an account with that email exists, we've sent you a password reset link.",
   PASSWORD_RESET_SUCCESS:
-    'Your password has been reset successfully. You can now sign in with your new password.',
+    'Your password has been successfully reset. You can now sign in with your new password.',
 } as const
 
 export const BASE_URLS = {

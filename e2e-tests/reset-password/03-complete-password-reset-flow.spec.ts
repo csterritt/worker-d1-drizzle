@@ -17,6 +17,7 @@ import {
   submitResetPasswordForm,
   submitSignInForm,
 } from '../support/form-helpers'
+import { TEST_USERS, ERROR_MESSAGES, BASE_URLS } from '../support/test-data'
 
 // Helper function to get the latest email from Mailpit
 const getLatestEmailFromMailpit = async () => {
@@ -66,8 +67,7 @@ test(
     await navigateToForgotPassword(page)
 
     // Use a known email from the test database
-    const email = 'fredfred@team439980.testinator.com'
-    const oldPassword = 'freds-clever-password'
+    const { email, password: oldPassword } = TEST_USERS.KNOWN_USER
     const newPassword = 'freds-new-password-123'
 
     // Request password reset
@@ -108,17 +108,14 @@ test(
 
     // Should be redirected to sign-in page with success message
     await verifyOnSignInPage(page)
-    await verifyAlert(
-      page,
-      'Your password has been successfully reset. You can now sign in with your new password.'
-    )
+    await verifyAlert(page, ERROR_MESSAGES.PASSWORD_RESET_SUCCESS)
 
     // Now try to sign in with the new password
     await submitSignInForm(page, { email, password: newPassword })
 
     // Should be successfully signed in and redirected to protected page
     await verifyOnProtectedPage(page)
-    await verifyAlert(page, 'Welcome! You have been signed in successfully.')
+    await verifyAlert(page, ERROR_MESSAGES.SIGN_IN_SUCCESS)
 
     // Verify that the old password no longer works by signing out and trying
     // Click the sign-out button (which submits a POST form)
@@ -126,7 +123,7 @@ test(
     await page.waitForTimeout(1000)
 
     // Should be redirected to home page after sign-out
-    await expect(page).toHaveURL('http://localhost:3000/')
+    await expect(page).toHaveURL(BASE_URLS.HOME + '/')
 
     // Try to sign in with old password
     await navigateToSignIn(page)
@@ -134,9 +131,6 @@ test(
 
     // Should stay on sign-in page with error message
     await verifyOnSignInPage(page)
-    await verifyAlert(
-      page,
-      'Invalid email or password. Please check your credentials and try again.'
-    )
+    await verifyAlert(page, ERROR_MESSAGES.INVALID_CREDENTIALS)
   })
 )

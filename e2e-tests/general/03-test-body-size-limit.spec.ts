@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
+
 import { signOutAndVerify, signInUser } from '../support/auth-helpers'
 import { navigateToHome } from '../support/navigation-helpers'
-import { HTML_STATUS } from '../../src/constants'
-
 import { testWithDatabase } from '../support/test-helpers'
+import { TEST_USERS } from '../support/test-data'
+import { HTML_STATUS } from '../../src/constants'
 
 test.describe('Body size limit', () => {
   test(
@@ -15,8 +16,8 @@ test.describe('Body size limit', () => {
       // Sign in with known email and password
       await signInUser(
         page,
-        'fredfred@team439980.testinator.com',
-        'freds-clever-password'
+        TEST_USERS.KNOWN_USER.email,
+        TEST_USERS.KNOWN_USER.password
       )
 
       // Create a large payload (2KB)
@@ -54,8 +55,8 @@ test.describe('Body size limit', () => {
       // Sign in with known email and password
       await signInUser(
         page,
-        'fredfred@team439980.testinator.com',
-        'freds-clever-password'
+        TEST_USERS.KNOWN_USER.email,
+        TEST_USERS.KNOWN_USER.password
       )
 
       // Create form data with a large value (2KB)
@@ -96,8 +97,8 @@ test.describe('Body size limit', () => {
       // Sign in with known email and password
       await signInUser(
         page,
-        'fredfred@team439980.testinator.com',
-        'freds-clever-password'
+        TEST_USERS.KNOWN_USER.email,
+        TEST_USERS.KNOWN_USER.password
       )
 
       // Create a payload just under the limit (1023 bytes)

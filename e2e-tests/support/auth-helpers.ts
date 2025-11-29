@@ -18,18 +18,6 @@ export const startSignIn = async (page: Page) => {
   await verifyOnSignInPage(page)
 }
 
-export const submitEmailAndPassword = async (
-  page: Page,
-  email: string,
-  password: string
-) => {
-  await fillInput(page, 'email-input', email)
-  await fillInput(page, 'password-input', password)
-  await clickLink(page, 'submit')
-  // For successful login, we should be redirected to the protected page
-  await verifyOnProtectedPage(page)
-}
-
 export const signInUser = async (
   page: Page,
   email: string,
@@ -39,5 +27,9 @@ export const signInUser = async (
   await startSignIn(page)
 
   // Fill and submit login form
-  await submitEmailAndPassword(page, email, password)
+  await fillInput(page, 'email-input', email)
+  await fillInput(page, 'password-input', password)
+  await clickLink(page, 'submit')
+  // For successful login, we should be redirected to the protected page
+  await verifyOnProtectedPage(page)
 }

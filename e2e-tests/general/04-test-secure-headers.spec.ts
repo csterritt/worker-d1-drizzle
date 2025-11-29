@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test'
+
 import { signOutAndVerify, signInUser } from '../support/auth-helpers'
 import { navigateToHome } from '../support/navigation-helpers'
-
 import { testWithDatabase } from '../support/test-helpers'
+import { TEST_USERS, BASE_URLS } from '../support/test-data'
 
 test.describe('Security Headers', () => {
   test('server sets appropriate security headers on responses', async ({
@@ -11,7 +12,7 @@ test.describe('Security Headers', () => {
   }) => {
     // Get the response headers - bit of a hack, the root page doesn't get automatic headers
     // in development, so we use a non-existent page
-    const response = await request.get('http://localhost:3000/auth/sign-in')
+    const response = await request.get(BASE_URLS.SIGN_IN)
     const headers = response.headers()
 
     // Verify security headers are present and have appropriate values
@@ -33,8 +34,8 @@ test.describe('Security Headers', () => {
       // Sign in with known email and password
       await signInUser(
         page,
-        'fredfred@team439980.testinator.com',
-        'freds-clever-password'
+        TEST_USERS.KNOWN_USER.email,
+        TEST_USERS.KNOWN_USER.password
       )
 
       // Try to POST to the increment endpoint with an invalid Origin header

@@ -35,16 +35,13 @@ export const navigateToSignUp = async (page: Page) => {
 
 /**
  * Navigate to interest sign-up page
- * In BOTH_SIGN_UP mode, navigates to /auth/sign-up (combined page)
- * In INTEREST_SIGN_UP mode, navigates to /auth/interest-sign-up
+ * Uses /auth/interest-sign-up in INTEREST_SIGN_UP mode, /auth/sign-up in BOTH_SIGN_UP mode
  */
 export const navigateToInterestSignUp = async (page: Page) => {
   const mode = await detectSignUpMode()
-  if (mode === 'BOTH_SIGN_UP') {
-    await page.goto(BASE_URLS.SIGN_UP)
-  } else {
-    await page.goto(BASE_URLS.INTEREST_SIGN_UP)
-  }
+  const url =
+    mode === 'INTEREST_SIGN_UP' ? BASE_URLS.INTEREST_SIGN_UP : BASE_URLS.SIGN_UP
+  await page.goto(url)
   await verifyOnSignUpPage(page)
 }
 
@@ -83,17 +80,9 @@ export const navigateToProfile = async (page: Page) => {
 }
 
 /**
- * Navigation helpers for testing 404 routes
+ * Navigation helper for testing 404 routes
  */
 export const navigateTo404Route = async (page: Page, route: string) => {
-  await page.goto(`${BASE_URLS.HOME}${route}`)
-  await verifyOn404Page(page)
-}
-
-/**
- * Helper for navigating to routes that should return 404 in certain modes
- */
-export const expectRoute404 = async (page: Page, route: string) => {
   await page.goto(`${BASE_URLS.HOME}${route}`)
   await verifyOn404Page(page)
 }
