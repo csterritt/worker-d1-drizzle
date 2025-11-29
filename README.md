@@ -11,12 +11,13 @@ uses Tailwind CSS and DaisyUI. It is functionally identical, just styled differe
 The app can be configured to run in one of following four modes, by setting the `SIGN_UP_MODE`
 environment variable:
 
-1. `NO_SIGN_UP` - No sign up allowed
-2. `OPEN_SIGN_UP` - Anyone can sign up, as long as they validate their sign in via an email
+1. `NO_SIGN_UP` - No sign up allowed.
+2. `OPEN_SIGN_UP` - Anyone can sign up, as long as they validate their sign in via an email.
 3. `GATED_SIGN_UP` - Sign up is allowed, with a validation email, but only for users with a single-use sign up code.
 4. `INTEREST_SIGN_UP` - Sign up is not allowed, but users can express interest in signing up, by giving their email address.
+5. `BOTH_SIGN_UP` - This combines both the `GATED_SIGN_UP` and `INTEREST_SIGN_UP` modes.
 
-There are tests for each of these modes (and general functionality) in the `e2e-tests` directory.
+There are tests for each of these modes (and general functionality) in the `e2e-tests` directory. The tests for `BOTH_SIGN_UP` run both the `GATED_SIGN_UP` and `INTEREST_SIGN_UP` tests.
 
 #### 404 behavior
 
@@ -45,9 +46,9 @@ file from `/public`, remove loading them from `renderer.tsx`, and you'll be left
   ```bash
   npm install
   ```
-  
+
 - Install the `mailpit` SMTP sink. See the [mailpit installation documentation](https://mailpit.axllent.org/docs/install/)
-for instructions for your platform.
+  for instructions for your platform.
 
 - Set up the D1 database:
 
@@ -58,13 +59,13 @@ for instructions for your platform.
 Then set the `CLOUDFLARE_DATABASE_ID` environment variable to the ID of the database. Also set
 the "database_id" in the "d1_databases" section of the `wrangler.jsonc` file to the ID of the
 database.
-  
+
 - Set up the local D1 database schema:
 
   ```bash
   ./build-schema-update.sh
   ```
-  
+
 Also see the "Adding initial users via sqlite3" below.
 
 - Copy the `.dev.vars.all.template` to `.dev.vars.all` and fill in the values for your environment.
@@ -105,13 +106,18 @@ You'll want to use the `wrangler d1` commands to add users to the remote Cloudfl
 
 #### Running E2E tests
 
+For testing all the sign-up modes, run the `scripts/run-all-tests.sh` script. It will
+start the dev server in the every mode and run all tests. It will present a table of the results after all tests are complete.
+
+You can test an individual sign-up mode as well, following the steps below.
+
 1. Start the dev server in the desired mode (see Development quickstart above).
 2. Run all tests from the command line:
 
    ```bash
    npx playwright test
    ```
-   
+
 Alternatively, you can run the `ui-tests.sh` script to bring up the UI to run the tests, and
 see the intermediate steps of each test.
 
@@ -169,4 +175,5 @@ Change the host name in the files that have the domain name as `mini-auth.exampl
 **TODO**: Document build-to-production steps.
 
 ### Licensing
+
 See LICENSE.txt
