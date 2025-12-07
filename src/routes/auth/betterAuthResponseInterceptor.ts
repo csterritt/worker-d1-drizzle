@@ -222,6 +222,47 @@ const captureEmailMiddleware = async (
 }
 
 /**
+ * Convert form data request to JSON request for better-auth
+ */
+const convertFormDataToJsonRequest = async (
+  request: Request
+): Promise<Request> => {
+  const contentType = request.headers.get('content-type') || ''
+
+  // If already JSON, return as-is
+  if (contentType.includes('application/json')) {
+    return request
+  }
+
+  // If form data, convert to JSON
+  if (
+    contentType.includes('application/x-www-form-urlencoded') ||
+    contentType.includes('multipart/form-data')
+  ) {
+    const clonedRequest = request.clone()
+    const formData = await clonedRequest.formData()
+    const jsonBody: Record<string, string> = {}
+
+    formData.forEach((value, key) => {
+      if (typeof value === 'string') {
+        jsonBody[key] = value
+      }
+    })
+
+    const newHeaders = new Headers(request.headers)
+    newHeaders.set('content-type', 'application/json')
+
+    return new Request(request.url, {
+      method: request.method,
+      headers: newHeaders,
+      body: JSON.stringify(jsonBody),
+    })
+  }
+
+  return request
+}
+
+/**
  * Main sign-in handler that intercepts better-auth responses
  */
 const signInHandler = async (
@@ -231,7 +272,10 @@ const signInHandler = async (
   try {
     const capturedEmail = c.get('signInEmail')
     const auth = createAuth(c.env)
-    const response = await auth.handler(c.req.raw)
+
+    // Convert form data to JSON for better-auth
+    const jsonRequest = await convertFormDataToJsonRequest(c.req.raw)
+    const response = await auth.handler(jsonRequest)
 
     if (!response) {
       return next()
