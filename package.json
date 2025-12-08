@@ -18,7 +18,7 @@
     "hono": "^4.10.6",
     "nodemailer": "^7.0.10",
     "true-myth": "^9.2.0",
-    "ulid": "^3.0.1",
+    "ulid": "^3.0.2",
     "valibot": "^1.1.0"
   },
   "devDependencies": {
