@@ -19,7 +19,7 @@ const renderRoot = () => {
   return (
     <div data-testid='startup-page-banner'>
       <div>
-        <div class='container'>
+        <div id='container'>
           <h2>Welcome!</h2>
           <h3 id='heading'>Worker, D1, Drizzle Project</h3>
           <p>
@@ -65,7 +65,7 @@ const renderRoot = () => {
               \`;
               
               // Insert alert before the main content
-              const mainContent = document.querySelector('.container');
+              const mainContent = document.querySelector('#container');
               if (mainContent && mainContent.parentNode) {
                 mainContent.parentNode.insertBefore(alertDiv, mainContent);
               }
@@ -90,7 +90,7 @@ export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
     ...ALLOW_SCRIPTS_SECURE_HEADERS,
     contentSecurityPolicy: {
       ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-ZXNCd2pGZQ/P0yKye0SdGhvwzepU6qcYgIvceOpTeMQ='"],
+      scriptSrc: ["'sha256-e48BSmWrVS2LUgRZaw8dWEPdcGYOg0yqKMyRSQoi2+A='"],
     },
   }
 
