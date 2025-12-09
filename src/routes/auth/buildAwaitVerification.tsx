@@ -26,13 +26,11 @@ const renderAwaitVerification = (email?: string) => {
         <div>
           <div>
             <div>
-              <div>
-                <h2>Check Your Email</h2>
-                <p>
-                  We've sent a verification link to{' '}
-                  {email ? <span>{email}</span> : 'your email address'}.
-                </p>
-              </div>
+              <h2>Check Your Email</h2>
+              <p>
+                We've sent a verification link to{' '}
+                {email ? <span>{email}</span> : 'your email address'}.
+              </p>
             </div>
           </div>
 
@@ -51,20 +49,20 @@ const renderAwaitVerification = (email?: string) => {
                 <li>The email may take a few minutes to arrive</li>
               </ul>
             </div>
+          </div>
 
-            <div>
-              <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-action'>
-                Back to Sign In
-              </a>
-              {email && (
-                <form method='post' action={PATHS.AUTH.RESEND_EMAIL}>
-                  <input type='hidden' name='email' value={email} />
-                  <button type='submit' data-testid='resend-email-action'>
-                    Resend Email
-                  </button>
-                </form>
-              )}
-            </div>
+          <div>
+            <a href={PATHS.AUTH.SIGN_IN} data-testid='back-to-sign-in-action'>
+              Back to Sign In
+            </a>
+            {email && (
+              <form method='post' action={PATHS.AUTH.RESEND_EMAIL}>
+                <input type='hidden' name='email' value={email} />
+                <button type='submit' data-testid='resend-email-action'>
+                  Resend Email
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>

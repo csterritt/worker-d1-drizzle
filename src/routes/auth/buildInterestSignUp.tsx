@@ -29,11 +29,11 @@ const renderInterestSignUp = (emailEntered: string) => {
           <h2>Join the Waitlist</h2>
 
           <div>
-            <h4>
+            <p data-testid='no-new-accounts-message'>
               We're not accepting new accounts at the moment, but we'd love to
               notify you when we are! Enter your email address to join our
               waitlist.
-            </h4>
+            </p>
           </div>
 
           {/* Interest sign-up form */}

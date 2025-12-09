@@ -31,9 +31,7 @@ const renderPrivate = () => {
             <a href={PATHS.PROFILE} data-testid='visit-profile-action'>
               Go to Profile
             </a>
-          </div>
 
-          <div>
             <a href={PATHS.ROOT} data-testid='visit-home-action'>
               Return Home
             </a>

@@ -30,7 +30,7 @@ test.describe('Interest Sign-Up Mode: UI Tests', () => {
   test('interest sign-up page shows explanatory text', async ({ page }) => {
     await navigateToInterestSignUp(page)
 
-    const explanation = page.locator('h4')
+    const explanation = page.getByTestId('no-new-accounts-message')
     await expect(explanation).toContainText(
       "We're not accepting new accounts at the moment"
     )

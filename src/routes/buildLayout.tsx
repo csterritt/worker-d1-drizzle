@@ -42,9 +42,7 @@ export const useLayout = (
       {/* Responsive navbar */}
       <div>
         <div>
-          <div>
-            <span>Worker, D1, Drizzle Demo</span>
-          </div>
+          <a href={PATHS.ROOT}>Worker, D1, Drizzle Demo</a>
         </div>
         <div>
           {!c.get('user') && (
@@ -83,7 +81,7 @@ export const useLayout = (
       )}
 
       {/* Main content */}
-      <div>{children}</div>
+      <main>{children}</main>
 
       {/* Footer */}
       <footer>

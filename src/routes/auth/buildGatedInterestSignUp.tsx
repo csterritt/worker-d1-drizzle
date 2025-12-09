@@ -119,10 +119,7 @@ const renderGatedInterestSignUp = (emailEntered: string) => {
           </div>
 
           {/* Divider */}
-          <div style={{ margin: '2rem 0', textAlign: 'center' }}>
-            <hr />
-            <span>OR</span>
-          </div>
+          <div>OR</div>
 
           {/* Interest sign-up form */}
           <div>
@@ -162,7 +159,7 @@ const renderGatedInterestSignUp = (emailEntered: string) => {
           </div>
 
           {/* Navigation to sign-in page */}
-          <div style={{ marginTop: '2rem' }}>Already have an account?</div>
+          <div>Already have an account?</div>
           <div>
             <a href={PATHS.AUTH.SIGN_IN} data-testid='go-to-sign-in-action'>
               Sign In Instead
