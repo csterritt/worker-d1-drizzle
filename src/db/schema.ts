@@ -77,7 +77,7 @@ export const verification = sqliteTable('verification', {
 })
 
 export const singleUseCode = sqliteTable('singleUseCode', {
-  code: text('code').primaryKey().unique(),
+  code: text('code').primaryKey(),
 })
 
 export const interestedEmails = sqliteTable('interestedEmails', {

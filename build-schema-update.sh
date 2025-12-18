@@ -23,6 +23,7 @@ if [[ "x${1-}" != "x" ]] ; then
 fi
 
 /bin/rm -f schema.sql
+npx drizzle-kit generate
 for i in `/bin/ls drizzle/*.sql` ; do
   perl -ne 'if (/^(.*)CREATE TABLE (.*)$/) {print "${1}CREATE TABLE IF NOT EXISTS $2\n"} elsif (/^(.*)CREATE UNIQUE INDEX (.*)$/) {print "${1}CREATE UNIQUE INDEX IF NOT EXISTS $2\n"} elsif (/^(.*)CREATE INDEX (.*)$/) {print "${1}CREATE INDEX IF NOT EXISTS $2\n"} else {print $_}' $i >> schema.sql
 done
