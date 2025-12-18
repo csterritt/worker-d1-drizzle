@@ -11,7 +11,7 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
-import { useLayout } from '../buildLayout'
+import { useLayout } from '../build-layout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 import { redirectWithMessage } from '../../lib/redirects'
 import { retrieveCookie, removeCookie } from '../../lib/cookie-support'

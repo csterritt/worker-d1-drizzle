@@ -57,6 +57,9 @@ export const useLayout = (
                 Welcome, {c.get('user')?.name || c.get('user')?.email || 'User'}
                 !
               </span>
+              <a href={PATHS.PROFILE} data-testid='visit-profile-action'>
+                Profile
+              </a>
               <form method='post' action='/auth/sign-out'>
                 <button type='submit' data-testid='sign-out-action'>
                   Sign out

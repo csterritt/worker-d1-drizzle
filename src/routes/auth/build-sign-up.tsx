@@ -3,8 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 /**
- * Route builder for the gated sign-up page.
- * @module routes/auth/buildGatedSignUp
+ * Route builder for the sign-up page.
+ * @module routes/auth/buildSignUp
  */
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
@@ -16,97 +16,79 @@ import {
   UI_TEXT,
 } from '../../constants'
 import { Bindings } from '../../local-types'
-import { useLayout } from '../buildLayout'
+import { useLayout } from '../build-layout'
 import { COOKIES } from '../../constants'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 import { retrieveCookie } from '../../lib/cookie-support'
 
 /**
- * Render the JSX for the gated sign-up page.
+ * Render the JSX for the sign-up page.
  * @param emailEntered - email entered by user, if any
  */
-const renderGatedSignUp = (emailEntered: string) => {
+const renderSignUp = (emailEntered: string) => {
   return (
     <div data-testid='sign-up-page-banner'>
       <div>
         <div>
           <h2>Create Account</h2>
-          <p>A sign-up code is required to create an account.</p>
 
-          {/* Gated sign up form */}
+          {/* Sign up form */}
           <form
             method='post'
             action={PATHS.AUTH.SIGN_UP}
-            className='flex flex-col gap-4'
-            aria-label='Gated sign up form'
-            noValidate
+            aria-label='Sign up form'
           >
             <div>
-              <label htmlFor='gated-signup-code'>
-                <span>Sign-up Code *</span>
+              <label htmlFor='signup-name'>
+                <span>Name</span>
               </label>
               <input
-                id='gated-signup-code'
-                name='code'
-                type='text'
-                placeholder='Enter your sign-up code'
-                required
-                autoFocus
-                data-testid='gated-signup-code-input'
-                aria-label='Sign-up Code'
-              />
-            </div>
-
-            <div>
-              <label htmlFor='gated-signup-name'>
-                <span>Name *</span>
-              </label>
-              <input
-                id='gated-signup-name'
+                id='signup-name'
                 name='name'
                 type='text'
                 placeholder='Enter your name'
                 required
-                data-testid='gated-signup-name-input'
+                autoFocus
+                data-testid='signup-name-input'
                 aria-label='Name'
               />
             </div>
 
             <div>
-              <label htmlFor='gated-signup-email'>
-                <span>Email *</span>
+              <label htmlFor='signup-email'>
+                <span>Email</span>
               </label>
               <input
-                id='gated-signup-email'
+                id='signup-email'
                 name='email'
                 type='email'
                 placeholder={UI_TEXT.ENTER_YOUR_EMAIL}
                 required
                 value={emailEntered}
-                data-testid='gated-signup-email-input'
+                data-testid='signup-email-input'
                 aria-label='Email'
               />
             </div>
 
             <div>
-              <label htmlFor='gated-signup-password'>
-                <span>Password *</span>
+              <label htmlFor='signup-password'>
+                <span>Password</span>
               </label>
               <input
-                id='gated-signup-password'
+                id='signup-password'
                 name='password'
                 type='password'
                 placeholder='Enter your password (min 8 characters)'
                 required
                 minLength={8}
-                data-testid='gated-signup-password-input'
+                data-testid='signup-password-input'
                 aria-label='Password'
               />
             </div>
 
             <div>
-              <button type='submit' data-testid='gated-signup-action'>
+              <button type='submit' data-testid='signup-action'>
                 Create Account
               </button>
             </div>
@@ -126,14 +108,16 @@ const renderGatedSignUp = (emailEntered: string) => {
 }
 
 /**
- * Attach the gated sign-up route to the app.
+ * Attach the sign-up route to the app.
  * @param app - Hono app instance
  */
-export const buildGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
+export const buildSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
   app.get(PATHS.AUTH.SIGN_UP, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     // Check if user is already signed in using better-auth session
     // Better-auth middleware sets user context, access it properly
-    const user = (c as any).get('user')
+    const user = (c as unknown as { get: (key: string) => unknown }).get(
+      'user'
+    ) as { id: string } | null
     if (user) {
       console.log('Already signed in')
       return redirectWithMessage(c, PATHS.PRIVATE, MESSAGES.ALREADY_SIGNED_IN)
@@ -142,6 +126,6 @@ export const buildGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
     const emailEntered: string = retrieveCookie(c, COOKIES.EMAIL_ENTERED) ?? ''
 
     setupNoCacheHeaders(c)
-    return c.render(useLayout(c, renderGatedSignUp(emailEntered)))
+    return c.render(useLayout(c, renderSignUp(emailEntered)))
   })
 }

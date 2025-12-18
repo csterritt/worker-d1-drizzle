@@ -169,7 +169,6 @@ export const DURATIONS = {
  * Standard retry options for async operations
  * @readonly
  */
-// @ts-ignore
 export const STANDARD_RETRY_OPTIONS = {
   // minTimeout: 200, // PRODUCTION:UNCOMMENT
   minTimeout: 20, // PRODUCTION:REMOVE

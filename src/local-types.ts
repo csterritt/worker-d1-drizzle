@@ -20,8 +20,6 @@ export type SignInSession = {
 export interface Bindings {
   PROJECT_DB: D1Database
   Session: Maybe<SignInSession>
-  MAGIC_CODE?: string
-  UPLOAD_URL?: string
   db?: string
   signUpType?: string
   SIGN_UP_MODE?: string
@@ -119,20 +117,4 @@ export interface FetchResponse {
   headers: Headers
   json: () => Promise<unknown>
   text: () => Promise<string>
-}
-
-/**
- * Counter with decrement functionality
- * Note: Consider replacing with a functional approach
- */
-export class CountAndDecrement {
-  count: number = 0
-
-  constructor(initialCount: number) {
-    this.count = initialCount
-  }
-
-  decrement(): void {
-    this.count -= 1
-  }
 }

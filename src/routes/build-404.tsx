@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 
 import { PATHS } from '../constants'
-import { useLayout } from './buildLayout'
+import { useLayout } from './build-layout'
 import { Bindings } from '../local-types'
 
 /**

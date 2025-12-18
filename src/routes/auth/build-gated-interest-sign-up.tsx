@@ -16,7 +16,7 @@ import {
   UI_TEXT,
 } from '../../constants'
 import { Bindings } from '../../local-types'
-import { useLayout } from '../buildLayout'
+import { useLayout } from '../build-layout'
 import { COOKIES } from '../../constants'
 import { redirectWithMessage } from '../../lib/redirects'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
@@ -43,7 +43,6 @@ const renderGatedInterestSignUp = (emailEntered: string) => {
             <form
               method='post'
               action={PATHS.AUTH.SIGN_UP}
-              className='flex flex-col gap-4'
               aria-label='Gated sign up form'
               noValidate
             >
@@ -180,7 +179,9 @@ export const buildGatedInterestSignUp = (
 ): void => {
   app.get(PATHS.AUTH.SIGN_UP, secureHeaders(STANDARD_SECURE_HEADERS), (c) => {
     // Check if user is already signed in using better-auth session
-    const user = (c as any).get('user')
+    const user = (c as unknown as { get: (key: string) => unknown }).get(
+      'user'
+    ) as { id: string } | null
     if (user) {
       console.log('Already signed in')
       return redirectWithMessage(c, PATHS.PRIVATE, MESSAGES.ALREADY_SIGNED_IN)

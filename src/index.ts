@@ -11,40 +11,40 @@ import { showRoutes } from 'hono/dev' // PRODUCTION:REMOVE
 
 import { HTML_STATUS, SIGN_UP_MODES } from './constants'
 import { renderer } from './renderer'
-import { buildRoot } from './routes/buildRoot' // PRODUCTION:REMOVE
-import { buildPrivate } from './routes/buildPrivate'
-import { build404 } from './routes/build404'
-import { buildEmailConfirmation } from './routes/auth/buildEmailConfirmation'
-import { buildAwaitVerification } from './routes/auth/buildAwaitVerification'
+import { buildRoot } from './routes/build-root' // PRODUCTION:REMOVE
+import { buildPrivate } from './routes/build-private'
+import { build404 } from './routes/build-404'
+import { buildEmailConfirmation } from './routes/auth/build-email-confirmation'
+import { buildAwaitVerification } from './routes/auth/build-await-verification'
 import { createDbClient } from './db/client'
-import { buildSignIn } from './routes/auth/buildSignIn'
-import { buildSignUp } from './routes/auth/buildSignUp'
-import { buildGatedSignUp } from './routes/auth/buildGatedSignUp'
-import { buildInterestSignUp } from './routes/auth/buildInterestSignUp'
-import { buildGatedInterestSignUp } from './routes/auth/buildGatedInterestSignUp'
-import { buildForgotPassword } from './routes/auth/buildForgotPassword'
-import { buildWaitingForReset } from './routes/auth/buildWaitingForReset'
-import { buildResetPassword } from './routes/auth/buildResetPassword'
-import { handleSignUp } from './routes/auth/handleSignUp'
-import { handleGatedSignUp } from './routes/auth/handleGatedSignUp'
-import { handleInterestSignUp } from './routes/auth/handleInterestSignUp'
-import { handleGatedInterestSignUp } from './routes/auth/handleGatedInterestSignUp'
-import { handleSignOut } from './routes/auth/handleSignOut'
-import { handleResendEmail } from './routes/auth/handleResendEmail'
-import { handleForgotPassword } from './routes/auth/handleForgotPassword'
-import { handleResetPassword } from './routes/auth/handleResetPassword'
-import { buildProfile } from './routes/profile/buildProfile'
-import { handleChangePassword } from './routes/profile/handleChangePassword'
+import { buildSignIn } from './routes/auth/build-sign-in'
+import { buildSignUp } from './routes/auth/build-sign-up'
+import { buildGatedSignUp } from './routes/auth/build-gated-sign-up'
+import { buildInterestSignUp } from './routes/auth/build-interest-sign-up'
+import { buildGatedInterestSignUp } from './routes/auth/build-gated-interest-sign-up'
+import { buildForgotPassword } from './routes/auth/build-forgot-password'
+import { buildWaitingForReset } from './routes/auth/build-waiting-for-reset'
+import { buildResetPassword } from './routes/auth/build-reset-password'
+import { handleSignUp } from './routes/auth/handle-sign-up'
+import { handleGatedSignUp } from './routes/auth/handle-gated-sign-up'
+import { handleInterestSignUp } from './routes/auth/handle-interest-sign-up'
+import { handleGatedInterestSignUp } from './routes/auth/handle-gated-interest-sign-up'
+import { handleSignOut } from './routes/auth/handle-sign-out'
+import { handleResendEmail } from './routes/auth/handle-resend-email'
+import { handleForgotPassword } from './routes/auth/handle-forgot-password'
+import { handleResetPassword } from './routes/auth/handle-reset-password'
+import { buildProfile } from './routes/profile/build-profile'
+import { handleChangePassword } from './routes/profile/handle-change-password'
 import {
   setupBetterAuth,
   setupBetterAuthMiddleware,
 } from './routes/auth/better-auth-handler'
-import { setupBetterAuthResponseInterceptor } from './routes/auth/betterAuthResponseInterceptor'
+import { setupBetterAuthResponseInterceptor } from './routes/auth/better-auth-response-interceptor'
 
 import { Bindings } from './local-types'
-import { handleSetClock } from './routes/auth/handleSetClock' // PRODUCTION:REMOVE
-import { handleResetClock } from './routes/auth/handleResetClock' // PRODUCTION:REMOVE
-import { handleSetDbFailures } from './routes/handleSetDbFailures' // PRODUCTION:REMOVE
+import { handleSetClock } from './routes/auth/handle-set-clock' // PRODUCTION:REMOVE
+import { handleResetClock } from './routes/auth/handle-reset-clock' // PRODUCTION:REMOVE
+import { handleSetDbFailures } from './routes/handle-set-db-failures' // PRODUCTION:REMOVE
 import { testDatabaseRouter } from './routes/test/database' // PRODUCTION:REMOVE
 import { testSignUpModeRouter } from './routes/test/sign-up-mode' // PRODUCTION:REMOVE
 import { testSmtpRouter } from './routes/test/smtp-config' // PRODUCTION:REMOVE
@@ -135,7 +135,7 @@ app.use(async (c, next) => {
 app.use(
   bodyLimit({
     // maxSize: 4 * 1024, // 4kb // PRODUCTION:UNCOMMENT
-    maxSize: 1024, // 50kb // PRODUCTION:REMOVE
+    maxSize: 1024, // 1kb // PRODUCTION:REMOVE
     onError: (c) => {
       console.log('Body limit exceeded')
       return c.text('overflow :(', HTML_STATUS.CONTENT_TOO_LARGE)

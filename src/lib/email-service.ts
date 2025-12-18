@@ -9,8 +9,19 @@
  */
 
 import nodemailer from 'nodemailer'
+
 import { getTestSmtpConfig } from '../routes/test/smtp-config'
 import type { Bindings } from '../local-types'
+
+/**
+ * Escape HTML special characters to prevent XSS in email templates
+ */
+const escapeHtml = (str: string): string =>
+  str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 
 /**
  * Configuration for email service
@@ -145,7 +156,7 @@ export const sendConfirmationEmail = async (
       subject: 'Confirm Your Email Address',
       html: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-          <h1 style="color: #333;">Welcome ${name}!</h1>
+          <h1 style="color: #333;">Welcome ${escapeHtml(name)}!</h1>
           <p>Thank you for signing up. Please confirm your email address by clicking the link below:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${confirmationUrl}" 
@@ -215,7 +226,7 @@ export const sendPasswordResetEmail = async (
       html: `
         <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
           <h1 style="color: #333;">Password Reset Request</h1>
-          <p>Hi ${name},</p>
+          <p>Hi ${escapeHtml(name)},</p>
           <p>You requested to reset your password. Please click the button below to set a new password:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" 

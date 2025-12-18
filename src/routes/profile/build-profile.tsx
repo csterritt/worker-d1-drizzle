@@ -10,9 +10,10 @@ import { Context, Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
-import { Bindings } from '../../local-types'
-import { useLayout } from '../buildLayout'
+import type { AuthUser, Bindings } from '../../local-types'
+import { useLayout } from '../build-layout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
+import { signedInAccess } from '../../middleware/signed-in-access'
 
 /**
  * List of humorous questions for the optional user information field
@@ -48,6 +49,11 @@ const getQuestionOfTheDay = (): string => {
   return HUMOROUS_QUESTIONS[index]
 }
 
+const getSignedInUser = (c: Context): AuthUser => {
+  const user = c.get('user') as AuthUser | undefined | null
+  return user as AuthUser
+}
+
 /**
  * Render the JSX for the profile page.
  * @param userName - User's name
@@ -57,45 +63,45 @@ const renderProfile = (userName: string, userEmail: string) => {
   const questionOfTheDay = getQuestionOfTheDay()
 
   return (
-    <div data-testid='profile-page' className='flex justify-center'>
-      <div className='card w-full max-w-2xl bg-base-100 shadow-xl'>
-        <div className='card-body'>
-          <h2 className='card-title text-2xl font-bold mb-4'>Profile</h2>
+    <div data-testid='profile-page'>
+      <div>
+        <div>
+          <div>
+            <h2>Profile</h2>
+            <a href={PATHS.PRIVATE} data-testid='go-back-action'>
+              Back
+            </a>
+          </div>
 
           {/* User Information Section */}
           <div className=''>
-            <h3 className='text-lg font-semibold mb-3'>Your Information</h3>
-            <div className='space-y-2'>
-              <div className='flex flex-col'>
-                <span className='text-sm text-gray-500'>Name</span>
-                <span className='text-base' data-testid='profile-name'>
-                  {userName}
-                </span>
+            <h3>Your Information</h3>
+            <div>
+              <div>
+                <span>Name</span>
+                <span data-testid='profile-name'>{userName}</span>
               </div>
-              <div className='flex flex-col'>
-                <span className='text-sm text-gray-500'>Email</span>
-                <span className='text-base' data-testid='profile-email'>
-                  {userEmail}
-                </span>
+              <div>
+                <span>Email</span>
+                <span data-testid='profile-email'>{userEmail}</span>
               </div>
             </div>
           </div>
 
-          <div className='divider my-2'></div>
+          <div></div>
 
           {/* Change Password Section */}
           <div>
-            <h3 className='text-lg font-semibold mb-3'>Change Password</h3>
+            <h3>Change Password</h3>
             <form
               method='post'
               action={PATHS.PROFILE}
-              className='flex flex-col gap-4'
               aria-label='Change password form'
               noValidate
             >
-              <div className='form-control w-full'>
-                <label className='label' htmlFor='current-password'>
-                  <span className='label-text'>Current Password</span>
+              <div>
+                <label htmlFor='current-password'>
+                  <span>Current Password</span>
                 </label>
                 <input
                   id='current-password'
@@ -103,15 +109,14 @@ const renderProfile = (userName: string, userEmail: string) => {
                   type='password'
                   placeholder='Enter your current password'
                   required
-                  className='input input-bordered w-full'
                   data-testid='current-password-input'
                   aria-label='Current Password'
                 />
               </div>
 
-              <div className='form-control w-full'>
-                <label className='label' htmlFor='new-password'>
-                  <span className='label-text'>New Password</span>
+              <div>
+                <label htmlFor='new-password'>
+                  <span>New Password</span>
                 </label>
                 <input
                   id='new-password'
@@ -120,15 +125,14 @@ const renderProfile = (userName: string, userEmail: string) => {
                   placeholder='Enter your new password'
                   required
                   minLength={8}
-                  className='input input-bordered w-full'
                   data-testid='new-password-input'
                   aria-label='New Password'
                 />
               </div>
 
-              <div className='form-control w-full'>
-                <label className='label' htmlFor='confirm-password'>
-                  <span className='label-text'>Confirm New Password</span>
+              <div>
+                <label htmlFor='confirm-password'>
+                  <span>Confirm New Password</span>
                 </label>
                 <input
                   id='confirm-password'
@@ -137,30 +141,20 @@ const renderProfile = (userName: string, userEmail: string) => {
                   placeholder='Confirm your new password'
                   required
                   minLength={8}
-                  className='input input-bordered w-full'
                   data-testid='confirm-password-input'
                   aria-label='Confirm Password'
                 />
               </div>
 
-              <div className='divider my-2'></div>
+              <div></div>
 
               {/* Humorous Question */}
-              <div className='form-control w-full'>
-                <span
-                  className='text-sm text-gray-600 italic'
-                  data-testid='humorous-question'
-                >
-                  {questionOfTheDay}
-                </span>
+              <div>
+                <span data-testid='humorous-question'>{questionOfTheDay}</span>
               </div>
 
-              <div className='card-actions justify-end mt-4'>
-                <button
-                  type='submit'
-                  className='btn btn-primary'
-                  data-testid='change-password-action'
-                >
+              <div>
+                <button type='submit' data-testid='change-password-action'>
                   Change Password
                 </button>
               </div>
@@ -180,19 +174,13 @@ export const buildProfile = (app: Hono<{ Bindings: Bindings }>): void => {
   app.get(
     PATHS.PROFILE,
     secureHeaders(STANDARD_SECURE_HEADERS),
+    signedInAccess,
     (c: Context) => {
-      setupNoCacheHeaders(c)
-
-      const user = c.get('user')
-
-      // Redirect to sign-in if not authenticated
-      if (!user) {
-        return c.redirect(PATHS.AUTH.SIGN_IN)
-      }
-
+      const user = getSignedInUser(c)
       const userName = user.name || 'User'
       const userEmail = user.email || ''
 
+      setupNoCacheHeaders(c)
       return c.render(useLayout(c, renderProfile(userName, userEmail)))
     }
   )

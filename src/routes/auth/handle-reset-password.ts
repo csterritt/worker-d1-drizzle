@@ -42,7 +42,7 @@ export const handleResetPassword = (
           return redirectWithError(c, target, err || MESSAGES.INVALID_INPUT)
         }
 
-        const { token, password } = data as any
+        const { token, password } = data as { token: string; password: string }
 
         // Use better-auth to reset the password
         const auth = createAuth(c.env)

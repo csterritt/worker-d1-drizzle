@@ -66,10 +66,7 @@ export const setupBetterAuth = (app: Hono<{ Bindings: Bindings }>): void => {
     } catch (error) {
       console.error('❌ Better-auth handler error:', error)
       console.error('❌ Error stack:', (error as Error)?.stack)
-      return new Response(
-        'Internal Server Error: ' + (error as Error)?.message,
-        { status: 500 }
-      )
+      return new Response('Internal Server Error', { status: 500 })
     }
   })
 

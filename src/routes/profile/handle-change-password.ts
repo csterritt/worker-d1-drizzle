@@ -12,8 +12,22 @@ import { secureHeaders } from 'hono/secure-headers'
 import { createAuth } from '../../lib/auth'
 import { redirectWithMessage, redirectWithError } from '../../lib/redirects'
 import { MESSAGES, PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
-import { Bindings } from '../../local-types'
+import type { AuthUser, Bindings } from '../../local-types'
+import { signedInAccess } from '../../middleware/signed-in-access'
 import { validateRequest, ChangePasswordFormSchema } from '../../lib/validators'
+
+interface ChangePasswordData {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+  userInfo?: string
+}
+
+const isErrorWithMessage = (value: unknown): value is { message: string } => {
+  if (typeof value !== 'object' || value === null) return false
+  if (!('message' in value)) return false
+  return typeof (value as { message: unknown }).message === 'string'
+}
 
 /**
  * Attach the change password handler to the app.
@@ -25,14 +39,10 @@ export const handleChangePassword = (
   app.post(
     PATHS.PROFILE,
     secureHeaders(STANDARD_SECURE_HEADERS),
+    signedInAccess,
     async (c: Context) => {
       try {
-        const user = c.get('user')
-
-        // Redirect to sign-in if not authenticated
-        if (!user) {
-          return c.redirect(PATHS.AUTH.SIGN_IN)
-        }
+        const user = c.get('user') as AuthUser
 
         const body = await c.req.parseBody()
         let [ok, data, err] = validateRequest(body, ChangePasswordFormSchema)
@@ -49,7 +59,7 @@ export const handleChangePassword = (
           )
         }
 
-        const { currentPassword, newPassword } = data as any
+        const { currentPassword, newPassword } = data as ChangePasswordData
 
         // Use better-auth to change the password
         const auth = createAuth(c.env)
@@ -61,7 +71,7 @@ export const handleChangePassword = (
             body: {
               currentPassword,
               newPassword,
-              revokeOtherSessions: false,
+              revokeOtherSessions: true,
             },
             headers: c.req.raw.headers,
           })
@@ -77,8 +87,8 @@ export const handleChangePassword = (
           console.error('Password change error:', error)
 
           // Check if it's a current password verification error
-          if (error && typeof error === 'object' && 'message' in error) {
-            const errorMessage = (error as any).message
+          if (isErrorWithMessage(error)) {
+            const errorMessage = error.message
             if (
               errorMessage.includes('password') ||
               errorMessage.includes('incorrect') ||

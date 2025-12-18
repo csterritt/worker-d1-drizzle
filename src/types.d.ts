@@ -7,6 +7,7 @@
  */
 import { DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from './db/schema'
+import type { AuthSession, AuthSessionResponse, AuthUser } from './local-types'
 
 declare interface Bindings {
   /**
@@ -21,5 +22,9 @@ declare interface Bindings {
 declare module 'hono' {
   interface ContextVariableMap {
     db: DrizzleD1Database<typeof schema>
+    user: AuthUser | null
+    session: AuthSession | null
+    authSession: AuthSessionResponse | null
+    signInEmail?: string
   }
 }

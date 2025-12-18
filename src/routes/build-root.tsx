@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 import { PATHS, COOKIES, ALLOW_SCRIPTS_SECURE_HEADERS } from '../constants'
-import { useLayout } from './buildLayout'
+import { useLayout } from './build-layout'
 import { Bindings } from '../local-types'
 
 /**
@@ -22,11 +22,11 @@ const renderRoot = () => {
         <div id='container'>
           <h2>Welcome!</h2>
           <h3 id='heading'>Worker, D1, Drizzle Project</h3>
-          <p>
+          <div>
             <a href={PATHS.PRIVATE} data-testid='visit-private-action'>
               Protected Content
             </a>
-          </p>
+          </div>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ const renderRoot = () => {
               // Create alert element
               const alertDiv = document.createElement('div');              
               alertDiv.innerHTML = \`
-                <div role="alert">
+                <div class="alert alert-success mx-4 mt-4" role="alert">
                   <span>\${decodedMessage}</span>
                 </div>
               \`;
@@ -90,7 +90,7 @@ export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
     ...ALLOW_SCRIPTS_SECURE_HEADERS,
     contentSecurityPolicy: {
       ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-e48BSmWrVS2LUgRZaw8dWEPdcGYOg0yqKMyRSQoi2+A='"],
+      scriptSrc: ["'sha256-Ah51Kj+wllbC3bdUAw3ijksPd2PeVkgagLouTcvHSZw='"],
     },
   }
 

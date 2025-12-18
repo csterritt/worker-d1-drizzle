@@ -30,6 +30,16 @@ const validateEmail = (value: unknown) => {
   return VALIDATION.EMAIL_PATTERN.test(v)
 }
 
+// Name validation: only letters, numbers, hyphens, underscores, and spaces
+const NAME_PATTERN = /^[a-zA-Z0-9_\- ]+$/
+const validateNameCharacters = (value: unknown): boolean => {
+  if (typeof value !== 'string') {
+    return false
+  }
+  const trimmed = value.trim()
+  return trimmed.length > 0 && NAME_PATTERN.test(trimmed)
+}
+
 /**
  * Email validation schema
  * - Must be a string
@@ -77,8 +87,8 @@ export const SignUpFormSchema = object({
     minLength(1, VALIDATION.NAME_REQUIRED),
     maxLength(100, 'Name must be 100 characters or fewer'),
     custom(
-      (v) => typeof v === 'string' && v.trim().length > 0,
-      VALIDATION.NAME_REQUIRED
+      validateNameCharacters,
+      'Name can only contain letters, numbers, hyphens, underscores, and spaces.'
     )
   ),
   email: EmailSchema,
@@ -107,8 +117,8 @@ export const GatedSignUpFormSchema = object({
     minLength(1, VALIDATION.NAME_REQUIRED),
     maxLength(100, 'Name must be 100 characters or fewer'),
     custom(
-      (v) => typeof v === 'string' && v.trim().length > 0,
-      VALIDATION.NAME_REQUIRED
+      validateNameCharacters,
+      'Name can only contain letters, numbers, hyphens, underscores, and spaces.'
     )
   ),
   email: EmailSchema,
