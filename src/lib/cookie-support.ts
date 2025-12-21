@@ -46,34 +46,10 @@ export const addCookie = (
 }
 
 /**
- * Sets a cookie without the standard cookie options, so it can be read/deleted
- * by javascript. Used solely for sign out message cookie.
- * @param c - Hono context
- * @param name - Cookie name
- * @param value - Cookie value
- */
-export const addSimpleCookie = (
-  c: Context,
-  name: string,
-  value: string
-): void => {
-  setCookie(c, name, value, { path: '/' })
-}
-
-/**
  * Removes a cookie with standard cookie options
  * @param c - Hono context
  * @param name - Cookie name
  */
 export const removeCookie = (c: Context, name: string): void => {
   deleteCookie(c, name, COOKIES.STANDARD_COOKIE_OPTIONS)
-}
-
-/**
- * Removes a cookie without the standard cookie options
- * @param c - Hono context
- * @param name - Cookie name
- */
-export const removeSimpleCookie = (c: Context, name: string): void => {
-  deleteCookie(c, name, { path: '/' })
 }

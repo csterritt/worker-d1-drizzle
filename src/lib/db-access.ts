@@ -230,3 +230,33 @@ const checkInterestedEmailExistsActual = async (
     return Result.err(e instanceof Error ? e : new Error(String(e)))
   }
 }
+
+/**
+ * Delete a user account by user ID
+ * FK cascade will automatically delete associated sessions and accounts
+ * @param db - Database instance
+ * @param userId - User ID to delete
+ * @returns Promise<Result<boolean, Error>> - true if user was deleted
+ */
+export const deleteUserAccount = (
+  db: DrizzleClient,
+  userId: string
+): Promise<Result<boolean, Error>> =>
+  withRetry('deleteUserAccount', () => deleteUserAccountActual(db, userId))
+
+const deleteUserAccountActual = async (
+  db: DrizzleClient,
+  userId: string
+): Promise<Result<boolean, Error>> => {
+  try {
+    const result = await db.delete(user).where(eq(user.id, userId))
+    // D1 returns changes in meta.changes, but fallback to rowsAffected for compatibility
+    const rowsDeleted =
+      result.meta?.changes ??
+      (result as { rowsAffected?: number }).rowsAffected ??
+      0
+    return Result.ok(rowsDeleted >= 1)
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}

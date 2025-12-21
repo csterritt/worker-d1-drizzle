@@ -66,8 +66,10 @@ export const PATHS = {
     SIGN_OUT: '/auth/sign-out',
   },
 
-  // Profile path
+  // Profile paths
   PROFILE: '/profile' as const,
+  PROFILE_DELETE_CONFIRM: '/profile/delete-confirm' as const,
+  PROFILE_DELETE: '/profile/delete' as const,
 } as const
 
 // Cookie names
@@ -81,8 +83,6 @@ export const COOKIES = {
 
   // Session cookie
   SESSION: 'SESSION',
-  // Sign out message cookie
-  SIGN_OUT_MESSAGE: 'SIGN_OUT_MESSAGE',
   // DB failure count cookie for testing // PRODUCTION:REMOVE
   DB_FAIL_COUNT: 'DB_FAIL_COUNT', // PRODUCTION:REMOVE
   DB_FAIL_INCR: 'DB_FAIL_INCR', // PRODUCTION:REMOVE

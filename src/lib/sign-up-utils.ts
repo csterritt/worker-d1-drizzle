@@ -11,13 +11,7 @@ import { Context } from 'hono'
 import { redirectWithMessage } from './redirects'
 import { addCookie } from './cookie-support'
 import { getUserIdByEmail, updateAccountTimestamp } from './db-access'
-import {
-  PATHS,
-  COOKIES,
-  MESSAGES,
-  LOG_MESSAGES,
-  HTML_STATUS,
-} from '../constants'
+import { PATHS, COOKIES, MESSAGES, LOG_MESSAGES } from '../constants'
 import type { Bindings, DrizzleClient } from '../local-types'
 
 /**
@@ -193,5 +187,5 @@ export const redirectToAwaitVerification = (
   email: string
 ): Response => {
   addCookie(c, COOKIES.EMAIL_ENTERED, email)
-  return c.redirect(PATHS.AUTH.AWAIT_VERIFICATION, HTML_STATUS.SEE_OTHER)
+  return redirectWithMessage(c, PATHS.AUTH.AWAIT_VERIFICATION, '')
 }

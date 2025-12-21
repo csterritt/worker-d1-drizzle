@@ -6,10 +6,9 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
-import { redirectWithMessage } from '../../lib/redirects'
-import { COOKIES, PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
+import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../../constants'
 import type { Bindings } from '../../local-types'
-import { addSimpleCookie } from '../../lib/cookie-support'
 
 /**
  * Handle sign-out with proper UX flow
@@ -39,13 +38,12 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
           const authResponse = await auth.handler(authRequest)
 
           if (authResponse && authResponse.status === 200) {
-            // Create redirect response with success message
-            addSimpleCookie(
+            // Create redirect response to sign-out page
+            const redirectResponse = redirectWithMessage(
               c,
-              COOKIES.SIGN_OUT_MESSAGE,
-              'You have been signed out successfully.'
+              PATHS.AUTH.SIGN_OUT,
+              ''
             )
-            const redirectResponse = redirectWithMessage(c, PATHS.ROOT, '')
 
             // Handle multiple cookie headers if they exist
             const allCookieHeaders = authResponse.headers.getSetCookie?.() || []
@@ -60,11 +58,7 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
         }
 
         // Fallback: Clear cookies manually and redirect
-        const fallbackResponse = redirectWithMessage(
-          c,
-          PATHS.ROOT,
-          'You have been signed out successfully.'
-        )
+        const fallbackResponse = redirectWithMessage(c, PATHS.AUTH.SIGN_OUT, '')
 
         // Manually clear better-auth session cookies
         fallbackResponse.headers.append(
@@ -80,8 +74,12 @@ export const handleSignOut = (app: Hono<{ Bindings: Bindings }>): void => {
       } catch (error) {
         console.error('Sign-out handler error:', error)
 
-        // Handle errors gracefully - still redirect to home
-        return redirectWithMessage(c, PATHS.ROOT, 'Sign-out completed.')
+        // Handle errors gracefully - still redirect to sign-out page
+        return redirectWithError(
+          c,
+          PATHS.AUTH.SIGN_OUT,
+          'Internal Server Error'
+        )
       }
     }
   )

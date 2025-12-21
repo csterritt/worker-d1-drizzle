@@ -25,6 +25,7 @@ import { buildGatedInterestSignUp } from './routes/auth/build-gated-interest-sig
 import { buildForgotPassword } from './routes/auth/build-forgot-password'
 import { buildWaitingForReset } from './routes/auth/build-waiting-for-reset'
 import { buildResetPassword } from './routes/auth/build-reset-password'
+import { buildSignOut } from './routes/auth/build-sign-out'
 import { handleSignUp } from './routes/auth/handle-sign-up'
 import { handleGatedSignUp } from './routes/auth/handle-gated-sign-up'
 import { handleInterestSignUp } from './routes/auth/handle-interest-sign-up'
@@ -34,7 +35,9 @@ import { handleResendEmail } from './routes/auth/handle-resend-email'
 import { handleForgotPassword } from './routes/auth/handle-forgot-password'
 import { handleResetPassword } from './routes/auth/handle-reset-password'
 import { buildProfile } from './routes/profile/build-profile'
+import { buildDeleteConfirm } from './routes/profile/build-delete-confirm'
 import { handleChangePassword } from './routes/profile/handle-change-password'
+import { handleDeleteAccount } from './routes/profile/handle-delete-account'
 import {
   setupBetterAuth,
   setupBetterAuthMiddleware,
@@ -193,11 +196,14 @@ buildForgotPassword(app)
 buildWaitingForReset(app)
 buildResetPassword(app)
 buildEmailConfirmation(app)
+buildSignOut(app)
 handleSignOut(app)
 handleForgotPassword(app)
 handleResetPassword(app)
 buildProfile(app)
+buildDeleteConfirm(app)
 handleChangePassword(app)
+handleDeleteAccount(app)
 
 handleSetClock(app) // PRODUCTION:REMOVE
 handleResetClock(app) // PRODUCTION:REMOVE

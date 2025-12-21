@@ -54,3 +54,11 @@ export const verifyOnInvalidTokenPage = async (page: any) => {
 export const verifyOnProfilePage = async (page: Page) => {
   expect(await verifyElementExists(page, 'profile-page')).toBe(true)
 }
+
+export const verifyOnDeleteConfirmPage = async (page: Page) => {
+  expect(await verifyElementExists(page, 'delete-confirm-page')).toBe(true)
+}
+
+export const verifyOnSignOutPage = async (page: Page) => {
+  expect(await verifyElementExists(page, 'sign-out-page')).toBe(true)
+}

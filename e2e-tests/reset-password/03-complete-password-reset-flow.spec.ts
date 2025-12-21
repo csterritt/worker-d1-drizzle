@@ -122,8 +122,8 @@ test(
     await clickLink(page, 'sign-out-action')
     await page.waitForTimeout(1000)
 
-    // Should be redirected to home page after sign-out
-    await expect(page).toHaveURL(BASE_URLS.HOME + '/')
+    // Should be redirected to the sign out page after sign-out
+    await expect(page).toHaveURL(BASE_URLS.SIGN_OUT)
 
     // Try to sign in with old password
     await navigateToSignIn(page)

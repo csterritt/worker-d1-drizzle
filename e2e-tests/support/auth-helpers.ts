@@ -1,13 +1,16 @@
 import { Page } from '@playwright/test'
 import { clickLink, fillInput } from './finders'
 import {
-  verifyOnStartupPage,
   verifyOnSignInPage,
+  verifyOnStartupPage,
   verifyOnProtectedPage,
+  verifyOnSignOutPage,
 } from './page-verifiers'
 
 export const signOutAndVerify = async (page: Page) => {
   await clickLink(page, 'sign-out-action')
+  await verifyOnSignOutPage(page)
+  await clickLink(page, 'go-home-action')
   await verifyOnStartupPage(page)
 }
 

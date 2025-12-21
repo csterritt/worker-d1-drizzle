@@ -1,11 +1,12 @@
 import { test } from '@playwright/test'
 
-import { startSignIn, signOutAndVerify } from '../support/auth-helpers'
-import { clickLink, verifyAlert } from '../support/finders'
+import { startSignIn } from '../support/auth-helpers'
+import { clickLink, verifyAlert, getElementText } from '../support/finders'
 import {
   verifyOnProtectedPage,
   verifyOnStartupPage,
   verifyOnSignInPage,
+  verifyOnSignOutPage,
 } from '../support/page-verifiers'
 import { testWithDatabase } from '../support/test-helpers'
 import { navigateToHome } from '../support/navigation-helpers'
@@ -34,10 +35,21 @@ test(
     // Now sign out
     await clickLink(page, 'sign-out-action')
 
-    // Verify we get the sign-out success message first
-    await verifyAlert(page, ERROR_MESSAGES.SIGN_OUT_SUCCESS)
+    // Verify we land on the sign-out page
+    await verifyOnSignOutPage(page)
 
-    // Verify we're back on the startup page
+    // Verify the success message is displayed
+    const pageText = await page.textContent('body')
+    if (!pageText?.includes(ERROR_MESSAGES.SIGN_OUT_SUCCESS)) {
+      throw new Error(
+        `Expected to find "${ERROR_MESSAGES.SIGN_OUT_SUCCESS}" on sign-out page`
+      )
+    }
+
+    // Click the Home button
+    await clickLink(page, 'go-home-action')
+
+    // Verify we're on the startup page
     await verifyOnStartupPage(page)
 
     // Try to access the private page again - should be redirected to sign-in

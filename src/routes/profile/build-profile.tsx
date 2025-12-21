@@ -160,6 +160,23 @@ const renderProfile = (userName: string, userEmail: string) => {
               </div>
             </form>
           </div>
+
+          {/* Delete Account Section */}
+          <div></div>
+
+          <div>
+            <h3>Delete Account</h3>
+            <p>
+              Once you delete your account, there is no going back. This action
+              cannot be undone.
+            </p>
+            <a
+              href={PATHS.PROFILE_DELETE_CONFIRM}
+              data-testid='delete-account-action'
+            >
+              Delete Account
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -9,16 +9,12 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import {
-  PATHS,
-  COOKIES,
-  STANDARD_SECURE_HEADERS,
-  HTML_STATUS,
-} from '../../constants'
+import { PATHS, COOKIES, STANDARD_SECURE_HEADERS } from '../../constants'
 import { Bindings } from '../../local-types'
 import { useLayout } from '../build-layout'
 import { setupNoCacheHeaders } from '../../lib/setup-no-cache-headers'
 import { retrieveCookie, removeCookie } from '../../lib/cookie-support'
+import { redirectWithMessage } from '../../lib/redirects'
 
 /**
  * Render the JSX for the await verification page.
@@ -93,7 +89,7 @@ export const buildAwaitVerification = (
 
       // If no email cookie is present, redirect to sign-in page
       if (!email) {
-        return c.redirect(PATHS.AUTH.SIGN_IN, HTML_STATUS.SEE_OTHER)
+        return redirectWithMessage(c, PATHS.AUTH.SIGN_IN, '')
       }
 
       // Remove the email cookie after retrieving it

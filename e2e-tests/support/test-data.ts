@@ -87,6 +87,8 @@ export const ERROR_MESSAGES = {
   PASSWORD_REQUIRED: 'Please enter your password.',
   NAME_REQUIRED: 'Please enter your name.',
   CODE_REQUIRED: 'Please enter a valid sign-up code.',
+  INVALID_NAME_CHARACTERS:
+    'Name can only contain letters, numbers, hyphens, underscores, and spaces.',
 
   // Sign-up errors
   DUPLICATE_EMAIL:
@@ -105,6 +107,9 @@ export const ERROR_MESSAGES = {
     "If an account with that email exists, we've sent you a password reset link.",
   PASSWORD_RESET_SUCCESS:
     'Your password has been successfully reset. You can now sign in with your new password.',
+
+  // Delete account messages
+  ACCOUNT_DELETED: 'Your account has been successfully deleted.',
 } as const
 
 export const BASE_URLS = {
@@ -116,5 +121,7 @@ export const BASE_URLS = {
   AWAIT_VERIFICATION: 'http://localhost:3000/auth/await-verification',
   PRIVATE: 'http://localhost:3000/private',
   WAITING_FOR_RESET: 'http://localhost:3000/auth/waiting-for-reset',
+  SIGN_OUT: 'http://localhost:3000/auth/sign-out',
   PROFILE: 'http://localhost:3000/profile',
+  PROFILE_DELETE_CONFIRM: 'http://localhost:3000/profile/delete-confirm',
 } as const

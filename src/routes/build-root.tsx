@@ -8,7 +8,7 @@
  */
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
-import { PATHS, COOKIES, ALLOW_SCRIPTS_SECURE_HEADERS } from '../constants'
+import { PATHS, STANDARD_SECURE_HEADERS } from '../constants'
 import { useLayout } from './build-layout'
 import { Bindings } from '../local-types'
 
@@ -29,54 +29,6 @@ const renderRoot = () => {
           </div>
         </div>
       </div>
-
-      {/* JavaScript to check for sign-out message cookie and display alert */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-          document.addEventListener('DOMContentLoaded', function() {
-            // Function to get cookie by name
-            function getCookie(name) {
-              const value = \`; \${document.cookie}\`;
-              const parts = value.split(\`; \${name}=\`);
-              if (parts.length === 2) {
-                return parts.pop().split(';').shift();
-              }
-              return null;
-            }
-            
-            // Function to delete cookie by name
-            function deleteCookie(name) {
-              document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            }
-            
-            // Check for sign-out message
-            const signOutMessage = getCookie('${COOKIES.SIGN_OUT_MESSAGE}');
-            if (signOutMessage) {
-              // Decode the URI component to replace %20 with spaces
-              const decodedMessage = decodeURIComponent(signOutMessage);
-              
-              // Create alert element
-              const alertDiv = document.createElement('div');              
-              alertDiv.innerHTML = \`
-                <div class="alert alert-success mx-4 mt-4" role="alert">
-                  <span>\${decodedMessage}</span>
-                </div>
-              \`;
-              
-              // Insert alert before the main content
-              const mainContent = document.querySelector('#container');
-              if (mainContent && mainContent.parentNode) {
-                mainContent.parentNode.insertBefore(alertDiv, mainContent);
-              }
-              
-              // Clear the cookie
-              deleteCookie('${COOKIES.SIGN_OUT_MESSAGE}');
-            }
-          });
-        `,
-        }}
-      />
     </div>
   )
 }
@@ -86,15 +38,7 @@ const renderRoot = () => {
  * @param app - Hono app instance
  */
 export const buildRoot = (app: Hono<{ Bindings: Bindings }>): void => {
-  const secureHeadersWithNonce = {
-    ...ALLOW_SCRIPTS_SECURE_HEADERS,
-    contentSecurityPolicy: {
-      ...ALLOW_SCRIPTS_SECURE_HEADERS.contentSecurityPolicy,
-      scriptSrc: ["'sha256-Ah51Kj+wllbC3bdUAw3ijksPd2PeVkgagLouTcvHSZw='"],
-    },
-  }
-
-  app.get(PATHS.ROOT, secureHeaders(secureHeadersWithNonce), (c) =>
+  app.get(PATHS.ROOT, secureHeaders(STANDARD_SECURE_HEADERS), (c) =>
     c.render(useLayout(c, renderRoot()))
   )
 }
