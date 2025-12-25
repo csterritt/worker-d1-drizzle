@@ -198,7 +198,7 @@ export const STANDARD_SECURE_HEADERS: SecureHeadersConfig = {
     baseUri: ["'self'"],
     childSrc: ["'self'"],
     connectSrc: ["'self'"],
-    fontSrc: ["'self'", 'https:', 'data:'],
+    fontSrc: ["'self'", 'data:'],
     // formAction: ["'self'", 'https://mini-auth.example.com', 'https://mini-auth.workers.dev'], // PRODUCTION:UNCOMMENT
     formAction: ["'self'"], // PRODUCTION:REMOVE
     frameAncestors: ["'self'"],
@@ -210,9 +210,9 @@ export const STANDARD_SECURE_HEADERS: SecureHeadersConfig = {
     reportTo: 'endpoint-1',
     sandbox: ['allow-same-origin', 'allow-forms'],
     scriptSrc: ["'self'"],
-    styleSrc: ["'self'", "'https:'"],
+    styleSrc: ["'self'"],
     styleSrcAttr: ["'none'"],
-    styleSrcElem: ["'self'", "'https:'"],
+    styleSrcElem: ["'self'"],
     upgradeInsecureRequests: [],
     workerSrc: ["'self'"],
   },
