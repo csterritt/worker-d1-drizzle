@@ -9,7 +9,7 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
-import { redirectWithMessage } from '../../lib/redirects'
+import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
 import {
   PATHS,
   DURATIONS,
@@ -42,7 +42,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         const body = await c.req.parseBody()
         const [ok, data, err] = validateRequest(body, ResendEmailFormSchema)
         if (!ok) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.AWAIT_VERIFICATION,
             err || 'Email address is required to resend verification.'
@@ -111,7 +111,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
               (waitTimeMs - timeSinceLastEmail) / 1000
             )
             addCookie(c, COOKIES.EMAIL_ENTERED, email)
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.AWAIT_VERIFICATION,
               `Please wait ${remainingSeconds} more second${remainingSeconds !== 1 ? 's' : ''} before requesting another verification email.`
@@ -153,7 +153,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
         }
       } catch (error) {
         console.error('Resend email error:', error)
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.AWAIT_VERIFICATION,
           MESSAGES.GENERIC_ERROR_TRY_AGAIN

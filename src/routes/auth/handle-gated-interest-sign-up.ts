@@ -54,7 +54,7 @@ export const handleGatedInterestSignUp = (
         const [ok, data, err] = validateRequest(body, GatedSignUpFormSchema)
 
         if (!ok) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             err || MESSAGES.INVALID_INPUT
@@ -73,7 +73,7 @@ export const handleGatedInterestSignUp = (
             'Database error validating sign-up code:',
             codeResult.error
           )
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -81,7 +81,7 @@ export const handleGatedInterestSignUp = (
         }
 
         if (!codeResult.value) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             'Invalid or expired sign-up code. Please check your code and try again.'
@@ -102,7 +102,7 @@ export const handleGatedInterestSignUp = (
           })
 
           if (!signUpResponse) {
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_UP,
               'Failed to create account. Please try again.'
@@ -122,7 +122,7 @@ export const handleGatedInterestSignUp = (
 
           if ('status' in signUpResponse && signUpResponse.status !== 200) {
             console.log('Better-auth non-200 status:', signUpResponse.status)
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_UP,
               MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -137,7 +137,7 @@ export const handleGatedInterestSignUp = (
         return redirectToAwaitVerification(c, email)
       } catch (error) {
         console.error('Gated sign-up error:', error)
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.SIGN_UP,
           MESSAGES.REGISTRATION_GENERIC_ERROR

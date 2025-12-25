@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
-import { redirectWithMessage } from '../../lib/redirects'
+import { redirectWithError } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS, MESSAGES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
@@ -40,7 +40,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         const [ok, data, err] = validateRequest(body, GatedSignUpFormSchema)
 
         if (!ok) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             err || MESSAGES.INVALID_INPUT
@@ -59,7 +59,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
             'Database error validating sign-up code:',
             codeResult.error
           )
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -67,7 +67,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         }
 
         if (!codeResult.value) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_UP,
             'Invalid or expired sign-up code. Please check your code and try again.'
@@ -88,7 +88,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           })
 
           if (!signUpResponse) {
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_UP,
               'Failed to create account. Please try again.'
@@ -108,7 +108,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
 
           if ('status' in signUpResponse && signUpResponse.status !== 200) {
             console.log('Better-auth non-200 status:', signUpResponse.status)
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_UP,
               MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -123,7 +123,7 @@ export const handleGatedSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         return redirectToAwaitVerification(c, email)
       } catch (error) {
         console.error('Gated sign-up error:', error)
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.SIGN_UP,
           MESSAGES.REGISTRATION_GENERIC_ERROR

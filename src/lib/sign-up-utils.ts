@@ -8,7 +8,7 @@
  */
 import { Context } from 'hono'
 
-import { redirectWithMessage } from './redirects'
+import { redirectWithError, redirectWithMessage } from './redirects'
 import { addCookie } from './cookie-support'
 import { getUserIdByEmail, updateAccountTimestamp } from './db-access'
 import { PATHS, COOKIES, MESSAGES, LOG_MESSAGES } from '../constants'
@@ -108,7 +108,7 @@ export const handleSignUpResponseError = (
     )
   }
 
-  return redirectWithMessage(
+  return redirectWithError(
     c,
     fallbackPath,
     `Registration failed: ${errorMessage}`
@@ -142,11 +142,7 @@ export const handleSignUpApiError = (
     )
   }
 
-  return redirectWithMessage(
-    c,
-    fallbackPath,
-    MESSAGES.REGISTRATION_GENERIC_ERROR
-  )
+  return redirectWithError(c, fallbackPath, MESSAGES.REGISTRATION_GENERIC_ERROR)
 }
 
 /**

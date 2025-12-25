@@ -117,7 +117,7 @@ export const handleInterestSignUp = (
         }
       } catch (error) {
         console.error('Handle interest sign-up error:', error)
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.INTEREST_SIGN_UP,
           MESSAGES.GENERIC_ERROR_TRY_AGAIN

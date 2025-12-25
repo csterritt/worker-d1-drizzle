@@ -5,7 +5,7 @@
 import { Hono, Context, Next } from 'hono'
 
 import { createAuth } from '../../lib/auth'
-import { redirectWithMessage } from '../../lib/redirects'
+import { redirectWithError, redirectWithMessage } from '../../lib/redirects'
 import { PATHS, COOKIES, MESSAGES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { addCookie } from '../../lib/cookie-support'
@@ -170,7 +170,7 @@ const handleErrorResponse = async (
 ): Promise<Response | null> => {
   switch (response.status) {
     case 401:
-      return redirectWithMessage(
+      return redirectWithError(
         c,
         PATHS.AUTH.SIGN_IN,
         ERROR_MESSAGES.INVALID_CREDENTIALS
@@ -180,7 +180,7 @@ const handleErrorResponse = async (
       return handleForbiddenResponse(c, response, capturedEmail)
 
     case 400:
-      return redirectWithMessage(
+      return redirectWithError(
         c,
         PATHS.AUTH.SIGN_IN,
         ERROR_MESSAGES.CHECK_CREDENTIALS
@@ -188,7 +188,7 @@ const handleErrorResponse = async (
 
     default:
       if (response.status >= 500) {
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.SIGN_IN,
           MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -296,7 +296,7 @@ const signInHandler = async (
     return response
   } catch (error) {
     console.error('Better-auth response interceptor error:', error)
-    return redirectWithMessage(
+    return redirectWithError(
       c,
       PATHS.AUTH.SIGN_IN,
       MESSAGES.GENERIC_ERROR_TRY_AGAIN

@@ -11,7 +11,7 @@ import { secureHeaders } from 'hono/secure-headers'
 
 import { PATHS, STANDARD_SECURE_HEADERS } from '../constants'
 import { Bindings } from '../local-types'
-import { redirectWithMessage } from '../lib/redirects'
+import { redirectWithError, redirectWithMessage } from '../lib/redirects'
 import { addCookie } from '../lib/cookie-support'
 
 /**
@@ -29,12 +29,12 @@ export const handleSetDbFailures = (
     async (c) => {
       const name = c.req.param('name')
       if (!name || name.trim() === '') {
-        return redirectWithMessage(c, PATHS.ROOT, 'Invalid name parameter')
+        return redirectWithError(c, PATHS.ROOT, 'Invalid name parameter')
       }
 
       const times = c.req.param('times')
       if (!times || isNaN(Number(times))) {
-        return redirectWithMessage(c, PATHS.ROOT, 'Invalid times parameter')
+        return redirectWithError(c, PATHS.ROOT, 'Invalid times parameter')
       }
 
       addCookie(c, name, times)

@@ -6,7 +6,7 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { createAuth } from '../../lib/auth'
-import { redirectWithMessage } from '../../lib/redirects'
+import { redirectWithError } from '../../lib/redirects'
 import { PATHS, STANDARD_SECURE_HEADERS, MESSAGES } from '../../constants'
 import type { Bindings } from '../../local-types'
 import { createDbClient } from '../../db/client'
@@ -38,7 +38,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         const [ok, data, err] = validateRequest(body, SignUpFormSchema)
 
         if (!ok) {
-          return redirectWithMessage(
+          return redirectWithError(
             c,
             PATHS.AUTH.SIGN_IN,
             err || MESSAGES.INVALID_INPUT
@@ -59,7 +59,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
           })
 
           if (!signUpResponse) {
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_IN,
               MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -79,7 +79,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
 
           if ('status' in signUpResponse && signUpResponse.status !== 200) {
             console.log('Better-auth non-200 status:', signUpResponse.status)
-            return redirectWithMessage(
+            return redirectWithError(
               c,
               PATHS.AUTH.SIGN_IN,
               MESSAGES.GENERIC_ERROR_TRY_AGAIN
@@ -95,7 +95,7 @@ export const handleSignUp = (app: Hono<{ Bindings: Bindings }>): void => {
         return redirectToAwaitVerification(c, email)
       } catch (error) {
         console.error('Sign-up error:', error)
-        return redirectWithMessage(
+        return redirectWithError(
           c,
           PATHS.AUTH.SIGN_IN,
           MESSAGES.REGISTRATION_GENERIC_ERROR
