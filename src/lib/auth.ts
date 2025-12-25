@@ -14,12 +14,6 @@ import { sendConfirmationEmail, sendPasswordResetEmail } from './email-service'
 import type { Bindings } from '../local-types'
 import { DURATIONS } from '../constants'
 
-let alternateOrigin = 'http://localhost:3000/' // PRODUCTION:REMOVE
-// PRODUCTION:REMOVE-NEXT-LINE
-if (process.env.ALTERNATE_ORIGIN) {
-  alternateOrigin = process.env.ALTERNATE_ORIGIN.replace(/\$/, '') // PRODUCTION:REMOVE
-} // PRODUCTION:REMOVE
-
 /**
  * Create and configure better-auth instance
  * @param env - Cloudflare environment
@@ -28,6 +22,12 @@ if (process.env.ALTERNATE_ORIGIN) {
 export const createAuth = (env: Bindings) => {
   const db: D1Database = env.PROJECT_DB
   const dbClient = createDbClient(db)
+
+  let alternateOrigin = 'http://localhost:3000/' // PRODUCTION:REMOVE
+  // PRODUCTION:REMOVE-NEXT-LINE
+  if (env.ALTERNATE_ORIGIN) {
+    alternateOrigin = env.ALTERNATE_ORIGIN.replace(/\$/, '') // PRODUCTION:REMOVE
+  } // PRODUCTION:REMOVE
 
   return betterAuth({
     database: drizzleAdapter(dbClient, {
@@ -113,7 +113,7 @@ export const createAuth = (env: Bindings) => {
     // baseURL: 'https://your-actual-origin.com', // PRODUCTION:UNCOMMENT
     baseURL: 'http://localhost:3000', // PRODUCTION:REMOVE
     redirectTo: '/private', // Redirect to protected page after successful sign-in
-    secret: process.env.BETTER_AUTH_SECRET,
+    secret: env.BETTER_AUTH_SECRET,
   })
 }
 

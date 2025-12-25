@@ -45,6 +45,7 @@ import {
 import { setupBetterAuthResponseInterceptor } from './routes/auth/better-auth-response-interceptor'
 
 import { Bindings } from './local-types'
+import { validateEnvBindings } from './middleware/guard-sign-up-mode'
 import { handleSetClock } from './routes/auth/handle-set-clock' // PRODUCTION:REMOVE
 import { handleResetClock } from './routes/auth/handle-reset-clock' // PRODUCTION:REMOVE
 import { handleSetDbFailures } from './routes/handle-set-db-failures' // PRODUCTION:REMOVE
@@ -148,6 +149,9 @@ app.use(
 
 app.use(logger())
 app.use(renderer)
+
+// Validate required environment bindings at runtime
+app.use(validateEnvBindings)
 
 // Initialize db client for each request
 app.use(async (c, next) => {

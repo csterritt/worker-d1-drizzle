@@ -6,13 +6,14 @@ import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
 import { STANDARD_SECURE_HEADERS, SIGN_UP_MODES } from '../../constants'
+import type { Bindings } from '../../local-types'
 
 /**
  * Test-only sign-up mode detection endpoint
  * This endpoint should ONLY be available in development/test environments
  */
 
-const testSignUpModeRouter = new Hono()
+const testSignUpModeRouter = new Hono<{ Bindings: Bindings }>()
 
 /**
  * Get current sign-up mode
@@ -22,9 +23,8 @@ testSignUpModeRouter.get(
   '/',
   secureHeaders(STANDARD_SECURE_HEADERS),
   async (c) => {
-    void c
     try {
-      const currentMode = process.env.SIGN_UP_MODE || SIGN_UP_MODES.NO_SIGN_UP
+      const currentMode = c.env.SIGN_UP_MODE || SIGN_UP_MODES.NO_SIGN_UP
 
       // Return just the mode as plain text for easy parsing
       return new Response(currentMode, {

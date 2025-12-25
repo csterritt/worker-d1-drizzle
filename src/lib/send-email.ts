@@ -7,6 +7,7 @@ import retry from 'async-retry'
 import Result from 'true-myth/result'
 
 import { STANDARD_RETRY_OPTIONS } from '../constants'
+import type { Bindings } from '../local-types'
 
 /**
  * Sends an email using SMTP with the provided details
@@ -19,16 +20,17 @@ import { STANDARD_RETRY_OPTIONS } from '../constants'
  * @throws Error if SMTP configuration is missing or if sending fails
  */
 export const sendEmail = async (
+  env: Bindings,
   fromAddress: string,
   toAddress: string,
   subject: string,
   content: string
 ): Promise<void> => {
-  // Get SMTP configuration from environment variables
-  const port = process.env.SMTP_SERVER_PORT
-  const host = process.env.SMTP_SERVER_HOST
-  const user = process.env.SMTP_SERVER_USER
-  const password = process.env.SMTP_SERVER_PASSWORD
+  // Get SMTP configuration from environment bindings
+  const port = env.SMTP_SERVER_PORT
+  const host = env.SMTP_SERVER_HOST
+  const user = env.SMTP_SERVER_USER
+  const password = env.SMTP_SERVER_PASSWORD
 
   // Validate that all required SMTP configuration is present
   if (!port || !host || !user || !password) {
@@ -69,6 +71,7 @@ export const sendEmail = async (
 }
 
 export const sendOtpToUserViaEmail = async (
+  env: Bindings,
   email: string,
   otp: string,
   emailAgent: typeof sendEmail = sendEmail
@@ -76,7 +79,7 @@ export const sendOtpToUserViaEmail = async (
   let res: Result<boolean, Error>
   try {
     res = await retry(
-      () => sendOtpToUserViaEmailActual(email, otp, emailAgent),
+      () => sendOtpToUserViaEmailActual(env, email, otp, emailAgent),
       STANDARD_RETRY_OPTIONS
     )
   } catch (err) {
@@ -88,12 +91,14 @@ export const sendOtpToUserViaEmail = async (
 }
 
 const sendOtpToUserViaEmailActual = async (
+  env: Bindings,
   email: string,
   otp: string,
   emailAgent: typeof sendEmail
 ): Promise<Result<boolean, Error>> => {
   try {
     await emailAgent(
+      env,
       'noreply@cls.cloud',
       email,
       'Your Mini-Auth Verification Code',
