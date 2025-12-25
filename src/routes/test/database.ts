@@ -5,6 +5,8 @@
 import { Hono } from 'hono'
 import { secureHeaders } from 'hono/secure-headers'
 
+import { eq } from 'drizzle-orm'
+
 import { createDbClient } from '../../db/client'
 import {
   user,
@@ -258,6 +260,44 @@ testDatabaseRouter.get(
         {
           success: false,
           error: 'Failed to get database status',
+          details: error instanceof Error ? error.message : 'Unknown error',
+        },
+        500
+      )
+    }
+  }
+)
+
+/**
+ * Check if a single-use code exists in the database
+ * GET /test/database/code-exists/:code
+ */
+testDatabaseRouter.get(
+  '/code-exists/:code',
+  secureHeaders(STANDARD_SECURE_HEADERS),
+  async (c) => {
+    try {
+      const code = c.req.param('code')
+      const db = createDbClient(c.env.PROJECT_DB)
+
+      const result = await db
+        .select({ code: singleUseCode.code })
+        .from(singleUseCode)
+        .where(eq(singleUseCode.code, code))
+
+      return c.json({
+        success: true,
+        exists: result.length === 1,
+        code,
+        timestamp: new Date().toISOString(),
+      })
+    } catch (error) {
+      console.error('Failed to check code existence:', error)
+
+      return c.json(
+        {
+          success: false,
+          error: 'Failed to check code existence',
           details: error instanceof Error ? error.message : 'Unknown error',
         },
         500

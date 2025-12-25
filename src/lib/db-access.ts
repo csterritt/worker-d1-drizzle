@@ -143,7 +143,36 @@ const updateAccountTimestampActual = async (
 }
 
 /**
- * Consume a single-use code (validate and delete atomically)
+ * Validate a single-use code exists (without consuming it)
+ * @param db - Database instance
+ * @param code - The code to validate
+ * @returns Promise<Result<boolean, Error>> - true if code exists, false if not
+ */
+export const validateSingleUseCode = (
+  db: DrizzleClient,
+  code: string
+): Promise<Result<boolean, Error>> =>
+  withRetry('validateSingleUseCode', () =>
+    validateSingleUseCodeActual(db, code)
+  )
+
+const validateSingleUseCodeActual = async (
+  db: DrizzleClient,
+  code: string
+): Promise<Result<boolean, Error>> => {
+  try {
+    const result = await db
+      .select({ code: singleUseCode.code })
+      .from(singleUseCode)
+      .where(eq(singleUseCode.code, code))
+    return Result.ok(result.length === 1)
+  } catch (e) {
+    return Result.err(e instanceof Error ? e : new Error(String(e)))
+  }
+}
+
+/**
+ * Consume a single-use code (delete it from the database)
  * @param db - Database instance
  * @param code - The code to consume
  * @returns Promise<Result<boolean, Error>> - true if code existed and was consumed, false if code didn't exist

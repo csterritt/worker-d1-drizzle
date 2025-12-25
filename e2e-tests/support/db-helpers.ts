@@ -62,6 +62,39 @@ export const clearSessions = async (): Promise<void> => {
 }
 
 /**
+ * Check if a single-use code exists in the database
+ * @param code - The code to check
+ * @returns Promise<boolean> - true if code exists, false otherwise
+ */
+export const checkCodeExists = async (code: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/test/database/code-exists/${encodeURIComponent(code)}`,
+      { method: 'GET' }
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+
+    const result = (await response.json()) as {
+      success: boolean
+      exists: boolean
+      error?: string
+    }
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to check code existence')
+    }
+
+    return result.exists
+  } catch (error) {
+    console.error('Failed to check code existence:', error)
+    throw error
+  }
+}
+
+/**
  * Seed database with test data
  * Calls test-only server endpoint to seed database
  */
