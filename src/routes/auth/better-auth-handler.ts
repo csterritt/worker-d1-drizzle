@@ -70,11 +70,6 @@ export const setupBetterAuth = (app: Hono<{ Bindings: Bindings }>): void => {
     }
   })
 
-  // Add a simple test route for debugging (after wildcard)
-  app.get('/api/auth/test', async (c: AppContext) => {
-    return c.json({ message: 'Test route working', url: c.req.url })
-  })
-
   console.log('✅ Better-auth routes setup complete')
 }
 
