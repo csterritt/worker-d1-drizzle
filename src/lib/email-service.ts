@@ -143,8 +143,8 @@ export const sendConfirmationEmail = async (
   console.log('🔔 sendConfirmationEmail called:', {
     email,
     name,
-    confirmationUrl,
-    token,
+    confirmationUrl, // PRODUCTION:REMOVE
+    token, // PRODUCTION:REMOVE
   })
 
   try {
@@ -212,8 +212,8 @@ export const sendPasswordResetEmail = async (
   console.log('🔔 sendPasswordResetEmail called:', {
     email,
     name,
-    resetUrl,
-    token,
+    resetUrl, // PRODUCTION:REMOVE
+    token, // PRODUCTION:REMOVE
   })
 
   try {

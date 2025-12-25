@@ -40,7 +40,7 @@ export const setupBetterAuth = (app: Hono<{ Bindings: Bindings }>): void => {
     console.log('🔔 Better-auth route hit:', c.req.method, c.req.url)
     console.log('🔧 Environment check:', {
       PROJECT_DB: !!c.env.PROJECT_DB,
-      envKeys: Object.keys(c.env || {}),
+      envKeys: Object.keys(c.env || {}), // PRODUCTION:REMOVE
     })
 
     try {
@@ -52,14 +52,14 @@ export const setupBetterAuth = (app: Hono<{ Bindings: Bindings }>): void => {
       console.log('🔧 Request details:', {
         method: c.req.method,
         url: c.req.url,
-        headers: Object.fromEntries(c.req.raw.headers.entries()),
+        headers: Object.fromEntries(c.req.raw.headers.entries()), // PRODUCTION:REMOVE
       })
 
       const response = await auth.handler(c.req.raw)
       console.log('✅ Auth handler response:', {
         status: response.status,
         statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
+        headers: Object.fromEntries(response.headers.entries()), // PRODUCTION:REMOVE
       })
 
       return response
