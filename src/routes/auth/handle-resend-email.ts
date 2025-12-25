@@ -123,7 +123,7 @@ export const handleResendEmail = (app: Hono<{ Bindings: Bindings }>): void => {
           await auth.api.sendVerificationEmail({
             body: {
               email: email,
-              callbackURL: `${c.req.url.split('/')[0]}//${c.req.url.split('/')[2]}${PATHS.AUTH.SIGN_IN}`,
+              callbackURL: `${new URL(c.req.url).origin}${PATHS.AUTH.SIGN_IN}`,
             },
           })
 
