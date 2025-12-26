@@ -4,7 +4,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 def check_git_modified_files
-    res = `/opt/homebrew/bin/git diff --name-only`.split(/[\r\n]+/)
+    res = `git diff --name-only`.split(/[\r\n]+/)
     if res.length > 0
         $stderr.puts "Error -- you have checked out files."
         $stderr.puts "All must be checked in before you can deploy."
@@ -58,7 +58,7 @@ if ARGV.length == 0
     check_git_modified_files()
 end
 
-res = `/opt/homebrew/bin/rg -l PRODUCTION | grep -v clean-for-production.rb`
+res = `rg -l PRODUCTION | grep -v clean-for-production.rb`
 files = res.split(/[\r\n]+/)
 
 files.each do |file_name|
