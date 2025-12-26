@@ -224,23 +224,39 @@ export const checkInterestedEmailExists = (
     checkInterestedEmailExistsActual(db, email)
   )
 
+const isUniqueConstraintError = (error: unknown): boolean => {
+  if (error instanceof Error) {
+    const message = error.message.toUpperCase()
+    if (
+      message.includes('UNIQUE CONSTRAINT') ||
+      message.includes('UNIQUE_CONSTRAINT') ||
+      message.includes('SQLITE_CONSTRAINT_UNIQUE') ||
+      message.includes('SQLITE_CONSTRAINT') ||
+      message.includes('DUPLICATE KEY') ||
+      message.includes('D1_ERROR: UNIQUE')
+    ) {
+      return true
+    }
+    // Check the cause property for nested errors (Drizzle wraps D1 errors)
+    const cause = (error as { cause?: unknown }).cause
+    if (cause) {
+      return isUniqueConstraintError(cause)
+    }
+  }
+  return false
+}
+
 const addInterestedEmailActual = async (
   db: DrizzleClient,
   email: string
 ): Promise<Result<boolean, Error>> => {
   try {
-    const existingEmails = await db
-      .select()
-      .from(interestedEmails)
-      .where(eq(interestedEmails.email, email))
-
-    if (existingEmails.length > 0) {
-      return Result.ok(false)
-    }
-
     await db.insert(interestedEmails).values({ email })
     return Result.ok(true)
   } catch (e) {
+    if (isUniqueConstraintError(e)) {
+      return Result.ok(false)
+    }
     return Result.err(e instanceof Error ? e : new Error(String(e)))
   }
 }
