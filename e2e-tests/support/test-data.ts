@@ -3,6 +3,11 @@
  * Eliminates hardcoded credentials scattered across test files
  */
 
+export type TestUser = {
+  email: string
+  password: string
+  name: string
+}
 export const TEST_USERS = {
   // Known user from seeded test database
   KNOWN_USER: {

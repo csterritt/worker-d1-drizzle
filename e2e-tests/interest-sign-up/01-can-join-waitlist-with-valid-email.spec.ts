@@ -8,7 +8,7 @@ import {
 } from '../support/workflow-helpers'
 
 test.describe('Interest Sign-Up Mode: Valid Email Tests', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async () => {
     await skipIfNotMode('INTEREST_SIGN_UP')
   })
 

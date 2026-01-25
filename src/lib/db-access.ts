@@ -10,7 +10,7 @@ import retry from 'async-retry'
 import Result from 'true-myth/result'
 import { eq } from 'drizzle-orm'
 
-import { user, account, singleUseCode, interestedEmails } from '../db/schema'
+import { user, account, singleUseCode, interestedEmail } from '../db/schema'
 import { STANDARD_RETRY_OPTIONS } from '../constants'
 import type { DrizzleClient } from '../local-types'
 
@@ -251,7 +251,7 @@ const addInterestedEmailActual = async (
   email: string
 ): Promise<Result<boolean, Error>> => {
   try {
-    await db.insert(interestedEmails).values({ email })
+    await db.insert(interestedEmail).values({ email })
     return Result.ok(true)
   } catch (e) {
     if (isUniqueConstraintError(e)) {
@@ -268,8 +268,8 @@ const checkInterestedEmailExistsActual = async (
   try {
     const existingEmails = await db
       .select()
-      .from(interestedEmails)
-      .where(eq(interestedEmails.email, email))
+      .from(interestedEmail)
+      .where(eq(interestedEmail.email, email))
     return Result.ok(existingEmails.length > 0)
   } catch (e) {
     return Result.err(e instanceof Error ? e : new Error(String(e)))

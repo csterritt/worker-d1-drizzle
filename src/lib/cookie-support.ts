@@ -10,6 +10,7 @@ import { Context } from 'hono'
 import { setCookie, deleteCookie, getCookie } from 'hono/cookie'
 
 import { COOKIES } from '../constants'
+import { Bindings } from '../local-types'
 
 /**
  * Retrieves a cookie value
@@ -17,8 +18,8 @@ import { COOKIES } from '../constants'
  * @param name - Cookie name
  * @returns Cookie value or undefined if not found
  */
-export const retrieveCookie = (
-  c: Context,
+export const retrieveCookie = <E extends { Bindings: Bindings }>(
+  c: Context<E, any, any>,
   name: string
 ): string | undefined => {
   return getCookie(c, name)
@@ -31,8 +32,8 @@ export const retrieveCookie = (
  * @param value - Cookie value
  * @param extraOptions - Additional cookie options
  */
-export const addCookie = (
-  c: Context,
+export const addCookie = <E extends { Bindings: Bindings }>(
+  c: Context<E, any, any>,
   name: string,
   value: string,
   extraOptions?: Record<string, unknown>
@@ -50,6 +51,9 @@ export const addCookie = (
  * @param c - Hono context
  * @param name - Cookie name
  */
-export const removeCookie = (c: Context, name: string): void => {
+export const removeCookie = <E extends { Bindings: Bindings }>(
+  c: Context<E, any, any>,
+  name: string
+): void => {
   deleteCookie(c, name, COOKIES.STANDARD_COOKIE_OPTIONS)
 }

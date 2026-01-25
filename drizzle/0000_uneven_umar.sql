@@ -15,6 +15,11 @@ CREATE TABLE `account` (
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `interestedEmail` (
+	`email` text PRIMARY KEY NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `interestedEmail_email_unique` ON `interestedEmail` (`email`);--> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
@@ -28,9 +33,13 @@ CREATE TABLE `session` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `session_token_unique` ON `session` (`token`);--> statement-breakpoint
+CREATE TABLE `singleUseCode` (
+	`code` text PRIMARY KEY NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `user` (
 	`id` text PRIMARY KEY NOT NULL,
-	`name` text,
+	`name` text NOT NULL,
 	`email` text NOT NULL,
 	`emailVerified` integer DEFAULT false NOT NULL,
 	`image` text,
@@ -38,6 +47,7 @@ CREATE TABLE `user` (
 	`updatedAt` integer NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `user_name_unique` ON `user` (`name`);--> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint
 CREATE TABLE `verification` (
 	`id` text PRIMARY KEY NOT NULL,

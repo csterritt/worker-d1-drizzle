@@ -15,7 +15,7 @@ import { COOKIES, HTML_STATUS } from '../constants'
  * @returns Response object with redirect and cookie
  */
 export const redirectWithMessage = (
-  c: Context,
+  c: Context<any, any, any>,
   redirectUrl: string,
   message: string
 ): Response => {
@@ -34,7 +34,7 @@ export const redirectWithMessage = (
  * @returns Response object with redirect and cookie
  */
 export const redirectWithError = (
-  c: Context,
+  c: Context<any, any, any>,
   redirectUrl: string,
   errorMessage: string
 ): Response => {

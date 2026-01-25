@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { verifyOnSignInPage } from '../support/page-verifiers'
 import { verifyElementExists } from '../support/finders'
 import { skipIfNotMode } from '../support/mode-helpers'
 import { navigateToSignIn } from '../support/navigation-helpers'

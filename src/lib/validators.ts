@@ -240,22 +240,3 @@ export function validateRequest<
   }
 }
 
-/**
- * Helper function to extract a string value from FormData
- * @param formData - The FormData object
- * @param key - The key to extract
- * @returns The string value or empty string if not found
- */
-export const getFormValue = (formData: FormData, key: string): string => {
-  const value = formData.get(key)
-  if (value === null || value === undefined) {
-    return ''
-  }
-
-  if (typeof value === 'string') {
-    return value
-  }
-
-  // Handle File objects (shouldn't happen for text fields, but be safe)
-  return ''
-}

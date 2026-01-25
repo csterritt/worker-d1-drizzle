@@ -3,7 +3,6 @@ import { test, expect } from '@playwright/test'
 import { testWithDatabase } from '../support/test-helpers'
 import { skipIfNotMode } from '../support/mode-helpers'
 import { completeSignUpFlow } from '../support/workflow-helpers'
-import { BASE_URLS } from '../support/test-data'
 
 test(
   'sign up with good email and password',

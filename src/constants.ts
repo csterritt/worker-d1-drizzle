@@ -119,7 +119,6 @@ export const VALIDATION = {
   EMAIL_INVALID: 'Please enter a valid email address.',
   NAME_REQUIRED: 'Name is required',
   PASSWORD_MIN_LENGTH: 'Password must be at least 8 characters long.',
-  COLLECTION_NAME_REQUIRED: 'Collection name is required.',
 } as const
 
 /**
@@ -133,11 +132,8 @@ export const MESSAGES = {
   VERIFY_EMAIL_BEFORE_SIGN_IN:
     'Please verify your email address before signing in. Check your email for a verification link.',
   GENERIC_ERROR_TRY_AGAIN: 'Something went wrong. Please try again.',
-  COLLECTION_NOT_FOUND_OR_NO_PERMISSION_DELETE:
-    'Collection not found or you do not have permission to delete it.',
   REGISTRATION_GENERIC_ERROR:
     'Something went wrong during registration. Please try again.',
-  COLLECTION_NAME_EXISTS: 'You already have a collection with that name.',
   RESET_PASSWORD_MESSAGE:
     "If an account with that email exists, we've sent you a password reset link.",
   ACCOUNT_ALREADY_EXISTS:
@@ -204,7 +200,6 @@ export const STANDARD_SECURE_HEADERS: SecureHeadersConfig = {
     frameAncestors: ["'self'"],
     frameSrc: ["'self'"],
     imgSrc: ["'self'", 'data:'],
-    manifestSrc: ["'self'"],
     mediaSrc: ["'self'"],
     objectSrc: ["'none'"],
     reportTo: 'endpoint-1',

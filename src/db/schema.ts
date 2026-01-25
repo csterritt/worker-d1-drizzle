@@ -13,7 +13,7 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
  */
 export const user = sqliteTable('user', {
   id: text('id').primaryKey(),
-  name: text('name'),
+  name: text('name').notNull().unique(),
   email: text('email').notNull().unique(),
   emailVerified: integer('emailVerified', { mode: 'boolean' })
     .default(false)
@@ -80,7 +80,7 @@ export const singleUseCode = sqliteTable('singleUseCode', {
   code: text('code').primaryKey(),
 })
 
-export const interestedEmails = sqliteTable('interestedEmails', {
+export const interestedEmail = sqliteTable('interestedEmail', {
   email: text('email').primaryKey().unique(),
 })
 
@@ -90,17 +90,17 @@ export const schema = {
   session,
   account,
   verification,
-  interestedEmails,
+  interestedEmail,
 }
 
 export type User = typeof user.$inferSelect
 export type Session = typeof session.$inferSelect
 export type Account = typeof account.$inferSelect
 export type Verification = typeof verification.$inferSelect
-export type InterestedEmail = typeof interestedEmails.$inferSelect
+export type InterestedEmail = typeof interestedEmail.$inferSelect
 
 export type NewUser = typeof user.$inferInsert
 export type NewSession = typeof session.$inferInsert
 export type NewAccount = typeof account.$inferInsert
 export type NewVerification = typeof verification.$inferInsert
-export type NewInterestedEmail = typeof interestedEmails.$inferInsert
+export type NewInterestedEmail = typeof interestedEmail.$inferInsert

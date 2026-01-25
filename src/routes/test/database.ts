@@ -13,7 +13,7 @@ import {
   account,
   session,
   singleUseCode,
-  interestedEmails,
+  interestedEmail,
 } from '../../db/schema'
 import { STANDARD_SECURE_HEADERS } from '../../constants'
 
@@ -40,7 +40,7 @@ testDatabaseRouter.delete(
       await db.delete(account)
       await db.delete(user)
       await db.delete(singleUseCode)
-      await db.delete(interestedEmails)
+      await db.delete(interestedEmail)
 
       console.log('Test database cleared successfully')
 
@@ -240,7 +240,7 @@ testDatabaseRouter.get(
       const accountCount = await db.select().from(account)
       const sessionCount = await db.select().from(session)
       const singleUseCodeCount = await db.select().from(singleUseCode)
-      const interestedEmailsCount = await db.select().from(interestedEmails)
+      const interestedEmailCount = await db.select().from(interestedEmail)
 
       return c.json({
         success: true,
@@ -249,7 +249,7 @@ testDatabaseRouter.get(
           accounts: accountCount.length,
           sessions: sessionCount.length,
           singleUseCodes: singleUseCodeCount.length,
-          interestedEmails: interestedEmailsCount.length,
+          interestedEmail: interestedEmailCount.length,
         },
         timestamp: new Date().toISOString(),
       })

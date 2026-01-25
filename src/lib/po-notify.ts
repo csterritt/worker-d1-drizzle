@@ -13,6 +13,7 @@ const post = async (url: string, data: PushoverMessage): Promise<Response> => {
   /**
    * gatherResponse awaits and returns a response body as a string.
    * Use await gatherResponse(...) in an async function to get the response body
+   * @param {Response} response
    */
   const gatherResponse = async (response: Response): Promise<string> => {
     const { headers } = response

@@ -13,6 +13,7 @@ import {
   navigateToSignIn,
 } from '../support/navigation-helpers'
 import { submitSignUpForm, submitSignInForm } from '../support/form-helpers'
+import { BASE_URLS } from '../support/test-data'
 
 test(
   'cannot access private page before email verification',
@@ -37,7 +38,7 @@ test(
     await verifyOnAwaitVerificationPage(page)
 
     // Now try to directly access the private page without being signed in
-    await page.goto('http://localhost:3000/private')
+    await page.goto(BASE_URLS.PRIVATE)
 
     // Should be redirected back to sign-in page with access denied message
     await verifyOnSignInPage(page)
@@ -55,7 +56,7 @@ test(
     )
 
     // Try to access private page again after failed sign-in attempt
-    await page.goto('http://localhost:3000/private')
+    await page.goto(BASE_URLS.PRIVATE)
 
     // Should still be redirected back to sign-in page with access denied message
     await verifyOnSignInPage(page)

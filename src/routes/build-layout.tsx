@@ -18,6 +18,7 @@ import { version } from '../version'
  * @returns TSX element with layout
  * @param c - Hono context
  * @param children - TSX children
+ * @param extraMessage - Optional extra message to display
  */
 export const useLayout = (
   c: Context,

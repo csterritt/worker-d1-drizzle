@@ -33,7 +33,7 @@ const renderResetPassword = (token: string) => {
           {/* Reset password form */}
           <form
             method='post'
-            action='/auth/reset-password'
+            action={PATHS.AUTH.RESET_PASSWORD}
             aria-label='Reset password form'
             noValidate
           >
